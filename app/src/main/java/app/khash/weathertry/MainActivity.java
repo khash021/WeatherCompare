@@ -34,6 +34,8 @@ public class MainActivity extends AppCompatActivity {
     //TODO: do the forecast
     //TODO: options for changing units
     //TODO: sunrise and sunset
+    //TODO: make these buttons into fragments so we can swipe right and left
+    //TODO: create a comparison table
 
     private final static String TAG = MainActivity.class.getSimpleName();
     private final static String CANMORE = "canmore";
@@ -67,7 +69,6 @@ public class MainActivity extends AppCompatActivity {
                     OpenWeatherQueryTask openWeatherQueryTask = new OpenWeatherQueryTask();
                     openWeatherQueryTask.execute(canmoreUrl);
                 }
-
             }
         });
 
@@ -86,7 +87,6 @@ public class MainActivity extends AppCompatActivity {
                     AccuWeatherQueryTask accuWeatherQueryTask = new AccuWeatherQueryTask();
                     accuWeatherQueryTask.execute(canmoreUrl);
                 }
-
             }
         });
 
@@ -101,9 +101,9 @@ public class MainActivity extends AppCompatActivity {
                 if (url == null) {
                     showError();
                 } else {
-
+                    DarkSkyQueryTask darkSkyQueryTask = new DarkSkyQueryTask();
+                    darkSkyQueryTask.execute(url);
                 }
-
             }
         });
 
@@ -124,9 +124,11 @@ public class MainActivity extends AppCompatActivity {
             String iconUrl = results.substring(index + 1);
             Uri iconUri = createUri(iconUrl);
             //use glide to set it
+            mIconImage.setVisibility(View.VISIBLE);
             Glide.with(this).load(iconUri).into(mIconImage);
         } else {
             mResultsText.setText(results);
+            mIconImage.setVisibility(View.INVISIBLE);
         }
 
     }//showResults

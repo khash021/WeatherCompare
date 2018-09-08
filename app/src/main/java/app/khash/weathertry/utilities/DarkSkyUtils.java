@@ -13,9 +13,26 @@ public class DarkSkyUtils {
 
     private static final String TAG = DarkSkyUtils.class.getSimpleName();
 
-    static final String DARK_SKY_BASE_URL = "https://api.darksky.net/forecast/";
+    /**
+     * The general outline is:
+     * "https://api.darksky.net/forecast/" + apiKey + "/" + lat + "," + long + "?" + exclude + "?" + unit;
+     *
+     * where exclude=[block] the block should be a comma-delimeted list (without spaces):
+     *  currently, minutely, hourly, daily,alerts, flags
+     *
+     */
 
-    static final String API_KEY = "f5e4285ed1e89d653fd1d99b04e375b7";
+    private static final String DARK_SKY_BASE_URL = "https://api.darksky.net/forecast/";
+
+    private static final String API_KEY = "f5e4285ed1e89d653fd1d99b04e375b7";
+
+    private static final String UNITS = "units=";
+
+    private static final String UNITS_METRIC = "ca"; //same as si except speed is km/h
+
+    private static final String EXCLUDE = "exclude=";
+
+    private static final String EXCLUDE_BLOCK_CURRENT = "minutely,hourly,daily,alerts,flags";
 
 
     /**
@@ -25,7 +42,8 @@ public class DarkSkyUtils {
      */
     public static URL createWeatherUrlId(String id) {
 
-        String url = DARK_SKY_BASE_URL + API_KEY + id;
+        String url = DARK_SKY_BASE_URL + API_KEY + id + "?" + EXCLUDE + EXCLUDE_BLOCK_CURRENT +
+                "?" + UNITS + UNITS_METRIC;
         Log.d(TAG, "URL: " + url );
 
         URL queryUrl = null;

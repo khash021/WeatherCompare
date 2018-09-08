@@ -16,7 +16,7 @@ public class ParseJSON {
 
     private static final String TAG = ParseJSON.class.getSimpleName();
 
-    //constants for OpenWeather json (OpenWeather)
+    //constants for OpenWeather json
     private static final String JSON_MAIN = "main";
     private static final String JSON_TEMP = "temp";
     private static final String JSON_PRESSURE = "pressure";
@@ -30,12 +30,27 @@ public class ParseJSON {
     private static final String JSON_CLOUDS_ALL = "all";
     private static final String JSON_ICON = "icon";
 
-    //constants for OpenWeather json (AccuWeather)
+    //constants for AccuWeather json
     private static final String JSON_AW_DESCRIPTION = "WeatherText";
     private static final String JSON_AW_TEMPERATURE = "Temperature";
     private static final String JSON_AW_TEMPERATURE_METRIC = "Metric";
     private static final String JSON_AW_TEMPERATURE_METRIC_VALUE = "Value";
     private static final String JSON_AW_ICON = "WeatherIcon";
+
+    private static final String JSON_DS_CURRENTLY = "currently";
+    private static final String JSON_DS_SUMMARY = "summary";
+    private static final String JSON_DS_ICON = "icon";
+    private static final String JSON_DS_TEMPERATURE = "temperature";
+    private static final String JSON_DS_DEW_POINT = "dewPoint";
+    private static final String JSON_DS_HUMIDITY = "humidity";
+    private static final String JSON_DS_PRESSURE = "pressure";
+    private static final String JSON_DS_WIND_SPEED = "windSpeed";
+    private static final String JSON_DS_WIND_GUST = "windGust";
+    private static final String JSON_DS_WIND_DIRECTION = "windBearing";
+    private static final String JSON_DS_CLOUD_COVER = "cloudCover";
+    private static final String JSON_DS_VISIBILITY = "visibility";
+    private static final String JSON_DS_POP = "precipProbability";
+    private static final String JSON_DS_PRECIP_TYPE = "precipType";
 
     //pictures
     private static final String OPENWEATHER_ICON_BASE_URL = "http://openweathermap.org/img/w/";
@@ -54,10 +69,17 @@ public class ParseJSON {
     private static final String UNIT_PERCENTAGE = " %";
 
     private static final String WIND = "Wind: ";
+    private static final String WIND_GUST = "Gusting  ";
     private static final String WIND_SPEED_UNIT = " km/h";
     private static final String WIND_DIRECTION = " from: ";
 
+    private static final String DEW_POINT = "Dew point: ";
+    private static final String POP = "POP: ";
+    private static final String VISIBILITY = "Visibility: ";
+    private static final String UNIT_KM = " km";
+
     private static final String CLOUD_COVERAGE = "Cloud coverage:  ";
+    private static final String CHANCE_OF = " chance of ";
 
     private final static String LINE_BREAK = "\n";
 
@@ -180,32 +202,65 @@ public class ParseJSON {
             return null;
         }//if
 
-        String description, temp, pressure, humidity, windSpeed, windDirection, cloudCoverage, icon;
+        String description, temp, pressure, dewPoint, humidity, windSpeed, windGust, windDirection,
+                cloudCoverage, icon, pop, precipType, visibility;
 
-        //create the main array
-        JSONArray forecastArray = new JSONArray(jsonString);
+        //create the main object
+        JSONObject forecastObject = new JSONObject(jsonString);
 
-        //get the first element of the array containing all the current weather data
-        JSONObject forecastObject = forecastArray.getJSONObject(0);
+        JSONObject currentObject = forecastObject.getJSONObject(JSON_DS_CURRENTLY);
 
-        description = forecastObject.optString(JSON_AW_DESCRIPTION);
+        description = currentObject.optString(JSON_DS_SUMMARY);
 
-        JSONObject tempObject  = forecastObject.getJSONObject(JSON_AW_TEMPERATURE);
-        JSONObject metricObject = tempObject.getJSONObject(JSON_AW_TEMPERATURE_METRIC);
-        double tempDouble = metricObject.optDouble(JSON_AW_TEMPERATURE_METRIC_VALUE);
-        temp = String.valueOf(tempDouble);
+        double popDouble = currentObject.optDouble(JSON_DS_POP);
+        pop = Conversions.decimalToPercentage(popDouble);
 
-        int iconId = forecastObject.optInt(JSON_AW_ICON);
-        if (iconId < 10) {
-            icon = "0" + iconId;
-        } else {
-            icon = String.valueOf(iconId);
+        precipType = currentObject.optString(JSON_DS_PRECIP_TYPE);
+        if (!(TextUtils.isEmpty(precipType) || precipType.length() < 2)) {
+            precipType = Conversions.capitalizeFirst(precipType);
+            precipType = CHANCE_OF + precipType;
         }
-        icon = ACCUWEATHER_ICON_BASE_URL + icon + ACCUWEATHER_ICON_EXTENSION;
+
+
+        double tempDouble = currentObject.optDouble(JSON_DS_TEMPERATURE);
+        temp = Conversions.farToCel(tempDouble);
+
+        double dewDouble = currentObject.optDouble(JSON_DS_DEW_POINT);
+        dewPoint = Conversions.farToCel(dewDouble);
+
+        double humidDouble = currentObject.optDouble(JSON_DS_HUMIDITY);
+        humidity = Conversions.decimalToPercentage(humidDouble);
+
+        double pressDouble = currentObject.optDouble(JSON_DS_PRESSURE);
+        pressure = Conversions.removeDecimal(pressDouble);
+
+        double windSpeedDouble = currentObject.optDouble(JSON_DS_WIND_SPEED);
+        windSpeed = Conversions.mileToKm(windSpeedDouble);
+
+        double windGustDouble = currentObject.optDouble(JSON_DS_WIND_GUST);
+        windGust = Conversions.mileToKm(windGustDouble);
+
+        double windDirDouble = currentObject.optDouble(JSON_DS_WIND_DIRECTION);
+        windDirection = Conversions.degreeToDirection(windDirDouble);
+
+        double cloudCoverDouble = currentObject.optDouble(JSON_DS_CLOUD_COVER);
+        cloudCoverage = Conversions.decimalToPercentage(cloudCoverDouble);
+
+        double visDouble = currentObject.optDouble(JSON_DS_VISIBILITY);
+        visibility = Conversions.mileToKm(visDouble);
+
+        icon = currentObject.optString(JSON_DS_ICON);
 
         String results = description + LINE_BREAK +
                 TEMPERATURE + temp + TEMPERATURE_UNIT_METRIC + LINE_BREAK +
-                ";" + icon;
+                DEW_POINT + dewPoint + TEMPERATURE_UNIT_METRIC + LINE_BREAK +
+                PRESSURE + pressure + PRESSURE_UNIT + LINE_BREAK +
+                HUMIDITY + humidity + UNIT_PERCENTAGE + LINE_BREAK +
+                WIND + windSpeed + WIND_SPEED_UNIT + " " + windDirection + " " + WIND_GUST +
+                windGust +  LINE_BREAK +
+                CLOUD_COVERAGE + cloudCoverage + UNIT_PERCENTAGE + LINE_BREAK +
+                POP + pop +UNIT_PERCENTAGE + precipType + LINE_BREAK +
+                VISIBILITY + visibility + UNIT_KM;
 
         return results;
     }//parseDarkSkyCurrent

@@ -1,5 +1,6 @@
 package app.khash.weathertry.utilities;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 public class Conversions {
@@ -53,8 +54,39 @@ public class Conversions {
         //TODO: use locale
         String output = String.format("%.1f", kmh);
         return output;
-
     }//meterToKmh
+
+    public static String farToCel (double far) {
+        double cel = (far - 32) * 5 / 9;
+        String output = String.format("%.0f", cel);
+        return output;
+    }//farToCel
+
+    public static String decimalToPercentage(double dec) {
+        double perc = dec * 100;
+        String output = String.format("%.0f", perc);
+        return output;
+    }//decimalToPercentage
+
+    public static String capitalizeFirst (String s) {
+        //check to makes sure it is not empty
+        if (s == null || TextUtils.isEmpty(s)) {
+            return "";
+        }
+        String output = s.substring(0,1).toUpperCase() + s.substring(1);
+        return output;
+    }//capitalizeFirst
+
+    public static String mileToKm (double mile) {
+        double km = mile * 1.60934;
+        String output = String.format("%.0f", km);
+        return output;
+    }//mileToKm
+
+    public static String removeDecimal (double d) {
+        String output = String.format("%.0f", d);
+        return output;
+    }//removeDecimal
 
     //helper method for limiting the decimal points of a string
     private String limitDecimal(String s) {
