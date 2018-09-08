@@ -43,8 +43,6 @@ public class ParseJSON {
     private static final String ACCUWEATHER_ICON_BASE_URL = "https://developer.accuweather.com/sites/default/files/";
     private static final String ACCUWEATHER_ICON_EXTENSION = "-s.png";
 
-    private final static int DECIMAL_POINTS = 1;
-
     //some constants for results
     private static final String TEMPERATURE = "Temperature: ";
     private static final String TEMPERATURE_UNIT_METRIC = " °C";
@@ -56,7 +54,7 @@ public class ParseJSON {
     private static final String UNIT_PERCENTAGE = " %";
 
     private static final String WIND = "Wind: ";
-    private static final String WIND_SPEED_UNIT = " m/s";
+    private static final String WIND_SPEED_UNIT = " km/h";
     private static final String WIND_DIRECTION = " from: ";
 
     private static final String CLOUD_COVERAGE = "Cloud coverage:  ";
@@ -99,8 +97,17 @@ public class ParseJSON {
 
         //get a reference to the wind
         JSONObject windObject = forecastJson.getJSONObject(JSON_WIND);
-        windSpeed = windObject.optString(JSON_WIND_SPEED);
-        windDirection = windObject.optString(JSON_WIND_DIRECTION);
+
+        //get the values
+        double windSpeedDouble = windObject.optDouble(JSON_WIND_SPEED);
+        double windDirectionDouble = windObject.optDouble(JSON_WIND_DIRECTION);
+
+        //convert the values
+        windDirection = Conversions.degreeToDirection(windDirectionDouble);
+        windSpeed = Conversions.meterToKmh(windSpeedDouble);
+
+//        windSpeed = windObject.optString(JSON_WIND_SPEED);
+//        windDirection = windObject.optString(JSON_WIND_DIRECTION);
 
         //cloud cover
         JSONObject cloudObject = forecastJson.getJSONObject(JSON_CLOUD);
@@ -160,14 +167,48 @@ public class ParseJSON {
         return results;
     }//parseAccuWeatherCurrent
 
-    //helper method for limiting the decimal points of a string
-    private String limitDecimal(String s) {
-        if (!(s.contains("."))) {
-            return s;
+    /**
+     * This method is for parsing the current weather from DarkSky
+     * @param jsonString : raw JSON response from the server
+     * @return : formatted current weather string to be represented in the UI
+     * @throws JSONException
+     */
+    public static String parseDarkSkyCurrent(String jsonString) throws JSONException {
+
+        //dummy check for empty or null input
+        if (jsonString == null || TextUtils.isEmpty(jsonString)) {
+            return null;
+        }//if
+
+        String description, temp, pressure, humidity, windSpeed, windDirection, cloudCoverage, icon;
+
+        //create the main array
+        JSONArray forecastArray = new JSONArray(jsonString);
+
+        //get the first element of the array containing all the current weather data
+        JSONObject forecastObject = forecastArray.getJSONObject(0);
+
+        description = forecastObject.optString(JSON_AW_DESCRIPTION);
+
+        JSONObject tempObject  = forecastObject.getJSONObject(JSON_AW_TEMPERATURE);
+        JSONObject metricObject = tempObject.getJSONObject(JSON_AW_TEMPERATURE_METRIC);
+        double tempDouble = metricObject.optDouble(JSON_AW_TEMPERATURE_METRIC_VALUE);
+        temp = String.valueOf(tempDouble);
+
+        int iconId = forecastObject.optInt(JSON_AW_ICON);
+        if (iconId < 10) {
+            icon = "0" + iconId;
         } else {
-            int index = s.indexOf(".");
-            return s.substring(0, index + DECIMAL_POINTS + 1);
+            icon = String.valueOf(iconId);
         }
-    }//onDecimal
+        icon = ACCUWEATHER_ICON_BASE_URL + icon + ACCUWEATHER_ICON_EXTENSION;
+
+        String results = description + LINE_BREAK +
+                TEMPERATURE + temp + TEMPERATURE_UNIT_METRIC + LINE_BREAK +
+                ";" + icon;
+
+        return results;
+    }//parseDarkSkyCurrent
+
 
 }//class
