@@ -8,32 +8,44 @@
     tools:context=".MainActivity">
 
     <Button
-        android:id="@+id/button_canmore_current"
+        android:id="@+id/button_canmore_current_open_weather"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:text="Canmore - Now"/>
+        android:text="Canmore - OW"/>
 
     <Button
-        android:id="@+id/button_canmore_forecast"
+        android:id="@+id/button_canmore_forecast_accu_weather"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:text="Canmore - 5 day"/>
+        android:text="Canmore - Accu"/>
+
+    <ImageView
+        android:id="@+id/image_icon"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_margin="22dp"
+        android:gravity="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/button_canmore_current_open_weather"
+        android:scaleType="center" />
 
     <TextView
         android:id="@+id/text_results"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="22dp"
+        android:textSize="16sp"
         android:gravity="center"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/button_canmore_current"/>
+        app:layout_constraintTop_toBottomOf="@id/image_icon"/>
 
     <ProgressBar
         android:id="@+id/progress_bar"

@@ -11,16 +11,16 @@ import java.util.Scanner;
 
 /**
  *
- * Responsible for creating the Url using different parameters
+ * Responsible for creating the Url using different parameters for OpenWeather
  */
 
-public class NetworkUtils {
+public class OpenWeatherUtils {
 
-    private final static String TAG = NetworkUtils.class.getSimpleName();
+    private final static String TAG = OpenWeatherUtils.class.getSimpleName();
 
     static final String OPENWEATHER_WEATHER_BASE_URL = "https://api.openweathermap.org/data/2.5/weather?id=";
 
-    static final String OPENWEATHER_FORECAST_BASE_URL = "https://samples.openweathermap.org/data/2.5/forecast?id=";
+    static final String OPENWEATHER_FORECAST_BASE_URL = "https://api.openweathermap.org/data/2.5/forecast?id=";
 
     static final String API_ID = "&appid=";
 
@@ -29,6 +29,8 @@ public class NetworkUtils {
     static final String UNIT = "&units=";
 
     static final String METRIC = "metric";
+
+
 
 
     /**
@@ -104,6 +106,8 @@ public class NetworkUtils {
             urlConnection.disconnect();
         }
     }//getResponseFromHttpUrl
+
+
 
 
 }//main - class
