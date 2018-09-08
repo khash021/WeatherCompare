@@ -8,32 +8,32 @@
     tools:context=".MainActivity">
 
     <Button
-        android:id="@+id/button_canmore_current_open_weather"
+        android:id="@+id/button_open_weather"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:text="Canmore\nOW"/>
+        android:text="OW"/>
 
     <Button
-        android:id="@+id/button_canmore_current_dark_sky"
+        android:id="@+id/button_dark_sky"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:text="Canmore\nDS"
+        android:text="DS"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toEndOf="@id/button_canmore_current_open_weather"
-        app:layout_constraintEnd_toStartOf="@id/button_canmore_forecast_accu_weather"/>
+        app:layout_constraintStart_toEndOf="@id/button_open_weather"
+        app:layout_constraintEnd_toStartOf="@id/button_accu_weather"/>
 
     <Button
-        android:id="@+id/button_canmore_forecast_accu_weather"
+        android:id="@+id/button_accu_weather"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:text="Canmore\nAccu"/>
+        android:text="Acc"/>
 
     <ImageView
         android:id="@+id/image_icon"
@@ -43,7 +43,7 @@
         android:gravity="center"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/button_canmore_current_open_weather"
+        app:layout_constraintTop_toBottomOf="@id/button_open_weather"
         android:scaleType="center" />
 
     <TextView

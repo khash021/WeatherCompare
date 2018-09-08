@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView mResultsText;
     private ImageView mIconImage;
     private ProgressBar mProgress;
+    private String mCurrentResponse;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
         mIconImage = findViewById(R.id.image_icon);
 
         //Getting Open Weather
-        Button canmoreOpenWeather = findViewById(R.id.button_canmore_current_open_weather);
+        Button canmoreOpenWeather = findViewById(R.id.button_open_weather);
         canmoreOpenWeather.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -73,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         //Getting Accu Weather
-        Button canmoreAccuWeather = findViewById(R.id.button_canmore_forecast_accu_weather);
+        Button canmoreAccuWeather = findViewById(R.id.button_accu_weather);
         canmoreAccuWeather.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -91,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         //Getting Dark Sky
-        Button canmoreDarkSky = findViewById(R.id.button_canmore_current_dark_sky);
+        Button canmoreDarkSky = findViewById(R.id.button_dark_sky);
         canmoreDarkSky.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -282,6 +283,8 @@ public class MainActivity extends AppCompatActivity {
         //update UI
         @Override
         protected void onPostExecute(String s) {
+            //save the response to be used later
+            mCurrentResponse = s;
             mProgress.setVisibility(View.INVISIBLE);
 
             //dummy check

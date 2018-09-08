@@ -3,12 +3,15 @@ package app.khash.weathertry.utilities;
 import android.text.TextUtils;
 import android.util.Log;
 
+import org.joda.time.DateTime;
+
+import java.util.Locale;
+
 public class Conversions {
 
     private final static String TAG = Conversions.class.getSimpleName();
 
-    private final static int DECIMAL_POINTS = 1;
-
+    //TODO: use enum for this
     public static String degreeToDirection (double degree ) {
         Log.d(TAG, "Degree is: " + degree);
 
@@ -88,14 +91,11 @@ public class Conversions {
         return output;
     }//removeDecimal
 
-    //helper method for limiting the decimal points of a string
-    private String limitDecimal(String s) {
-        if (!(s.contains("."))) {
-            return s;
-        } else {
-            int index = s.indexOf(".");
-            return s.substring(0, index + DECIMAL_POINTS + 1);
-        }
-    }//onDecimal
+    public static String getDayEpoch (long epoch) {
+        DateTime dateTime = new DateTime(epoch);
+        String day = dateTime.dayOfWeek().getAsText(Locale.getDefault());
+        return day;
+    }//getDayEpoch
 
-}
+
+}//class
