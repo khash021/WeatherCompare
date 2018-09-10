@@ -13,6 +13,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 
 import org.json.JSONException;
 
@@ -55,6 +57,16 @@ public class MainActivity extends AppCompatActivity {
         mResultsText = findViewById(R.id.text_results);
         mProgress = findViewById(R.id.progress_bar);
         mIconImage = findViewById(R.id.image_icon);
+
+        /**
+         * This section is for the banner add
+         */
+        AdView bannerAd = findViewById(R.id.ad_banner_view);
+        //create an ad request object using the builder
+        AdRequest adRequest = new AdRequest.Builder()
+                .build();
+        //load the ad request into the ad view
+        bannerAd.loadAd(adRequest);
 
         //Getting Open Weather
         Button canmoreOpenWeather = findViewById(R.id.button_open_weather);
@@ -114,6 +126,7 @@ public class MainActivity extends AppCompatActivity {
      * Helper methods for showing the result or error
      */
     private void showResults(String results) {
+        Log.v(TAG, "Weather results: " + results);
 
         if (results.contains(";")) {
             //get the index of ;

@@ -11,6 +11,8 @@ public class Conversions {
 
     private final static String TAG = Conversions.class.getSimpleName();
 
+    //TODO: change the decimal so it actually rounds up or down depending on the value
+
     //TODO: use enum for this
     public static String degreeToDirection (double degree ) {
         Log.d(TAG, "Degree is: " + degree);
@@ -90,6 +92,7 @@ public class Conversions {
         String output = String.format("%.0f", d);
         return output;
     }//removeDecimal
+
 
     public static String getDayEpoch (long epoch) {
         DateTime dateTime = new DateTime(epoch);

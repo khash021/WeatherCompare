@@ -25,6 +25,8 @@ public class AccuWeatherUtils {
 
     static final String API_KEY = "Lxds8cj5vJGWk7n1XBe8McAhJhyFnCaw";
 
+    static final String DETAILS_TRUE = "&details=true";
+
 
     /**
      * This creates the URL using the city ID for the current weather
@@ -33,7 +35,7 @@ public class AccuWeatherUtils {
      */
     public static URL createWeatherUrlId(String id) {
 
-        String url = ACCU_WEATHER_BASE_URL + id + API_ID + API_KEY;
+        String url = ACCU_WEATHER_BASE_URL + id + API_ID + API_KEY + DETAILS_TRUE;
         Log.d(TAG, "URL: " + url );
 
         URL queryUrl = null;

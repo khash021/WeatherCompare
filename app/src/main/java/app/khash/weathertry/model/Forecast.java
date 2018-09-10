@@ -1,4 +1,4 @@
-package app.khash.weathertry;
+package app.khash.weathertry.model;
 
 /**
  * Object representing each forecast to be used for showing the list of forecasts
