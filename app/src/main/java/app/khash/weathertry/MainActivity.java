@@ -49,12 +49,17 @@ public class MainActivity extends AppCompatActivity {
     static final String CANMORE_LAT_LONG = "/51.09,-115.35";
     private ImageView mIconImage;
     private ProgressBar mProgress;
-    
+
+    //this is to be used for tracking the progress bar (it will be set to -1 if it a single update; otherwise
+    //it will be incremented so the last query to get finished will remove it
+    private int mTracker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mTracker = 0;
 
         mProgress = findViewById(R.id.progress_bar);
 //        mIconImage = findViewById(R.id.image_icon);
@@ -81,7 +86,10 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     //instantiate a OpenWeatherQueryTask object and then passing in our URL
                     OpenWeatherQueryTask openWeatherQueryTask = new OpenWeatherQueryTask();
+                    //set the tracker to -1 so we know it is a single load
+                    mTracker = -1;
                     openWeatherQueryTask.execute(canmoreUrl);
+
                 }
             }
         });
@@ -99,6 +107,8 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     //instantiate a AccuWeatherQueryTask object and then passing in our URL
                     AccuWeatherQueryTask accuWeatherQueryTask = new AccuWeatherQueryTask();
+                    //set the tracker to -1 so we know it is a single load
+                    mTracker = -1;
                     accuWeatherQueryTask.execute(canmoreUrl);
                 }
             }
@@ -116,6 +126,8 @@ public class MainActivity extends AppCompatActivity {
                     showDarkSkyError();
                 } else {
                     DarkSkyQueryTask darkSkyQueryTask = new DarkSkyQueryTask();
+                    //set the tracker to -1 so we know it is a single load
+                    mTracker = -1;
                     darkSkyQueryTask.execute(url);
                 }
             }
@@ -155,7 +167,17 @@ public class MainActivity extends AppCompatActivity {
         //update UI
         @Override
         protected void onPostExecute(String s) {
-            mProgress.setVisibility(View.INVISIBLE);
+            //if it was a single load, then remove progress bar and set it back to 0; otherwise
+            //if it is not 2, just increment
+            if (mTracker == -1 || mTracker == 2) {
+
+                //remove progress bar and reset the tracker
+                mProgress.setVisibility(View.INVISIBLE);
+                mTracker = 0;
+            } else {
+                //this means this is part the group load and just increment
+                mTracker++;
+            }
 
             //dummy check
             if (s == null || TextUtils.isEmpty(s)) {
@@ -208,7 +230,17 @@ public class MainActivity extends AppCompatActivity {
         //update UI
         @Override
         protected void onPostExecute(String s) {
-            mProgress.setVisibility(View.INVISIBLE);
+            //if it was a single load, then remove progress bar and set it back to 0; otherwise
+            //if it is not 2, just increment
+            if (mTracker == -1 || mTracker == 2) {
+
+                //remove progress bar and reset the tracker
+                mProgress.setVisibility(View.INVISIBLE);
+                mTracker = 0;
+            } else {
+                //this means this is part the group load and just increment
+                mTracker++;
+            }
 
             //dummy check
             if (s == null || TextUtils.isEmpty(s)) {
@@ -261,7 +293,17 @@ public class MainActivity extends AppCompatActivity {
         //update UI
         @Override
         protected void onPostExecute(String s) {
-            mProgress.setVisibility(View.INVISIBLE);
+            //if it was a single load, then remove progress bar and set it back to 0; otherwise
+            //if it is not 2, just increment
+            if (mTracker == -1 || mTracker == 2) {
+
+                //remove progress bar and reset the tracker
+                mProgress.setVisibility(View.INVISIBLE);
+                mTracker = 0;
+            } else {
+                //this means this is part the group load and just increment
+                mTracker++;
+            }
 
             //dummy check
             if (s == null || TextUtils.isEmpty(s)) {
