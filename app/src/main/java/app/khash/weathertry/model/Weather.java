@@ -10,8 +10,8 @@ import android.net.Uri;
 
 public class Weather {
 
-    private String summary, temperature, dewPoint, pressure, windSpeed, windDirection, windGust,
-            visibility, cloudCoverage, pop, popType, iconUrl;
+    private String summary, temperature, humidity, dewPoint, pressure, windSpeed, windDirection,
+            windGust, visibility, cloudCoverage, pop, popType, iconUrl;
     private Uri iconUri;
 
     //default public constructor
@@ -47,6 +47,10 @@ public class Weather {
     public void setPressure(String pressure) {
         this.pressure = pressure;
     }//setPressure
+
+    public void setHumidity(String humidity) {
+        this.humidity = humidity;
+    }//setHumidity
 
     public void setWindSpeed(String windSpeed) {
         this.windSpeed = windSpeed;
@@ -110,6 +114,13 @@ public class Weather {
         }
         return pressure;
     }//getPressure
+
+    public String getHumidity() {
+        if (humidity == null) {
+            return "";
+        }
+        return humidity;
+    }//getHumidity
 
     public String getWindSpeed() {
         if (windSpeed == null) {
