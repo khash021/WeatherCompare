@@ -1,4 +1,4 @@
-package app.khash.weathertry.utilities;
+package tech.khash.weathercompare.utilities;
 
 import android.text.TextUtils;
 
@@ -6,7 +6,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import app.khash.weathertry.model.Weather;
+import tech.khash.weathercompare.model.Weather;
 
 /**
  * This is responsible for receiving the JSON and decode it and return the result text to be shown on UI

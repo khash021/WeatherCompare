@@ -1,5 +1,4 @@
-package app.khash.weathertry.utilities;
-
+package tech.khash.weathercompare.utilities;
 
 import android.util.Log;
 
@@ -10,22 +9,30 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Scanner;
 
-/**
- * Responsible for creating the Url using different parameters for AccuWeather
- */
+public class DarkSkyUtils {
 
-public class AccuWeatherUtils {
+    private static final String TAG = DarkSkyUtils.class.getSimpleName();
 
+    /**
+     * The general outline is:
+     * "https://api.darksky.net/forecast/" + apiKey + "/" + lat + "," + long + "?" + exclude + "?" + unit;
+     *
+     * where exclude=[block] the block should be a comma-delimeted list (without spaces):
+     *  currently, minutely, hourly, daily,alerts, flags
+     *
+     */
 
-    private final static String TAG = AccuWeatherUtils.class.getSimpleName();
+    private static final String DARK_SKY_BASE_URL = "https://api.darksky.net/forecast/";
 
-    static final String ACCU_WEATHER_BASE_URL = "http://dataservice.accuweather.com/currentconditions/v1/";
+    private static final String API_KEY = "f5e4285ed1e89d653fd1d99b04e375b7";
 
-    static final String API_ID = "?apikey=";
+    private static final String UNITS = "units=";
 
-    static final String API_KEY = "Lxds8cj5vJGWk7n1XBe8McAhJhyFnCaw";
+    private static final String UNITS_METRIC = "ca"; //same as si except speed is km/h
 
-    static final String DETAILS_TRUE = "&details=true";
+    private static final String EXCLUDE = "exclude=";
+
+    private static final String EXCLUDE_BLOCK_CURRENT = "minutely,hourly,daily,alerts,flags";
 
 
     /**
@@ -35,7 +42,8 @@ public class AccuWeatherUtils {
      */
     public static URL createWeatherUrlId(String id) {
 
-        String url = ACCU_WEATHER_BASE_URL + id + API_ID + API_KEY + DETAILS_TRUE;
+        String url = DARK_SKY_BASE_URL + API_KEY + id + "?" + EXCLUDE + EXCLUDE_BLOCK_CURRENT +
+                "?" + UNITS + UNITS_METRIC;
         Log.d(TAG, "URL: " + url );
 
         URL queryUrl = null;

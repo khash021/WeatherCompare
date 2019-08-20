@@ -1,4 +1,5 @@
-package app.khash.weathertry.utilities;
+package tech.khash.weathercompare.utilities;
+
 
 import android.util.Log;
 
@@ -10,57 +11,31 @@ import java.net.URL;
 import java.util.Scanner;
 
 /**
- *
- * Responsible for creating the Url using different parameters for OpenWeather
+ * Responsible for creating the Url using different parameters for AccuWeather
  */
 
-public class OpenWeatherUtils {
-
-    private final static String TAG = OpenWeatherUtils.class.getSimpleName();
-
-    static final String OPENWEATHER_WEATHER_BASE_URL = "https://api.openweathermap.org/data/2.5/weather?id=";
-
-    static final String OPENWEATHER_FORECAST_BASE_URL = "https://api.openweathermap.org/data/2.5/forecast?id=";
-
-    static final String API_ID = "&appid=";
-
-    static final String API_KEY = "470cd029b949095fcc602ed656262f8b";
-
-    static final String UNIT = "&units=";
-
-    static final String METRIC = "metric";
+public class AccuWeatherUtils {
 
 
+    private final static String TAG = AccuWeatherUtils.class.getSimpleName();
+
+    static final String ACCU_WEATHER_BASE_URL = "http://dataservice.accuweather.com/currentconditions/v1/";
+
+    static final String API_ID = "?apikey=";
+
+    static final String API_KEY = "Lxds8cj5vJGWk7n1XBe8McAhJhyFnCaw";
+
+    static final String DETAILS_TRUE = "&details=true";
 
 
     /**
      * This creates the URL using the city ID for the current weather
-     * @param id : OpenWeatherMap city ID
-     * @return URL : query URL (metric)
+     * @param id : city's id
+     * @return : URL
      */
-    public static URL createWeatherUrlId(int id) {
+    public static URL createWeatherUrlId(String id) {
 
-        String url = OPENWEATHER_WEATHER_BASE_URL + id + UNIT + METRIC + API_ID + API_KEY;
-        Log.d(TAG, "URL: " + url );
-
-        URL queryUrl = null;
-        try {
-            queryUrl = new URL(url);
-        } catch (MalformedURLException e) {
-
-            Log.e(TAG, "Error creating URL from string", e);
-        }
-        return queryUrl;
-    }//createWeatherUrlId
-
-    /**
-     * This creates the URL using the city ID for the current weather
-     * @param id : OpenWeatherMap city ID
-     * @return URL : query URL (metric)
-     */
-    public static URL createForecastUrlId(int id) {
-
-        String url = OPENWEATHER_FORECAST_BASE_URL + id + UNIT + METRIC + API_ID + API_KEY;
+        String url = ACCU_WEATHER_BASE_URL + id + API_ID + API_KEY + DETAILS_TRUE;
         Log.d(TAG, "URL: " + url );
 
         URL queryUrl = null;
@@ -106,8 +81,4 @@ public class OpenWeatherUtils {
             urlConnection.disconnect();
         }
     }//getResponseFromHttpUrl
-
-
-
-
-}//main - class
+}//class

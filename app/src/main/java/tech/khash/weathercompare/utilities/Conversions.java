@@ -1,4 +1,4 @@
-package app.khash.weathertry.utilities;
+package tech.khash.weathercompare.utilities;
 
 import android.text.TextUtils;
 import android.util.Log;

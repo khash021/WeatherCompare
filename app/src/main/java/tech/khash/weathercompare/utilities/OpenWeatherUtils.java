@@ -1,4 +1,4 @@
-package app.khash.weathertry.utilities;
+package tech.khash.weathercompare.utilities;
 
 import android.util.Log;
 
@@ -9,41 +9,58 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Scanner;
 
-public class DarkSkyUtils {
+/**
+ *
+ * Responsible for creating the Url using different parameters for OpenWeather
+ */
 
-    private static final String TAG = DarkSkyUtils.class.getSimpleName();
+public class OpenWeatherUtils {
 
-    /**
-     * The general outline is:
-     * "https://api.darksky.net/forecast/" + apiKey + "/" + lat + "," + long + "?" + exclude + "?" + unit;
-     *
-     * where exclude=[block] the block should be a comma-delimeted list (without spaces):
-     *  currently, minutely, hourly, daily,alerts, flags
-     *
-     */
+    private final static String TAG = OpenWeatherUtils.class.getSimpleName();
 
-    private static final String DARK_SKY_BASE_URL = "https://api.darksky.net/forecast/";
+    static final String OPENWEATHER_WEATHER_BASE_URL = "https://api.openweathermap.org/data/2.5/weather?id=";
 
-    private static final String API_KEY = "f5e4285ed1e89d653fd1d99b04e375b7";
+    static final String OPENWEATHER_FORECAST_BASE_URL = "https://api.openweathermap.org/data/2.5/forecast?id=";
 
-    private static final String UNITS = "units=";
+    static final String API_ID = "&appid=";
 
-    private static final String UNITS_METRIC = "ca"; //same as si except speed is km/h
+    static final String API_KEY = "470cd029b949095fcc602ed656262f8b";
 
-    private static final String EXCLUDE = "exclude=";
+    static final String UNIT = "&units=";
 
-    private static final String EXCLUDE_BLOCK_CURRENT = "minutely,hourly,daily,alerts,flags";
+    static final String METRIC = "metric";
+
+
 
 
     /**
      * This creates the URL using the city ID for the current weather
-     * @param id : city's id
-     * @return : URL
+     * @param id : OpenWeatherMap city ID
+     * @return URL : query URL (metric)
      */
-    public static URL createWeatherUrlId(String id) {
+    public static URL createWeatherUrlId(int id) {
 
-        String url = DARK_SKY_BASE_URL + API_KEY + id + "?" + EXCLUDE + EXCLUDE_BLOCK_CURRENT +
-                "?" + UNITS + UNITS_METRIC;
+        String url = OPENWEATHER_WEATHER_BASE_URL + id + UNIT + METRIC + API_ID + API_KEY;
+        Log.d(TAG, "URL: " + url );
+
+        URL queryUrl = null;
+        try {
+            queryUrl = new URL(url);
+        } catch (MalformedURLException e) {
+
+            Log.e(TAG, "Error creating URL from string", e);
+        }
+        return queryUrl;
+    }//createWeatherUrlId
+
+    /**
+     * This creates the URL using the city ID for the current weather
+     * @param id : OpenWeatherMap city ID
+     * @return URL : query URL (metric)
+     */
+    public static URL createForecastUrlId(int id) {
+
+        String url = OPENWEATHER_FORECAST_BASE_URL + id + UNIT + METRIC + API_ID + API_KEY;
         Log.d(TAG, "URL: " + url );
 
         URL queryUrl = null;
@@ -89,4 +106,8 @@ public class DarkSkyUtils {
             urlConnection.disconnect();
         }
     }//getResponseFromHttpUrl
-}//class
+
+
+
+
+}//main - class

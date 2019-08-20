@@ -1,4 +1,4 @@
-package app.khash.weathertry;
+package tech.khash.weathercompare;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -21,16 +21,18 @@ import org.json.JSONException;
 import java.io.IOException;
 import java.net.URL;
 
-import app.khash.weathertry.model.Weather;
-import app.khash.weathertry.utilities.AccuWeatherUtils;
-import app.khash.weathertry.utilities.DarkSkyUtils;
-import app.khash.weathertry.utilities.OpenWeatherUtils;
-import app.khash.weathertry.utilities.ParseJSON;
+import tech.khash.weathercompare.model.Weather;
+import tech.khash.weathercompare.utilities.AccuWeatherUtils;
+import tech.khash.weathercompare.utilities.DarkSkyUtils;
+import tech.khash.weathercompare.utilities.OpenWeatherUtils;
+import tech.khash.weathercompare.utilities.ParseJSON;
 
 //TODO: extensive cleaning, commenting, and re-thinking the entire architecture of the desing and flow
 
 
 public class MainActivity extends AppCompatActivity {
+
+    //TODO: remove ad for now
 
     //TODO: search for location, and automatic find me
     //TODO: move everything away from inner classes and use task loader
@@ -43,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
     //TODO: use somehow manage progress bar to go off once everything is loaded
 
     private final static String TAG = MainActivity.class.getSimpleName();
+
     private final static String CANMORE = "canmore";
     private static final int CANMORE_ID_OPEN_WEATHER = 7871396;
     private static final String CANMORE_ID_ACCU_WEATHER = "52903_PC";
@@ -58,6 +61,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Log.v(TAG, "onCreate Called");
+        Log.v(TAG, "Package name: " + getPackageName());
 
         mTracker = 0;
 

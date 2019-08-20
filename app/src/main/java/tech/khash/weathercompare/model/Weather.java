@@ -1,4 +1,4 @@
-package app.khash.weathertry.model;
+package tech.khash.weathercompare.model;
 
 import android.net.Uri;
 

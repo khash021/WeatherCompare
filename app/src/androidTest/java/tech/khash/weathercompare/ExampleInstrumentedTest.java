@@ -1,4 +1,4 @@
-package app.khash.weathertry;
+package tech.khash.weathercompare;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
