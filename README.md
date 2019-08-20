@@ -1,4 +1,4 @@
-# WeatherTry
+# WeatherCompare
 A weather comparing Android App
 
 This app will show you the forecast from 3 different weather services, side by side. This makes it easier to compare weather data and make a judgemnt call. 
