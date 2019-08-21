@@ -84,7 +84,7 @@ public class Loc {
     public void setKey(String key) {
         this.key = key;
     }
-    
+
     public void setId(String id) {
         this.id = id;
     }//setId
