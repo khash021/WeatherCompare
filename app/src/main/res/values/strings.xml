@@ -3,6 +3,9 @@
     <string name="package_name" translatable="false">tech.khash.weathercompare</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="title_activity_compare">Compare</string>
+    <string name="title_activity_add_location">Add Location</string>
+
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyAHyUo4VnllUXatwyKVvfEjMjhwsEDf5zE</string>
 
 
     <!--Ads-->
@@ -37,6 +40,8 @@
     <string name="share_intent_title">Share Weather Compare</string>
     <string name="share_dialog_title">Check this app out!</string>
     <string name="google_play_address" translatable="false">https://play.google.com/store/apps/details?id=tech.khash.weathercompare</string>
+    <string name="add_location">Add Location</string>
+
 
 
 </resources>

@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -26,6 +27,8 @@ public class MainActivity extends AppCompatActivity implements
         NavigationView.OnNavigationItemSelectedListener {
 
     private final static String TAG = MainActivity.class.getSimpleName();
+
+    private static final int ADD_LOCATION_REQUEST_CODE = 1;
 
     //drawer layout used for navigation drawer
     private DrawerLayout mDrawerLayout;
@@ -99,6 +102,18 @@ public class MainActivity extends AppCompatActivity implements
     }//onDestroy
 
     /**
+     *          We start AddLocation activity for results to get the location data. This gets
+     *          called when we return from that.
+     * @param requestCode : request code we sent with the original intent
+     * @param resultCode : result code that the activity has set
+     * @param data : the data being sent back
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+    }//onActivityResult
+
+    /**
      * Handles the Back button: closes the nav drawer.
      */
     @Override
@@ -149,6 +164,10 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         switch (menuItem.getItemId()) {
+            case R.id.nav_add_location:
+                Intent addLocationIntent = new Intent(MainActivity.this, AddLocationActivity.class);
+                startActivityForResult(addLocationIntent, ADD_LOCATION_REQUEST_CODE);
+                return true;
             case R.id.nav_settings:
                 //TODO:
                 showToast(this, "Settings");
