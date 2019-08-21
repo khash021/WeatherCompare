@@ -1,6 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorPrimary">#03a9f4</color>
+    <color name="colorPrimaryDark">#007ac1</color>
+    <color name="colorPrimaryLight">#67daff</color>
+    <color name="colorAccent">#a003f4</color>
+
+    <!--could work-->
+    <color name="colorAccentOctonary">#a003f4</color>
+    <!--maybe-->
+    <color name="colorAccentSecondary">#f45303</color>
+    <!--maybe-->
+    <color name="colorAccentTertiary">#03f44f</color>
+    <!--maybe-->
+    <color name="colorAccentQuinary">#f49003</color>
+    <!--maybe-->
+    <color name="colorAccentSenary">#f4cc03</color>
+
+
+
+
+    <color name="ic_launcher_background">#49ACF1</color>
 </resources>

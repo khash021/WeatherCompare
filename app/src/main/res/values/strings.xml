@@ -1,11 +1,42 @@
 <resources>
-    <string name="app_name">WeatherCompare</string>
+    <string name="app_name">Weather Compare</string>
     <string name="package_name" translatable="false">tech.khash.weathercompare</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_compare">Compare</string>
 
 
     <!--Ads-->
     <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
     <string name="interstitial_ad_unit_id">ca-app-pub-3940256099942544/1033173712</string>
+
+    <!--UI/Names-->
+    <string name="open_weather">OpenWeather</string>
+    <string name="dark_sky">DarkSky</string>
+    <string name="accu_weather">AccuWeather</string>
+    <string name="summary">Summary</string>
+    <string name="temp">Temp</string>
+    <string name="dew_point">Dew Point</string>
+    <string name="pressure">Pressure</string>
+    <string name="humidity">Humidity</string>
+    <string name="wind">Wind</string>
+    <string name="wind_gust">Wind Gust</string>
+    <string name="cloud_cover">Cloud Cover</string>
+    <string name="visibility">Visibility</string>
+
+    <!--Menu Main and Navigation Drawer-->
+    <string name="search">Search</string>
+    <string name="find_me">Find me</string>
+    <string name="about">About</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="share">Share</string>
+    <string name="rate_app">Rate Us</string>
+    <string name="contact">Contact</string>
+    <string name="communication">Communication</string>
+    <string name="settings">Settings</string>
+    <string name="contact_email">WeatherCompare@khash.tech</string>
+    <string name="share_intent_title">Share Weather Compare</string>
+    <string name="share_dialog_title">Check this app out!</string>
+    <string name="google_play_address" translatable="false">https://play.google.com/store/apps/details?id=tech.khash.weathercompare</string>
 
 
 </resources>
