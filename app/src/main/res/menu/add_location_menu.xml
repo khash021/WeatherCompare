@@ -14,7 +14,7 @@
         android:id="@+id/action_find_me"
         android:icon="@drawable/ic_my_location_white"
         android:orderInCategory="20"
-        android:title="@string/find_me"
+        android:title="@string/my_location"
         app:showAsAction="ifRoom" />
 
 </menu>

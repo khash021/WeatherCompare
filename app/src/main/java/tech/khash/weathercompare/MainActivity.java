@@ -2,41 +2,43 @@ package tech.khash.weathercompare;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
+import android.view.View;
+import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
 import androidx.core.app.ShareCompat;
-import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
-import tech.khash.weathercompare.model.Constant;
+import tech.khash.weathercompare.adapter.LocListAdapter;
 import tech.khash.weathercompare.model.Loc;
+import tech.khash.weathercompare.utilities.HelperFunctions;
 import tech.khash.weathercompare.utilities.SaveLoadList;
 
 public class MainActivity extends AppCompatActivity implements
-        NavigationView.OnNavigationItemSelectedListener {
+        NavigationView.OnNavigationItemSelectedListener,
+        LocListAdapter.ListItemClickListener {
+
+    //TODO: check for duplicate name
 
     private final static String TAG = MainActivity.class.getSimpleName();
 
@@ -49,6 +51,14 @@ public class MainActivity extends AppCompatActivity implements
 
     //for holding the current location
     private Loc locCurrent;
+
+    //adapter
+    private ArrayList<Loc> mLocArrayList;
+    private LocListAdapter mAdapter;
+    private RecyclerView mRecyclerView;
+
+    //for tracking changes that needs the list to be updated/recreated
+    private boolean needsUpdate = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +84,44 @@ public class MainActivity extends AppCompatActivity implements
         if (navigationView != null) {
             navigationView.setNavigationItemSelectedListener(this);
         }
+
+        //view containing the empty view
+        LinearLayout emptyView = findViewById(R.id.empty_view);
+
+        //get the arrayList, and set the visibility of empty view accordingly
+        mLocArrayList = SaveLoadList.loadLocList(this);
+        if (mLocArrayList == null || mLocArrayList.size() < 1) {
+            emptyView.setVisibility(View.VISIBLE);
+        } else {
+            emptyView.setVisibility(View.GONE);
+        }
+
+        //TODO: testing
+        logList(mLocArrayList);
+
+        // Get a handle to the RecyclerView.
+        mRecyclerView = findViewById(R.id.recycler_view);
+        // Create an mAdapter and supply the data to be displayed.
+        mAdapter = new LocListAdapter(this, mLocArrayList, this);
+        // Connect the mAdapter with the RecyclerView.
+        mRecyclerView.setAdapter(mAdapter);
+        // Give the RecyclerView a default layout manager.
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        //Add divider between items using the DividerItemDecoration
+        DividerItemDecoration decoration = new DividerItemDecoration(mRecyclerView.getContext(),
+                DividerItemDecoration.VERTICAL);
+        mRecyclerView.addItemDecoration(decoration);
+
+        //find the fab and set it up
+        FloatingActionButton fabAdd = findViewById(R.id.fab_add);
+        fabAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //needs update
+                needsUpdate = true;
+                openAddLocation();
+            }
+        });
     }//onCreate
 
     @Override
@@ -85,6 +133,10 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onStart() {
         Log.v(TAG, "onStart Called");
+        //check for update boolean
+        if (needsUpdate) {
+            recreate();
+        }
         super.onStart();
 //        if (!mGoogleApiClient.isConnecting() || !mGoogleApiClient.isConnected()) {
 //            mGoogleApiClient.connect();
@@ -131,7 +183,7 @@ public class MainActivity extends AppCompatActivity implements
         if (requestCode == ADD_LOCATION_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             //get the name of the loc
             String nameLoc = data.getStringExtra(FENCE_EDIT_EXTRA_INTENT_LOC_NAME);
-            if (nameLoc ==null || nameLoc.isEmpty()) {
+            if (nameLoc == null || nameLoc.isEmpty()) {
                 return;
             }//null name
             //get the corresponding Loc object
@@ -183,11 +235,19 @@ public class MainActivity extends AppCompatActivity implements
                 return true;
             case R.id.action_find_me:
                 //TODO:
-                showToast(this, "Find Me");
+                HelperFunctions.showToast(this, "Find Me");
                 return true;
-            case R.id.action_search:
+            case R.id.action_sort_name_ascending:
                 //TODO:
-                showToast(this, "Search");
+                return true;
+            case R.id.action_sort_name_descending:
+                //TODO:
+                return true;
+            case R.id.action_refresh:
+                recreate();
+                return true;
+            case R.id.action_delete_all:
+                //TODO:
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -198,12 +258,11 @@ public class MainActivity extends AppCompatActivity implements
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case R.id.nav_add_location:
-                Intent addLocationIntent = new Intent(MainActivity.this, AddLocationActivity.class);
-                startActivityForResult(addLocationIntent, ADD_LOCATION_REQUEST_CODE);
+                openAddLocation();
                 return true;
             case R.id.nav_settings:
                 //TODO:
-                showToast(this, "Settings");
+                HelperFunctions.showToast(this, "Settings");
                 return true;
             case R.id.nav_contact:
                 //send email. Use Implicit intent so the user can choose their preferred app
@@ -242,7 +301,7 @@ public class MainActivity extends AppCompatActivity implements
                 return true;
             case R.id.nav_about:
                 //TODO:
-                showToast(this, "About");
+                HelperFunctions.showToast(this, "About");
                 return true;
             case R.id.nav_privacy_policy:
                 try {
@@ -260,83 +319,31 @@ public class MainActivity extends AppCompatActivity implements
         }//switch
     }//onNavigationItemSelected
 
-
-
+    @Override
+    public void onListItemClick(int clickedItemIndex) {
+        //get the corresponding fence object
+        Loc loc = mLocArrayList.get(clickedItemIndex);
+        //show a dialog
+        HelperFunctions.showToast(this, "\"" +loc.getId() + "\"" + " clicked");
+    }//onListItemClick
 
     /*------------------------------------------------------------------------------------------
                     ---------------    HELPER METHODS    ---------------
     ------------------------------------------------------------------------------------------*/
 
-    //Display Toast
-    public static void showToast(Context context, String message) {
-        Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
-    }//showToast
+    //open add location activity for results
+    private void openAddLocation() {
+        Intent addLocationIntent = new Intent(MainActivity.this, AddLocationActivity.class);
+        startActivityForResult(addLocationIntent, ADD_LOCATION_REQUEST_CODE);
+    }//openAddLocation
 
-    //checks location permission
-    public static boolean checkLocationPermission(Context context) {
-        //check for location permission and ask for it
-        return ContextCompat.checkSelfPermission(context,
-                android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
-    }//checkLocationPermission
+    //for testing
+    private void logList(ArrayList<Loc> locArrayList) {
+        int counter = 1;
+        for (Loc loc : locArrayList) {
+            Log.v(TAG, counter + ": " + "\n" + "Name: " + loc.getId() + " ----- " + "LatLng: " + loc.getLatLng().toString());
+        }
+    }//logList
 
-    /**
-     * Helper method for showing a message to the user informing them about the benefits of turning on their
-     * location. and also can direct them to the location settings of their phone
-     */
-    public static void askLocationPermission(final Context context, final Activity activity) {
-        //Create a dialog to inform the user about this feature's permission
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        //Chain together various setter methods to set the dialogConfirmation characteristics
-        builder.setMessage(R.string.permission_required_text_dialog).setTitle(R.string.permission_required_title_dialog);
-        // Add the buttons. We can call helper methods from inside the onClick if we need to
-        builder.setPositiveButton(R.string.permission_required_yes_dialog, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int id) {
-
-                //first check to see if the user has denied permission before
-                if (ContextCompat.checkSelfPermission(context,
-                        android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED) {
-                    //here we check to see if they have selected "never ask again". If that is the case, then
-                    // shouldShowRequestPermissionRationale will return false. If that is false, and
-                    //the build version is higher than 23 (that feature is only available to >= 23
-                    //then send them to the
-                    //TODO: this is still weird with the second condition. I removed ! but still needs work
-                    if (Build.VERSION.SDK_INT >= 23 && !(activity.shouldShowRequestPermissionRationale(android.Manifest.permission.ACCESS_FINE_LOCATION))) {
-                        //This is the case when the user checked the box, so we send them to the settings
-                        openPermissionSettings(activity);
-                    } else {
-                        ActivityCompat.requestPermissions(activity,
-                                new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
-                                Constant.LOCATION_PERMISSION_REQUEST_CODE);
-                    }
-                } else {
-                    //this is the case that the user has never denied permission, so we ask for it
-                    ActivityCompat.requestPermissions(activity,
-                            new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
-                            Constant.LOCATION_PERMISSION_REQUEST_CODE);
-                }
-
-            }
-        });
-        builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-        //build and show dialog
-        builder.create().show();
-    }//askLocationPermission
-
-    /**
-     * Helper method for directing the user to the app's setting in their phone to turn on the permission
-     */
-    private static void openPermissionSettings(Activity activity) {
-        Intent intent = new Intent();
-        intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-        Uri uri = Uri.fromParts("package", activity.getPackageName(), null);
-        intent.setData(uri);
-        activity.startActivity(intent);
-    }//openPermissionSettings
 
 }//MainActivity

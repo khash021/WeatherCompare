@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Locale;
 
 import tech.khash.weathercompare.model.Loc;
+import tech.khash.weathercompare.utilities.HelperFunctions;
 import tech.khash.weathercompare.utilities.SaveLoadList;
 
 public class AddLocationActivity extends AppCompatActivity implements OnMapReadyCallback,
@@ -151,7 +152,7 @@ public class AddLocationActivity extends AppCompatActivity implements OnMapReady
                 return true;
             case R.id.action_search:
                 //TODO:
-                MainActivity.showToast(this, "Search");
+                HelperFunctions.showToast(this, "Search");
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -167,24 +168,24 @@ public class AddLocationActivity extends AppCompatActivity implements OnMapReady
     //Helper method for find me
     private void findMeMap() {
         //check for permission first and ask it if needed
-        if (MainActivity.checkLocationPermission(this)) {
+        if (HelperFunctions.checkLocationPermission(this)) {
             //we have permission. Check map first and enable my location if necessary
             if (isMapReady()) {
                 getDeviceLocation();
             } else {
                 Log.v(TAG, "Map not ready from findMeMap");
-                MainActivity.showToast(this, "Map not ready");
+                HelperFunctions.showToast(this, "Map not ready");
             }
         } else {
             //don't have permission, ask for it
-            MainActivity.askLocationPermission(this, this);
+            HelperFunctions.askLocationPermission(this, this);
         }
     }//findMeMap
 
     //Helper method for getting my location (Permission has already been checked)
     private void getDeviceLocation() {
         try {
-            if (MainActivity.checkLocationPermission(this)) {
+            if (HelperFunctions.checkLocationPermission(this)) {
                 Task<Location> locationResult = mFusedLocationProviderClient.getLastLocation();
                 locationResult.addOnCompleteListener(this, new OnCompleteListener<Location>() {
                     @Override
@@ -229,7 +230,7 @@ public class AddLocationActivity extends AppCompatActivity implements OnMapReady
     private void moveCamera(LatLng latLng, float zoom) {
         //check map first
         if (!isMapReady()) {
-            MainActivity.showToast(this, "Map not ready");
+            HelperFunctions.showToast(this, "Map not ready");
             Log.v(TAG, "Map not ready from moveCamera");
             return;
         }//map not ready
@@ -245,12 +246,12 @@ public class AddLocationActivity extends AppCompatActivity implements OnMapReady
     private void saveLocation() {
         String name = editTextName.getText().toString().trim();
         if (name == null || name.isEmpty()) {
-            MainActivity.showToast(this, getResources().getString(R.string.name_required_toast));
+            HelperFunctions.showToast(this, getResources().getString(R.string.name_required_toast));
             return;
         }
 
         if (latLngCamera == null) {
-            MainActivity.showToast(this, getResources().getString(R.string.error_getting_location_toast));
+            HelperFunctions.showToast(this, getResources().getString(R.string.error_getting_location_toast));
             Log.v(TAG, "latLngCamera is null from saveLocation method");
             return;
         }
@@ -260,7 +261,7 @@ public class AddLocationActivity extends AppCompatActivity implements OnMapReady
         //add it to the list
         SaveLoadList.addToLocList(this, location);
 
-        MainActivity.showToast(this, "\"" + name + "\"" + " " + getString(R.string.location_added_successfully_toast));
+        HelperFunctions.showToast(this, "\"" + name + "\"" + " " + getString(R.string.location_added_successfully_toast));
         Log.v(TAG, "Location added.\nName: " + name + "\nLatLng: " + latLngCamera);
 
         //return to sender
@@ -313,7 +314,7 @@ public class AddLocationActivity extends AppCompatActivity implements OnMapReady
         //check for geocoder availability
         if (!Geocoder.isPresent()) {
             Log.v(TAG, "Geocoder not available - searchAddress");
-            MainActivity.showToast(this, getString(R.string.geocoder_not_available_toast));
+            HelperFunctions.showToast(this, getString(R.string.geocoder_not_available_toast));
             return;
         }
         //Now we know it is available, Create geocoder to retrieve the location
@@ -329,7 +330,7 @@ public class AddLocationActivity extends AppCompatActivity implements OnMapReady
             List<Address> addresses = geocoder.getFromLocationName(query, SEARCH_MAX_RESULTS);
             //check to make sure we got results
             if (addresses.size() < 1) {
-                MainActivity.showToast(this, getString(R.string.no_results_found_toast));
+                HelperFunctions.showToast(this, getString(R.string.no_results_found_toast));
                 Log.v(TAG, "No results - searchAddress");
                 return;
             }//if
@@ -369,8 +370,14 @@ public class AddLocationActivity extends AppCompatActivity implements OnMapReady
 
             //don't need to set bounds if there is only one result. Just move the camera
             if (counter <= 1) {
-                LatLng latLng = new LatLng(addresses.get(0).getLatitude(), addresses.get(0).getLongitude());
+                Address address = addresses.get(0);
+                LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
                 moveCamera(latLng, DEFAULT_ZOOM);
+                //add the name to the filed
+                String featureName = address.getFeatureName();
+                if (featureName != null && !featureName.isEmpty()) {
+                    editTextName.setText(featureName);
+                }
                 return;
             }
 

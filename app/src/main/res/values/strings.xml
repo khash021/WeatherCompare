@@ -28,7 +28,7 @@
 
     <!--Menu Main and Navigation Drawer-->
     <string name="search">Search</string>
-    <string name="find_me">Find me</string>
+    <string name="my_location">My Location</string>
     <string name="about">About</string>
     <string name="privacy_policy">Privacy Policy</string>
     <string name="share">Share</string>
@@ -41,6 +41,11 @@
     <string name="share_dialog_title">Check this app out!</string>
     <string name="google_play_address" translatable="false">https://play.google.com/store/apps/details?id=tech.khash.weathercompare</string>
     <string name="add_location">Add Location</string>
+    <string name="delete_all">Delete all</string>
+    <string name="refresh">Refresh</string>
+    <string name="sort_by_name_des">Sort (Descending)</string>
+    <string name="sort_by_name_asc">Sort (Ascending)</string>
+
 
     <!--Permission-->
     <string name="permission_required_text_dialog">This feature requires user\'s location to work properly. This app does not store user\'s location.\nWould you like to turn it on now?</string>
@@ -60,6 +65,9 @@
     <string name="geocoder_not_available_toast">Geocoder not available</string>
     <string name="no_results_found_toast">No results found</string>
 
+    <!--Main Activity-->
+    <string name="no_saved_location">No Saved Locations</string>
+    <string name="add_location_empty_view_text">Add locations using the button or from menu</string>
 
 
 </resources>
