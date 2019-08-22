@@ -1,6 +1,7 @@
 package tech.khash.weathercompare.adapter;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -79,6 +80,12 @@ public class LocListAdapter extends RecyclerView.Adapter<LocListAdapter.LocViewH
 
         //set name
         holder.idTextView.setText(loc.getId());
+
+        //code
+        String code = loc.getKey();
+        if (!TextUtils.isEmpty(code)) {
+            holder.codeTextView.setText(code);
+        }
     }//onBindViewHolder
 
     @Override
@@ -93,7 +100,7 @@ public class LocListAdapter extends RecyclerView.Adapter<LocListAdapter.LocViewH
     //Inner class for the view holder
     class LocViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         //our views
-        final TextView idTextView;
+        final TextView idTextView, codeTextView;
         final LocListAdapter locListAdapter;
         private Context context;
 
@@ -103,6 +110,7 @@ public class LocListAdapter extends RecyclerView.Adapter<LocListAdapter.LocViewH
             this.context = context;
             //find view
             idTextView = itemView.findViewById(R.id.list_text_id);
+            codeTextView = itemView.findViewById(R.id.list_text_location_code);
             //adapter
             this.locListAdapter = adapter;
             //for click listener

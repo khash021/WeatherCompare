@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:ads="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -13,9 +11,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
+        android:text="OW"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:text="OW"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/button_dark_sky"
@@ -23,80 +21,83 @@
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:text="DS"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/button_accu_weather"
         app:layout_constraintStart_toEndOf="@id/button_open_weather"
-        app:layout_constraintEnd_toStartOf="@id/button_accu_weather"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/button_accu_weather"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
+        android:text="Acc"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:text="Acc"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <!--<ImageView-->
-        <!--android:id="@+id/image_icon"-->
-        <!--android:layout_width="150dp"-->
-        <!--android:layout_height="150dp"-->
-        <!--android:layout_margin="22dp"-->
-        <!--android:gravity="center"-->
-        <!--app:layout_constraintStart_toStartOf="parent"-->
-        <!--app:layout_constraintEnd_toEndOf="parent"-->
-        <!--app:layout_constraintTop_toBottomOf="@id/button_open_weather"-->
-        <!--android:scaleType="center" />-->
+    <!--android:id="@+id/image_icon"-->
+    <!--android:layout_width="150dp"-->
+    <!--android:layout_height="150dp"-->
+    <!--android:layout_margin="22dp"-->
+    <!--android:gravity="center"-->
+    <!--app:layout_constraintStart_toStartOf="parent"-->
+    <!--app:layout_constraintEnd_toEndOf="parent"-->
+    <!--app:layout_constraintTop_toBottomOf="@id/button_open_weather"-->
+    <!--android:scaleType="center" />-->
 
     <LinearLayout
         android:id="@+id/layout_results_main"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:layout_marginTop="22dp"
-        app:layout_constraintStart_toStartOf="parent"
+        android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/button_open_weather">
 
         <LinearLayout
             android:id="@+id/layout_title_row"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/text_title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:padding="6dp"/>
+                android:padding="6dp" />
+
             <TextView
                 android:id="@+id/text_title_open_weather"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="@string/open_weather"
-                android:textSize="12sp"
+                android:layout_weight="1"
                 android:gravity="center"
                 android:padding="6dp"
-                android:layout_weight="1"/>
+                android:text="@string/open_weather"
+                android:textSize="12sp" />
+
             <TextView
                 android:id="@+id/text_title_dark_sky"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:gravity="center"
-                android:textSize="12sp"
                 android:padding="6dp"
                 android:text="@string/dark_sky"
-                android:layout_weight="1"/>
+                android:textSize="12sp" />
+
             <TextView
                 android:id="@+id/text_title_accu"
                 android:layout_width="0dp"
-                android:padding="6dp"
-                android:textSize="12sp"
                 android:layout_height="wrap_content"
-                android:gravity="center"
                 android:layout_weight="1"
-                android:text="@string/accu_weather"/>
+                android:gravity="center"
+                android:padding="6dp"
+                android:text="@string/accu_weather"
+                android:textSize="12sp" />
 
         </LinearLayout>
 
@@ -104,41 +105,44 @@
             android:id="@+id/layout_summary_row"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/text_title_summary"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:padding="6dp"
                 android:gravity="center"
-                android:text="@string/summary"/>
+                android:padding="6dp"
+                android:text="@string/summary" />
+
             <TextView
                 android:id="@+id/text_summary_open_weather"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:textSize="10sp"
+                android:layout_weight="1"
                 android:gravity="center"
                 android:padding="6dp"
-                android:layout_weight="1"/>
+                android:textSize="10sp" />
+
             <TextView
                 android:id="@+id/text_summary_dark_sky"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:gravity="center"
-                android:textSize="10sp"
                 android:padding="6dp"
-                android:layout_weight="1"/>
+                android:textSize="10sp" />
+
             <TextView
                 android:id="@+id/text_summary_accu"
                 android:layout_width="0dp"
-                android:padding="6dp"
-                android:textSize="10sp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:gravity="center"
-                android:layout_weight="1" />
+                android:padding="6dp"
+                android:textSize="10sp" />
 
         </LinearLayout>
 
@@ -146,39 +150,44 @@
             android:id="@+id/layout_temp_row"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/text_title_temp"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:padding="6dp"
                 android:gravity="center"
-                android:text="@string/temp"/>
+                android:padding="6dp"
+                android:text="@string/temp" />
+
             <TextView
                 android:id="@+id/text_temp_open_weather"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:gravity="center"
                 android:padding="6dp"
-                android:layout_weight="1"/>
+                android:textSize="10sp" />
+
             <TextView
                 android:id="@+id/text_temp_dark_sky"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:gravity="center"
                 android:padding="6dp"
-                android:layout_weight="1"/>
+                android:textSize="10sp" />
+
             <TextView
                 android:id="@+id/text_temp_accu"
                 android:layout_width="0dp"
-                android:padding="6dp"
-                android:textSize="12sp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:gravity="center"
-                android:layout_weight="1" />
+                android:padding="6dp"
+                android:textSize="10sp" />
 
         </LinearLayout>
 
@@ -186,39 +195,44 @@
             android:id="@+id/layout_dew_row"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/text_title_dew"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:padding="6dp"
                 android:gravity="center"
-                android:text="@string/dew_point"/>
+                android:padding="6dp"
+                android:text="@string/dew_point" />
+
             <TextView
                 android:id="@+id/text_dew_open_weather"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:gravity="center"
                 android:padding="6dp"
-                android:layout_weight="1"/>
+                android:textSize="10sp" />
+
             <TextView
                 android:id="@+id/text_dew_dark_sky"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:gravity="center"
                 android:padding="6dp"
-                android:layout_weight="1"/>
+                android:textSize="10sp" />
+
             <TextView
                 android:id="@+id/text_dew_accu"
                 android:layout_width="0dp"
-                android:padding="6dp"
-                android:textSize="12sp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:gravity="center"
-                android:layout_weight="1" />
+                android:padding="6dp"
+                android:textSize="10sp" />
 
         </LinearLayout>
 
@@ -226,39 +240,44 @@
             android:id="@+id/layout_press_row"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/text_title_press"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:padding="6dp"
                 android:gravity="center"
-                android:text="@string/pressure"/>
+                android:padding="6dp"
+                android:text="@string/pressure" />
+
             <TextView
                 android:id="@+id/text_press_open_weather"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:gravity="center"
                 android:padding="6dp"
-                android:layout_weight="1"/>
+                android:textSize="10sp" />
+
             <TextView
                 android:id="@+id/text_press_dark_sky"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:gravity="center"
                 android:padding="6dp"
-                android:layout_weight="1"/>
+                android:textSize="10sp" />
+
             <TextView
                 android:id="@+id/text_press_accu"
                 android:layout_width="0dp"
-                android:padding="6dp"
-                android:textSize="12sp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:gravity="center"
-                android:layout_weight="1" />
+                android:padding="6dp"
+                android:textSize="10sp" />
 
         </LinearLayout>
 
@@ -266,39 +285,44 @@
             android:id="@+id/layout_humidity_row"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/text_title_humidity"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:padding="6dp"
                 android:gravity="center"
-                android:text="@string/humidity"/>
+                android:padding="6dp"
+                android:text="@string/humidity" />
+
             <TextView
                 android:id="@+id/text_humidity_open_weather"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:gravity="center"
                 android:padding="6dp"
-                android:layout_weight="1"/>
+                android:textSize="10sp" />
+
             <TextView
                 android:id="@+id/text_humidity_dark_sky"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:gravity="center"
                 android:padding="6dp"
-                android:layout_weight="1"/>
+                android:textSize="10sp" />
+
             <TextView
                 android:id="@+id/text_humidity_accu"
                 android:layout_width="0dp"
-                android:padding="6dp"
-                android:textSize="12sp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:gravity="center"
-                android:layout_weight="1" />
+                android:padding="6dp"
+                android:textSize="10sp" />
 
         </LinearLayout>
 
@@ -306,39 +330,44 @@
             android:id="@+id/layout_wind_row"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/text_title_wind"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:padding="6dp"
                 android:gravity="center"
-                android:text="@string/wind"/>
+                android:padding="6dp"
+                android:text="@string/wind" />
+
             <TextView
                 android:id="@+id/text_wind_open_weather"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:gravity="center"
                 android:padding="6dp"
-                android:layout_weight="1"/>
+                android:textSize="10sp" />
+
             <TextView
                 android:id="@+id/text_wind_dark_sky"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:gravity="center"
                 android:padding="6dp"
-                android:layout_weight="1"/>
+                android:textSize="10sp" />
+
             <TextView
                 android:id="@+id/text_wind_accu"
                 android:layout_width="0dp"
-                android:padding="6dp"
-                android:textSize="12sp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:gravity="center"
-                android:layout_weight="1" />
+                android:padding="6dp"
+                android:textSize="10sp" />
 
         </LinearLayout>
 
@@ -346,39 +375,44 @@
             android:id="@+id/layout_gust_row"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/text_title_gust"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:padding="6dp"
                 android:gravity="center"
-                android:text="@string/wind_gust"/>
+                android:padding="6dp"
+                android:text="@string/wind_gust" />
+
             <TextView
                 android:id="@+id/text_gust_open_weather"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:gravity="center"
                 android:padding="6dp"
-                android:layout_weight="1"/>
+                android:textSize="10sp" />
+
             <TextView
                 android:id="@+id/text_gust_dark_sky"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:gravity="center"
                 android:padding="6dp"
-                android:layout_weight="1"/>
+                android:textSize="10sp" />
+
             <TextView
                 android:id="@+id/text_gust_accu"
                 android:layout_width="0dp"
-                android:padding="6dp"
-                android:textSize="12sp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:gravity="center"
-                android:layout_weight="1" />
+                android:padding="6dp"
+                android:textSize="10sp" />
 
         </LinearLayout>
 
@@ -386,39 +420,44 @@
             android:id="@+id/layout_cloud_row"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/text_title_cloud"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:padding="6dp"
                 android:gravity="center"
-                android:text="@string/cloud_cover"/>
+                android:padding="6dp"
+                android:text="@string/cloud_cover" />
+
             <TextView
                 android:id="@+id/text_cloud_open_weather"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:gravity="center"
                 android:padding="6dp"
-                android:layout_weight="1"/>
+                android:textSize="10sp" />
+
             <TextView
                 android:id="@+id/text_cloud_dark_sky"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:gravity="center"
                 android:padding="6dp"
-                android:layout_weight="1"/>
+                android:textSize="10sp" />
+
             <TextView
                 android:id="@+id/text_cloud_accu"
                 android:layout_width="0dp"
-                android:padding="6dp"
-                android:textSize="12sp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:gravity="center"
-                android:layout_weight="1" />
+                android:padding="6dp"
+                android:textSize="10sp" />
 
         </LinearLayout>
 
@@ -426,77 +465,59 @@
             android:id="@+id/layout_visibility_row"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/text_title_visibility"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:padding="6dp"
                 android:gravity="center"
-                android:text="@string/visibility"/>
+                android:padding="6dp"
+                android:text="@string/visibility" />
+
             <TextView
                 android:id="@+id/text_visibility_open_weather"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:gravity="center"
                 android:padding="6dp"
-                android:layout_weight="1"/>
+                android:textSize="10sp" />
+
             <TextView
                 android:id="@+id/text_visibility_dark_sky"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:gravity="center"
                 android:padding="6dp"
-                android:layout_weight="1"/>
+                android:textSize="10sp" />
+
             <TextView
                 android:id="@+id/text_visibility_accu"
                 android:layout_width="0dp"
-                android:padding="6dp"
-                android:textSize="12sp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:gravity="center"
-                android:layout_weight="1" />
+                android:padding="6dp"
+                android:textSize="10sp" />
 
         </LinearLayout>
 
 
     </LinearLayout>
 
-
-
-    <!--<TextView-->
-        <!--android:id="@+id/text_results"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_margin="22dp"-->
-        <!--android:textSize="16sp"-->
-        <!--android:gravity="center"-->
-        <!--app:layout_constraintStart_toStartOf="parent"-->
-        <!--app:layout_constraintEnd_toEndOf="parent"-->
-        <!--app:layout_constraintTop_toBottomOf="@id/image_icon"/>-->
-
     <ProgressBar
         android:id="@+id/progress_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:visibility="gone"/>
-
-    <!--<com.google.android.gms.ads.AdView-->
-        <!--android:id="@+id/ad_banner_view"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--app:layout_constraintBottom_toBottomOf="parent"-->
-        <!--app:layout_constraintStart_toStartOf="parent"-->
-        <!--app:layout_constraintEnd_toEndOf="parent"-->
-        <!--ads:adSize = "BANNER"-->
-        <!--ads:adUnitId="@string/banner_ad_unit_id"/>-->
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

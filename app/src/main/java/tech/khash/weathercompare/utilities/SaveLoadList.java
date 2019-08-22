@@ -52,8 +52,6 @@ public class SaveLoadList {
 
         //get the shared preference editor
         SharedPreferences.Editor editor = sharedPreferences.edit();
-//        //since we have added the old data to the new list, we can now delete the last entry
-//        editor.remove(Constant.PREF_KEY_ARRAY).apply();
         //add the new updated list. If it already exists, it just replaces the old one so we wont need to delete first
         editor.putString(Constant.PREF_KEY_ARRAY, json);
         editor.apply();
@@ -69,9 +67,6 @@ public class SaveLoadList {
      * @param input : Loc object to be added to the list
      */
     public static void addToLocList (Context context, Loc input) {
-        //create Gson object
-        Gson gson = new Gson();
-
         //load the previous data, and add the new list to it
         ArrayList<Loc> currentList = loadLocList(context);
 
@@ -139,6 +134,55 @@ public class SaveLoadList {
         return loc;
     }//getLocFromDb
 
+    /**
+     *  This method gets an updated Loc object as an input and replaces it in the main arraylist
+     *  It searches the database for the Loc using its ID, and then replaces it.
+     *
+     *  If no such Object is found, nothing is done
+     *  //TODO: This could be modified. either return a boolean, or just simply add the new one
+     *
+     * @param context : context
+     * @param newLoc : updated Loc
+     */
+    public static void replaceLocInDb(Context context, Loc newLoc) {
+        //find the old Loc and get its index
+        int index  = getLocIndex(context, newLoc);
+        if (index == -1) {
+            //no such Loc exists
+            return;
+        }//if
+        //load the database
+        ArrayList<Loc> locArrayList = loadLocList(context);
+
+        //replace the old Loc object with the new one in the ArrayList
+        locArrayList.set(index, newLoc);
+
+        //save the new list
+        savedLocList(context, locArrayList);
+    }//replaceLocInDb
+
+    /**
+     * This method searches the database using a given Loc (using its name), and then returns the
+     * item's index
+     * @param context : context
+     * @param loc : Loc object to be searched for
+     * @return : index of the object. returns -1 if no such Loc exists
+     */
+    private static int getLocIndex (Context context, Loc loc) {
+        String id = loc.getId();
+        ArrayList<Loc> locArrayList = loadLocList(context);
+
+        int index = -1;
+        int i = 0;
+        for (Loc l : locArrayList) {
+            if (l.getId().equalsIgnoreCase(id)) {
+                index = i;
+                return index;
+            }//if
+            i++;
+        }//for
+        return index;
+    }//getLocIndex
 
     public static void deleteDb(Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);

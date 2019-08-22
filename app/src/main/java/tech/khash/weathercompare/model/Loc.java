@@ -1,5 +1,7 @@
 package tech.khash.weathercompare.model;
 
+import android.text.TextUtils;
+
 import androidx.annotation.Nullable;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -25,11 +27,6 @@ public class Loc {
 
     //default constructor
     public Loc(){}
-
-    //Constructors
-    public Loc(LatLng latLng) {
-        this.latLng = latLng;
-    }
 
     public Loc(String id, LatLng latLng) {
         this.latLng = latLng;
@@ -102,4 +99,8 @@ public class Loc {
     public void setCountry(String country) {
         this.country = country;
     }//setCountry
+
+    public boolean hasKey() {
+        return !TextUtils.isEmpty(key);
+    }
 }//Loc

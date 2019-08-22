@@ -36,6 +36,7 @@ import java.util.Objects;
 
 import tech.khash.weathercompare.adapter.LocListAdapter;
 import tech.khash.weathercompare.model.Loc;
+import tech.khash.weathercompare.utilities.AccuWeatherUtils;
 import tech.khash.weathercompare.utilities.HelperFunctions;
 import tech.khash.weathercompare.utilities.SaveLoadList;
 
@@ -50,17 +51,18 @@ public class MainActivity extends AppCompatActivity implements
     //for sending and receiving location from add location activity
     private static final int ADD_LOCATION_REQUEST_CODE = 1;
     public final static String FENCE_EDIT_EXTRA_INTENT_LOC_NAME = "fence-edit-extra-intent-loc_name";
+    public final static String COMPARE_EXTRA_LOC_ID = "compare-extra-loc-id";
 
     //drawer layout used for navigation drawer
-    private DrawerLayout mDrawerLayout;
+    private DrawerLayout drawerLayout;
 
     //for holding the current location
     private Loc locCurrent;
 
     //adapter
-    private ArrayList<Loc> mLocArrayList;
-    private LocListAdapter mAdapter;
-    private RecyclerView mRecyclerView;
+    private ArrayList<Loc> locArrayList;
+    private LocListAdapter adapter;
+    private RecyclerView recyclerView;
 
     //for tracking changes that needs the list to be updated/recreated
     private boolean needsUpdate = false;
@@ -84,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements
         //In order for the button to open the menu we need to override onOption Item selected (below onCreate)
 
         //get the drawer layout and navigation drawer
-        mDrawerLayout = findViewById(R.id.drawer_layout);
+        drawerLayout = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
         if (navigationView != null) {
             navigationView.setNavigationItemSelectedListener(this);
@@ -94,28 +96,28 @@ public class MainActivity extends AppCompatActivity implements
         LinearLayout emptyView = findViewById(R.id.empty_view);
 
         //get the arrayList, and set the visibility of empty view accordingly
-        mLocArrayList = SaveLoadList.loadLocList(this);
-        if (mLocArrayList == null || mLocArrayList.size() < 1) {
+        locArrayList = SaveLoadList.loadLocList(this);
+        if (locArrayList == null || locArrayList.size() < 1) {
             emptyView.setVisibility(View.VISIBLE);
         } else {
             emptyView.setVisibility(View.GONE);
         }
 
         //TODO: testing
-        logList(mLocArrayList);
+        logList(locArrayList);
 
         // Get a handle to the RecyclerView.
-        mRecyclerView = findViewById(R.id.recycler_view);
-        // Create an mAdapter and supply the data to be displayed.
-        mAdapter = new LocListAdapter(this, mLocArrayList, this);
-        // Connect the mAdapter with the RecyclerView.
-        mRecyclerView.setAdapter(mAdapter);
+        recyclerView = findViewById(R.id.recycler_view);
+        // Create an adapter and supply the data to be displayed.
+        adapter = new LocListAdapter(this, locArrayList, this);
+        // Connect the adapter with the RecyclerView.
+        recyclerView.setAdapter(adapter);
         // Give the RecyclerView a default layout manager.
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
         //Add divider between items using the DividerItemDecoration
-        DividerItemDecoration decoration = new DividerItemDecoration(mRecyclerView.getContext(),
+        DividerItemDecoration decoration = new DividerItemDecoration(recyclerView.getContext(),
                 DividerItemDecoration.VERTICAL);
-        mRecyclerView.addItemDecoration(decoration);
+        recyclerView.addItemDecoration(decoration);
 
         //find the fab and set it up
         FloatingActionButton fabAdd = findViewById(R.id.fab_add);
@@ -127,6 +129,13 @@ public class MainActivity extends AppCompatActivity implements
                 openAddLocation();
             }
         });
+
+
+        Loc loc = new Loc();
+        String key = loc.getKey();
+        boolean hasKey = loc.hasKey();
+
+        Log.v(TAG, "Has Key: " + String.valueOf(loc.hasKey()) + "\nKey: " + key);
     }//onCreate
 
     @Override
@@ -153,9 +162,9 @@ public class MainActivity extends AppCompatActivity implements
         Log.v(TAG, "onPause Called");
         super.onPause();
         //if the navigation drawer is open, we close it so when the user is directed back, it doesn't stay open
-        if (mDrawerLayout != null) {
-            if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
-                mDrawerLayout.closeDrawer(GravityCompat.START);
+        if (drawerLayout != null) {
+            if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                drawerLayout.closeDrawer(GravityCompat.START);
             }
         }
     }//onPause
@@ -210,9 +219,9 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onBackPressed() {
         //If the user clicks the systems back button and if the navigation drawer is open, it closes it
-        if (mDrawerLayout != null) {
-            if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
-                mDrawerLayout.closeDrawer(GravityCompat.START);
+        if (drawerLayout != null) {
+            if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                drawerLayout.closeDrawer(GravityCompat.START);
             } else {
                 super.onBackPressed();
             }
@@ -237,12 +246,14 @@ public class MainActivity extends AppCompatActivity implements
         switch (item.getItemId()) {
             case android.R.id.home:
                 //open navigation drawer
-                mDrawerLayout.openDrawer(GravityCompat.START);
+                drawerLayout.openDrawer(GravityCompat.START);
                 return true;
             case R.id.action_find_me:
                 //TODO:
-//                HelperFunctions.showToast(this, "Find Me");
-                HelperFunctions.askLocationPermission(this, this);
+                //Testing only
+                for (Loc loc : locArrayList) {
+                    AccuWeatherUtils.createLocationCodeUrl(loc.getLatLng());
+                }
                 return true;
             case R.id.action_sort_name_ascending:
                 sortNameAscending();
@@ -329,9 +340,15 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onListItemClick(int clickedItemIndex) {
         //get the corresponding fence object
-        Loc loc = mLocArrayList.get(clickedItemIndex);
-        //show a dialog
-        HelperFunctions.showToast(this, "\"" + loc.getId() + "\"" + " clicked");
+        Loc loc = locArrayList.get(clickedItemIndex);
+//        HelperFunctions.showToast(this, "\"" + loc.getId() + "\"" + " clicked");
+
+        //start compare activity, passing in the loc object
+        Intent compareIntent = new Intent(MainActivity.this, CompareActivity.class);
+        String id = loc.getId();
+        compareIntent.putExtra(COMPARE_EXTRA_LOC_ID, id);
+        startActivity(compareIntent);
+
     }//onListItemClick
 
     /*------------------------------------------------------------------------------------------
@@ -357,26 +374,26 @@ public class MainActivity extends AppCompatActivity implements
 
     //Helper method for sorting list based on their name (ascending)
     private void sortNameAscending() {
-        Collections.sort(mLocArrayList, new Comparator<Loc>() {
+        Collections.sort(locArrayList, new Comparator<Loc>() {
             @Override
             public int compare(Loc o1, Loc o2) {
                 return o1.getId().compareTo(o2.getId());
             }
         });
-        //notify the mAdapter that the data has changed, and it should update
-        mAdapter.notifyDataSetChanged();
+        //notify the adapter that the data has changed, and it should update
+        adapter.notifyDataSetChanged();
     }//sortNameAscending
 
     //Helper method for sorting list based on their name (ascending)
     private void sortNameDescending() {
-        Collections.sort(mLocArrayList, new Comparator<Loc>() {
+        Collections.sort(locArrayList, new Comparator<Loc>() {
             @Override
             public int compare(Loc o1, Loc o2) {
                 return o2.getId().compareTo(o1.getId());
             }
         });
-        //notify the mAdapter that the data has changed, and it should update
-        mAdapter.notifyDataSetChanged();
+        //notify the adapter that the data has changed, and it should update
+        adapter.notifyDataSetChanged();
     }//sortNameAscending
 
     //Helper method for showing the dialog for deleting all data

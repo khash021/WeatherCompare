@@ -1,5 +1,6 @@
 package tech.khash.weathercompare;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -19,11 +20,13 @@ import org.json.JSONException;
 import java.io.IOException;
 import java.net.URL;
 
+import tech.khash.weathercompare.model.Loc;
 import tech.khash.weathercompare.model.Weather;
 import tech.khash.weathercompare.utilities.AccuWeatherUtils;
 import tech.khash.weathercompare.utilities.DarkSkyUtils;
 import tech.khash.weathercompare.utilities.OpenWeatherUtils;
 import tech.khash.weathercompare.utilities.ParseJSON;
+import tech.khash.weathercompare.utilities.SaveLoadList;
 
 //TODO: extensive cleaning, commenting, and re-thinking the entire architecture of the desing and flow
 
@@ -49,11 +52,13 @@ public class CompareActivity extends AppCompatActivity {
     private static final String CANMORE_ID_ACCU_WEATHER = "52903_PC";
     static final String CANMORE_LAT_LONG = "/51.09,-115.35";
     private ImageView mIconImage;
-    private ProgressBar mProgress;
+    private ProgressBar progressBar;
+
+    private Loc currentLoc;
 
     //this is to be used for tracking the progress bar (it will be set to -1 if it a single update; otherwise
     //it will be incremented so the last query to get finished will remove it
-    private int mTracker;
+    private int tracker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,18 +67,26 @@ public class CompareActivity extends AppCompatActivity {
         Log.v(TAG, "onCreate Called");
         Log.v(TAG, "Package name: " + getPackageName());
 
-        mTracker = 0;
+        tracker = 0;
 
-        mProgress = findViewById(R.id.progress_bar);
+        progressBar = findViewById(R.id.progress_bar);
 //        mIconImage = findViewById(R.id.image_icon);
 
-
-        //Add banner add (disable for now)
-//        addBannerAd();
+        //get the loc id from intent extra
+        if (getIntent().hasExtra(MainActivity.COMPARE_EXTRA_LOC_ID)) {
+            String id = getIntent().getStringExtra(MainActivity.COMPARE_EXTRA_LOC_ID);
+            if (!TextUtils.isEmpty(id)) {
+                //get the corresponding loc
+                Loc loc = SaveLoadList.getLocFromDb(this, id);
+                if (loc != null) {
+                    currentLoc = loc;
+                }//null-loc
+            }//empty string
+        }//has extra
 
         //Getting Open Weather
-        Button canmoreOpenWeather = findViewById(R.id.button_open_weather);
-        canmoreOpenWeather.setOnClickListener(new View.OnClickListener() {
+        Button buttonOpenWeather = findViewById(R.id.button_open_weather);
+        buttonOpenWeather.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 URL canmoreUrl = OpenWeatherUtils.createWeatherUrlId(CANMORE_ID_OPEN_WEATHER);
@@ -84,7 +97,7 @@ public class CompareActivity extends AppCompatActivity {
                     //instantiate a OpenWeatherQueryTask object and then passing in our URL
                     OpenWeatherQueryTask openWeatherQueryTask = new OpenWeatherQueryTask();
                     //set the tracker to -1 so we know it is a single load
-                    mTracker = -1;
+                    tracker = -1;
                     openWeatherQueryTask.execute(canmoreUrl);
 
                 }
@@ -92,28 +105,52 @@ public class CompareActivity extends AppCompatActivity {
         });
 
         //Getting Accu Weather
-        Button canmoreAccuWeather = findViewById(R.id.button_accu_weather);
-        canmoreAccuWeather.setOnClickListener(new View.OnClickListener() {
+        Button buttonAccuWeather = findViewById(R.id.button_accu_weather);
+        buttonAccuWeather.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                URL canmoreUrl = AccuWeatherUtils.createWeatherUrlId(CANMORE_ID_ACCU_WEATHER);
+                //TODO: later we should just get the code from Loc
+                //check for null loc
+                if (currentLoc != null) {
 
-                if (canmoreUrl == null) {
-                    showAccuWeatherError();
-                } else {
-                    //instantiate a AccuWeatherQueryTask object and then passing in our URL
-                    AccuWeatherQueryTask accuWeatherQueryTask = new AccuWeatherQueryTask();
-                    //set the tracker to -1 so we know it is a single load
-                    mTracker = -1;
-                    accuWeatherQueryTask.execute(canmoreUrl);
-                }
-            }
-        });
+                    //get location code url
+                    //TODO: later we should just get the code from Loc
+                    if (!currentLoc.hasKey()) {
+                        //doesn't have key, so we need to get it
+                        //get the location code
+                        URL locationCodeUrl = AccuWeatherUtils.createLocationCodeUrl(currentLoc.getLatLng());
+
+                        if (locationCodeUrl == null) {
+                            showAccuWeatherError();
+                            Log.v(TAG, "AW - Location code URL null");
+                        } else {
+                            //instantiate AccuWeatherLocationQueryTask to get the location key
+                            AccuWeatherLocationQueryTask locationQueryTask = new AccuWeatherLocationQueryTask(getApplicationContext());
+                            locationQueryTask.execute(locationCodeUrl);
+                        }//null-loc
+                    } else {
+                        //this means we already have a key, so just start query for weather
+                        //create weather URL
+                        URL url = AccuWeatherUtils.createCurrentWeatherUrlId(currentLoc.getKey());
+                        if (url == null) {
+                            showAccuWeatherError();
+                            Log.v(TAG, "AW - weather URL null");
+                        } else {
+                            //instantiate a AccuWeatherQueryTask object and then passing in our URL
+                            AccuWeatherQueryTask accuWeatherQueryTask = new AccuWeatherQueryTask();
+                            //set the tracker to -1 so we know it is a single load
+                            tracker = -1;
+                            accuWeatherQueryTask.execute(url);
+                        }//if-else null url
+                    }//if-else loc.hasKey
+                }//current loc-null
+            }//onClick
+        });//onClickListener
 
         //Getting Dark Sky
-        Button canmoreDarkSky = findViewById(R.id.button_dark_sky);
-        canmoreDarkSky.setOnClickListener(new View.OnClickListener() {
+        Button buttonDarkSky = findViewById(R.id.button_dark_sky);
+        buttonDarkSky.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -124,7 +161,7 @@ public class CompareActivity extends AppCompatActivity {
                 } else {
                     DarkSkyQueryTask darkSkyQueryTask = new DarkSkyQueryTask();
                     //set the tracker to -1 so we know it is a single load
-                    mTracker = -1;
+                    tracker = -1;
                     darkSkyQueryTask.execute(url);
                 }
             }
@@ -132,14 +169,54 @@ public class CompareActivity extends AppCompatActivity {
 
     }//onCreate
 
-//    private void addBannerAd() {
-//        AdView bannerAd = findViewById(R.id.ad_banner_view);
-//        //create an ad request object using the builder
-//        AdRequest adRequest = new AdRequest.Builder()
-//                .build();
-//        //load the ad request into the ad view
-//        bannerAd.loadAd(adRequest);
-//    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.compare_menu, menu);
+
+        //return true since we have managed it
+        return true;
+    }//onCreateOptionsMenu
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        if (item.getItemId() == R.id.action_refresh) {
+
+            //open weather
+            URL openWeatherUrl = OpenWeatherUtils.createWeatherUrlId(CANMORE_ID_OPEN_WEATHER);
+
+            if (openWeatherUrl == null) {
+                showOpenWeatherError();
+            } else {
+                //instantiate a OpenWeatherQueryTask object and then passing in our URL
+                OpenWeatherQueryTask openWeatherQueryTask = new OpenWeatherQueryTask();
+                openWeatherQueryTask.execute(openWeatherUrl);
+            }
+
+            //Accu Weather
+            URL accuUrl = AccuWeatherUtils.createCurrentWeatherUrlId(CANMORE_ID_ACCU_WEATHER);
+
+            if (accuUrl == null) {
+                showAccuWeatherError();
+            } else {
+                //instantiate a AccuWeatherQueryTask object and then passing in our URL
+                AccuWeatherQueryTask accuWeatherQueryTask = new AccuWeatherQueryTask();
+                accuWeatherQueryTask.execute(accuUrl);
+            }
+
+            //DarkSky
+            URL darkSkyUrl = DarkSkyUtils.createWeatherUrlId(CANMORE_LAT_LONG);
+
+            if (darkSkyUrl == null) {
+                showDarkSkyError();
+            } else {
+                DarkSkyQueryTask darkSkyQueryTask = new DarkSkyQueryTask();
+                darkSkyQueryTask.execute(darkSkyUrl);
+            }
+        }//if
+
+        return super.onOptionsItemSelected(item);
+    }//onOptionsItemSelected
 
     /**
      * For now we are using an AsyncTask loader class for getting the JSON response from Open Weather
@@ -151,7 +228,7 @@ public class CompareActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            mProgress.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(View.VISIBLE);
         }//onPreExecute
 
         //http query
@@ -162,7 +239,7 @@ public class CompareActivity extends AppCompatActivity {
             try {
                 //get the response using the class, passing in our url
                 String httpResponse = OpenWeatherUtils.getResponseFromHttpUrl(urls[0]);
-                Log.d(TAG, "OpenWeather JSON response: " + httpResponse);
+                Log.v(TAG, "OpenWeather JSON response: " + httpResponse);
                 return httpResponse;
             } catch (IOException e) {
                 Log.e(TAG, "Error establishing connection - OpenWeather ", e);
@@ -175,14 +252,14 @@ public class CompareActivity extends AppCompatActivity {
         protected void onPostExecute(String s) {
             //if it was a single load, then remove progress bar and set it back to 0; otherwise
             //if it is not 2, just increment
-            if (mTracker == -1 || mTracker == 2) {
+            if (tracker == -1 || tracker == 2) {
 
                 //remove progress bar and reset the tracker
-                mProgress.setVisibility(View.INVISIBLE);
-                mTracker = 0;
+                progressBar.setVisibility(View.INVISIBLE);
+                tracker = 0;
             } else {
                 //this means this is part the group load and just increment
-                mTracker++;
+                tracker++;
             }
 
             //dummy check
@@ -207,6 +284,64 @@ public class CompareActivity extends AppCompatActivity {
         }//onPostExecute
     }//OpenWeatherQueryTask
 
+    public class AccuWeatherLocationQueryTask extends AsyncTask<URL, Void, String> {
+
+        private Context context;
+
+        public AccuWeatherLocationQueryTask(Context context) {
+            this.context = context;
+        }
+
+        //show progress bar
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressBar.setVisibility(View.VISIBLE);
+        }//onPreExecute
+
+        @Override
+        protected String doInBackground(URL... urls) {
+            //Make the request
+            try {
+                String locationCodeResponse = AccuWeatherUtils.getResponseFromHttpUrl(urls[0]);
+                return locationCodeResponse;
+            } catch (IOException e) {
+                Log.e(TAG, "Error establishing connection - AccuWeather - location ", e);
+                return null;
+            }
+        }//doInBackground
+
+        @Override
+        protected void onPostExecute(String s) {
+            //parse the response and get the code
+            try {
+                String locationCode = ParseJSON.parseAccuLocationCode(s);
+                //set the loc
+                if (currentLoc != null) {
+                    currentLoc.setKey(locationCode);
+                    //TODO: testing
+                    //update the Loc in list
+                    SaveLoadList.replaceLocInDb(context, currentLoc);
+                }//loc null
+                //create weather URL
+                URL url = AccuWeatherUtils.createCurrentWeatherUrlId(locationCode);
+                if (url == null) {
+                    showAccuWeatherError();
+                    Log.v(TAG, "AW - weather URL null");
+                } else {
+                    //instantiate a AccuWeatherQueryTask object and then passing in our URL
+                    AccuWeatherQueryTask accuWeatherQueryTask = new AccuWeatherQueryTask();
+                    //set the tracker to -1 so we know it is a single load
+                    tracker = -1;
+                    accuWeatherQueryTask.execute(url);
+                }//if-else null url
+
+            } catch (JSONException e) {
+                Log.e(TAG, "Error parsing location code response - AccuWeather ", e);
+            }
+        }//onPostExecute
+    }//AccuWeatherLocationQueryTask
+
     /**
      * For now we are using an AsyncTask loader class for getting the JSON response from AccuWeather
      */
@@ -216,7 +351,7 @@ public class CompareActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            mProgress.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(View.VISIBLE);
         }//onPreExecute
 
         @Override
@@ -225,7 +360,7 @@ public class CompareActivity extends AppCompatActivity {
             try {
                 //get the response using the class, passing in our url
                 String httpResponse = AccuWeatherUtils.getResponseFromHttpUrl(urls[0]);
-                Log.d(TAG, "AccuWeather - JSON response: " + httpResponse);
+                Log.v(TAG, "AccuWeather - JSON response: " + httpResponse);
                 return httpResponse;
             } catch (IOException e) {
                 Log.e(TAG, "Error establishing connection - AccuWeather ", e);
@@ -238,14 +373,14 @@ public class CompareActivity extends AppCompatActivity {
         protected void onPostExecute(String s) {
             //if it was a single load, then remove progress bar and set it back to 0; otherwise
             //if it is not 2, just increment
-            if (mTracker == -1 || mTracker == 2) {
+            if (tracker == -1 || tracker == 2) {
 
                 //remove progress bar and reset the tracker
-                mProgress.setVisibility(View.INVISIBLE);
-                mTracker = 0;
+                progressBar.setVisibility(View.INVISIBLE);
+                tracker = 0;
             } else {
                 //this means this is part the group load and just increment
-                mTracker++;
+                tracker++;
             }
 
             //dummy check
@@ -279,7 +414,7 @@ public class CompareActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            mProgress.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(View.VISIBLE);
         }//onPreExecute
 
         @Override
@@ -288,7 +423,7 @@ public class CompareActivity extends AppCompatActivity {
             try {
                 //get the response using the class, passing in our url
                 String httpResponse = DarkSkyUtils.getResponseFromHttpUrl(urls[0]);
-                Log.d(TAG, "DarkSky - JSON response: " + httpResponse);
+                Log.v(TAG, "DarkSky - JSON response: " + httpResponse);
                 return httpResponse;
             } catch (IOException e) {
                 Log.e(TAG, "Error establishing connection - DarkSky ", e);
@@ -301,14 +436,14 @@ public class CompareActivity extends AppCompatActivity {
         protected void onPostExecute(String s) {
             //if it was a single load, then remove progress bar and set it back to 0; otherwise
             //if it is not 2, just increment
-            if (mTracker == -1 || mTracker == 2) {
+            if (tracker == -1 || tracker == 2) {
 
                 //remove progress bar and reset the tracker
-                mProgress.setVisibility(View.INVISIBLE);
-                mTracker = 0;
+                progressBar.setVisibility(View.INVISIBLE);
+                tracker = 0;
             } else {
                 //this means this is part the group load and just increment
-                mTracker++;
+                tracker++;
             }
 
             //dummy check
@@ -517,53 +652,6 @@ public class CompareActivity extends AppCompatActivity {
         visibility.setText(empty);
     }//showOpenWeatherError
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.compare_menu, menu);
 
-        //return true since we have managed it
-        return true;
-    }//onCreateOptionsMenu
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        if (item.getItemId() == R.id.action_refresh) {
-
-            //open weather
-            URL openWeatherUrl = OpenWeatherUtils.createWeatherUrlId(CANMORE_ID_OPEN_WEATHER);
-
-            if (openWeatherUrl == null) {
-                showOpenWeatherError();
-            } else {
-                //instantiate a OpenWeatherQueryTask object and then passing in our URL
-                OpenWeatherQueryTask openWeatherQueryTask = new OpenWeatherQueryTask();
-                openWeatherQueryTask.execute(openWeatherUrl);
-            }
-
-            //Accu Weather
-            URL accuUrl = AccuWeatherUtils.createWeatherUrlId(CANMORE_ID_ACCU_WEATHER);
-
-            if (accuUrl == null) {
-                showAccuWeatherError();
-            } else {
-                //instantiate a AccuWeatherQueryTask object and then passing in our URL
-                AccuWeatherQueryTask accuWeatherQueryTask = new AccuWeatherQueryTask();
-                accuWeatherQueryTask.execute(accuUrl);
-            }
-
-            //DarkSky
-            URL darkSkyUrl = DarkSkyUtils.createWeatherUrlId(CANMORE_LAT_LONG);
-
-            if (darkSkyUrl == null) {
-                showDarkSkyError();
-            } else {
-                DarkSkyQueryTask darkSkyQueryTask = new DarkSkyQueryTask();
-                darkSkyQueryTask.execute(darkSkyUrl);
-            }
-        }//if
-
-        return super.onOptionsItemSelected(item);
-    }//onOptionsItemSelected
 
 }//main-class

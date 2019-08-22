@@ -51,7 +51,7 @@ public class OpenWeatherUtils {
             Log.e(TAG, "Error creating URL from string", e);
         }
         return queryUrl;
-    }//createWeatherUrlId
+    }//createCurrentWeatherUrlId
 
     /**
      * This creates the URL using the city ID for the current weather
@@ -71,7 +71,7 @@ public class OpenWeatherUtils {
             Log.e(TAG, "Error creating URL from string", e);
         }
         return queryUrl;
-    }//createWeatherUrlId
+    }//createCurrentWeatherUrlId
 
     /**
      * This method returns the entire result from the HTTP response.

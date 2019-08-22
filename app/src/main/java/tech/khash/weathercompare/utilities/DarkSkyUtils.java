@@ -54,7 +54,7 @@ public class DarkSkyUtils {
             Log.e(TAG, "Error creating URL from string", e);
         }
         return queryUrl;
-    }//createWeatherUrlId
+    }//createCurrentWeatherUrlId
 
     /**
      * This method returns the entire result from the HTTP response.

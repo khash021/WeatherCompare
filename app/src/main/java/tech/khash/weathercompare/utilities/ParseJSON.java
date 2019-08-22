@@ -1,6 +1,7 @@
 package tech.khash.weathercompare.utilities;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -48,6 +49,7 @@ public class ParseJSON {
     private static final String JSON_AW_VISIBILITY = "Visibility";
     private static final String JSON_AW_CLOUD_COVER = "CloudCover";
     private static final String JSON_AW_PRESSURE = "Pressure";
+    private static final String JSON_AW_LOCATION_KEY = "Key";
 
     private static final String JSON_AW_ICON = "WeatherIcon";
 
@@ -161,6 +163,27 @@ public class ParseJSON {
 
         return weather;
     }//parseOpenWeatherCurrent
+
+    /**
+     *  It extracts AccuWeather's location code from the JSON response
+     * @param jsonString : JSON response from AW API
+     * @return : location code
+     * @throws JSONException
+     */
+    public static String parseAccuLocationCode (String jsonString) throws JSONException {
+        if (TextUtils.isEmpty(jsonString)) {
+            return null;
+        }
+        String locationCode;
+        JSONObject responseObject = new JSONObject(jsonString);
+
+        //by using optString, if such string does not exists, it returns an empty string.
+        locationCode = responseObject.optString(JSON_AW_LOCATION_KEY);
+
+        Log.v(TAG, "location code: " + locationCode);
+
+        return locationCode;
+    }//parseAccuLocationCode
 
     /**
      * This method is for parsing the current weather from AccuWeather

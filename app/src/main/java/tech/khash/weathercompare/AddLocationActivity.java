@@ -47,6 +47,8 @@ public class AddLocationActivity extends AppCompatActivity implements OnMapReady
 
     private static final String TAG = AddLocationActivity.class.getSimpleName();
 
+    //TODO: check against duplicate names
+
     private GoogleMap mMap;
     private LatLng latLngCamera;
     private LatLng latLngUser;

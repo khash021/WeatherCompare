@@ -3,6 +3,8 @@ package tech.khash.weathercompare.utilities;
 
 import android.util.Log;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -19,34 +21,61 @@ public class AccuWeatherUtils {
 
     private final static String TAG = AccuWeatherUtils.class.getSimpleName();
 
-    static final String ACCU_WEATHER_BASE_URL = "http://dataservice.accuweather.com/currentconditions/v1/";
+    private static final String ACCU_WEATHER_BASE_URL_CURRENT =
+            "http://dataservice.accuweather.com/currentconditions/v1/";
 
-    static final String API_ID = "?apikey=";
+    private static final String QUERY = "&q=";
 
-    static final String API_KEY = "Lxds8cj5vJGWk7n1XBe8McAhJhyFnCaw";
+    static final String ACCU_WEATHER_BASE_URL_LOCATION =
+            "http://dataservice.accuweather.com/locations/v1/cities/geoposition/search";
 
-    static final String DETAILS_TRUE = "&details=true";
+    private static final String API_ID = "?apikey=";
+
+    private static final String API_KEY = "Lxds8cj5vJGWk7n1XBe8McAhJhyFnCaw";
+
+    private static final String DETAILS_TRUE = "&details=true";
 
 
     /**
-     * This creates the URL using the city ID for the current weather
+     *  This creates a URL for getting location code from LatLng
+     * @param latLng : LatLng of the location
+     * @return : URL for getting the location code
+     */
+    public static URL createLocationCodeUrl (LatLng latLng) {
+        String latLngString = latLng.latitude + "," + latLng.longitude;
+        String urlString = ACCU_WEATHER_BASE_URL_LOCATION + API_ID + API_KEY + QUERY + latLngString;
+
+        URL url = null;
+        try {
+            url = new URL(urlString);
+            Log.v(TAG, "Location URL: " + url.toString());
+        } catch (MalformedURLException e) {
+            Log.e(TAG, "Error creating location URL from string", e);
+        }
+        return url;
+    }//createLocationCodeUrl
+
+
+    /**
+     * This creates the URL for current weather using city ID
      * @param id : city's id
      * @return : URL
      */
-    public static URL createWeatherUrlId(String id) {
+    public static URL createCurrentWeatherUrlId(String id) {
 
-        String url = ACCU_WEATHER_BASE_URL + id + API_ID + API_KEY + DETAILS_TRUE;
-        Log.d(TAG, "URL: " + url );
+        String url = ACCU_WEATHER_BASE_URL_CURRENT + id + API_ID + API_KEY + DETAILS_TRUE;
+        Log.v(TAG, "current weather URL: " + url );
 
         URL queryUrl = null;
         try {
             queryUrl = new URL(url);
+            Log.v(TAG, "generated current url: " + queryUrl.toString());
         } catch (MalformedURLException e) {
 
-            Log.e(TAG, "Error creating URL from string", e);
+            Log.e(TAG, "Error creating current weather URL from string", e);
         }
         return queryUrl;
-    }//createWeatherUrlId
+    }//createCurrentWeatherUrlId
 
     /**
      * This method returns the entire result from the HTTP response.
