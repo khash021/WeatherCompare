@@ -14,6 +14,7 @@ public final class Constant {
 
     //location permission
     public final static int LOCATION_PERMISSION_REQUEST_CODE = 1;
+    public static final String PREF_KEY_FIRST_TIME_LOCATION = "pref_key_first_time_location";
 
 
 }//Constant
