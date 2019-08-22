@@ -26,6 +26,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 
@@ -131,11 +132,11 @@ public class MainActivity extends AppCompatActivity implements
         });
 
 
-        Loc loc = new Loc();
-        String key = loc.getKey();
-        boolean hasKey = loc.hasKey();
+        LatLng latLng = new LatLng(49.273367, -123.102950);
+        String lat = "lat=%s&lon=%s";
+        String outPut = String.format(lat, latLng.latitude, latLng.longitude );
 
-        Log.v(TAG, "Has Key: " + String.valueOf(loc.hasKey()) + "\nKey: " + key);
+        Log.v(TAG, "OUTPUT IS: " + outPut);
     }//onCreate
 
     @Override

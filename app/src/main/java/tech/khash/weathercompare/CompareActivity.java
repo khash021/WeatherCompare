@@ -89,20 +89,23 @@ public class CompareActivity extends AppCompatActivity {
         buttonOpenWeather.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                URL canmoreUrl = OpenWeatherUtils.createWeatherUrlId(CANMORE_ID_OPEN_WEATHER);
+                //check current loc
+                if (currentLoc != null) {
+                    //get the current weather URL
+                    URL latLngUrl = OpenWeatherUtils.createCurrentUrlLatLng(currentLoc.getLatLng());
 
-                if (canmoreUrl == null) {
-                    showOpenWeatherError();
-                } else {
-                    //instantiate a OpenWeatherQueryTask object and then passing in our URL
-                    OpenWeatherQueryTask openWeatherQueryTask = new OpenWeatherQueryTask();
-                    //set the tracker to -1 so we know it is a single load
-                    tracker = -1;
-                    openWeatherQueryTask.execute(canmoreUrl);
-
-                }
-            }
-        });
+                    if (latLngUrl == null) {
+                        showOpenWeatherError();
+                        Log.v(TAG, "OW - LatLng URL null");
+                    } else {
+                        OpenWeatherQueryTask openWeatherQueryTask = new OpenWeatherQueryTask();
+                        //set the tracker to -1 so we know it is a single load
+                        tracker = -1;
+                        openWeatherQueryTask.execute(latLngUrl);
+                    }//if-else null url
+                }//null loc
+            }//onClick
+        });//onClickListener
 
         //Getting Accu Weather
         Button buttonAccuWeather = findViewById(R.id.button_accu_weather);
@@ -127,6 +130,8 @@ public class CompareActivity extends AppCompatActivity {
                         } else {
                             //instantiate AccuWeatherLocationQueryTask to get the location key
                             AccuWeatherLocationQueryTask locationQueryTask = new AccuWeatherLocationQueryTask(getApplicationContext());
+                            //set the tracker to -1 so we know it is a single load
+                            tracker = -1;
                             locationQueryTask.execute(locationCodeUrl);
                         }//null-loc
                     } else {
@@ -183,7 +188,7 @@ public class CompareActivity extends AppCompatActivity {
         if (item.getItemId() == R.id.action_refresh) {
 
             //open weather
-            URL openWeatherUrl = OpenWeatherUtils.createWeatherUrlId(CANMORE_ID_OPEN_WEATHER);
+            URL openWeatherUrl = OpenWeatherUtils.createCurrentUrlId(CANMORE_ID_OPEN_WEATHER);
 
             if (openWeatherUrl == null) {
                 showOpenWeatherError();

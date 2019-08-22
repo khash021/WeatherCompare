@@ -2,6 +2,8 @@ package tech.khash.weathercompare.utilities;
 
 import android.util.Log;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -18,17 +20,21 @@ public class OpenWeatherUtils {
 
     private final static String TAG = OpenWeatherUtils.class.getSimpleName();
 
-    static final String OPENWEATHER_WEATHER_BASE_URL = "https://api.openweathermap.org/data/2.5/weather?id=";
+    //for current
+    private static final String OPENWEATHER_WEATHER_BASE_URL_CITY_CODE = "https://api.openweathermap.org/data/2.5/weather?id=";
+    private static final String OPENWEATHER_WEATHER_BASE_URL_LAT_LNG = "https://api.openweathermap.org/data/2.5/weather?";
+    //forecast
+    private static final String OPENWEATHER_FORECAST_BASE_URL = "https://api.openweathermap.org/data/2.5/forecast?id=";
 
-    static final String OPENWEATHER_FORECAST_BASE_URL = "https://api.openweathermap.org/data/2.5/forecast?id=";
+    private static final String API_ID = "&appid=";
 
-    static final String API_ID = "&appid=";
+    private static final String API_KEY = "470cd029b949095fcc602ed656262f8b";
 
-    static final String API_KEY = "470cd029b949095fcc602ed656262f8b";
+    private static final String LAT_LNG = "lat=%s&lon=%s";
 
-    static final String UNIT = "&units=";
+    private static final String UNIT = "&units=";
 
-    static final String METRIC = "metric";
+    private static final String METRIC = "metric";
 
 
 
@@ -38,10 +44,10 @@ public class OpenWeatherUtils {
      * @param id : OpenWeatherMap city ID
      * @return URL : query URL (metric)
      */
-    public static URL createWeatherUrlId(int id) {
+    public static URL createCurrentUrlId(int id) {
 
-        String url = OPENWEATHER_WEATHER_BASE_URL + id + UNIT + METRIC + API_ID + API_KEY;
-        Log.d(TAG, "URL: " + url );
+        String url = OPENWEATHER_WEATHER_BASE_URL_CITY_CODE + id + UNIT + METRIC + API_ID + API_KEY;
+        Log.v(TAG, "URL: " + url );
 
         URL queryUrl = null;
         try {
@@ -49,6 +55,22 @@ public class OpenWeatherUtils {
         } catch (MalformedURLException e) {
 
             Log.e(TAG, "Error creating URL from string", e);
+        }
+        return queryUrl;
+    }//createCurrentWeatherUrlId
+
+    public static URL createCurrentUrlLatLng(LatLng latLng) {
+        String latLngString = String.format(LAT_LNG, latLng.latitude, latLng.longitude);
+
+        String url = OPENWEATHER_WEATHER_BASE_URL_LAT_LNG + latLngString + UNIT + METRIC + API_ID + API_KEY;
+        Log.v(TAG, "URL - LatLng: " + url );
+
+        URL queryUrl = null;
+        try {
+            queryUrl = new URL(url);
+        } catch (MalformedURLException e) {
+
+            Log.e(TAG, "Error creating URL from string (LatLng)", e);
         }
         return queryUrl;
     }//createCurrentWeatherUrlId
@@ -61,14 +83,14 @@ public class OpenWeatherUtils {
     public static URL createForecastUrlId(int id) {
 
         String url = OPENWEATHER_FORECAST_BASE_URL + id + UNIT + METRIC + API_ID + API_KEY;
-        Log.d(TAG, "URL: " + url );
+        Log.v(TAG, "URL - city ID: " + url );
 
         URL queryUrl = null;
         try {
             queryUrl = new URL(url);
         } catch (MalformedURLException e) {
 
-            Log.e(TAG, "Error creating URL from string", e);
+            Log.e(TAG, "Error creating URL from string(City code)", e);
         }
         return queryUrl;
     }//createCurrentWeatherUrlId

@@ -15,6 +15,8 @@ import com.google.android.gms.maps.model.LatLng;
  * AccuWeather needs a location key (cannot be done using LatLng), so the AW stands for AccuWeather
  */
 
+//TODO: add methods for creating OW, AW, and DS URLs
+
 public class Loc {
 
     private final static String TAG = Loc.class.getSimpleName();
