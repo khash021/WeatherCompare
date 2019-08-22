@@ -25,39 +25,36 @@ import tech.khash.weathercompare.model.Loc;
 
 public class SaveLoadList {
 
+    private static final String TAG = SaveLoadList.class.getSimpleName();
+
     public SaveLoadList(){}
 
     /**
-     *      Helper method for saving the new ArrayList<Loc> by replacing the old one (if it exists)
+     *      Helper private method for saving the new ArrayList<Loc> by replacing the old
+     *      one (if it exists)
      * @param inputArrayList : ArrayList<Loc> to be saved
      * @param context : context (we need this since it is a static method
      */
-    public static void savedLocList (Context context, ArrayList<Loc> inputArrayList) {
+    private static void savedLocList (Context context, ArrayList<Loc> inputArrayList) {
         //get reference to shared pref
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
         //create Gson object
         Gson gson = new Gson();
 
-        //load the previous data, and add the new list to it
-        ArrayList<Loc> fullList = loadLocList(context);
-
-        //if there is nothing in there, this will be null, so we instantiate it
-        if (fullList == null) {
-            fullList = new ArrayList<>();
-        }//if
-
-        //add the new data to it
-        fullList.addAll(inputArrayList);
+        //check for null input
+        if (inputArrayList == null) {
+            inputArrayList = new ArrayList<>();
+        }
 
         //convert arraylist
-        String json = gson.toJson(fullList);
+        String json = gson.toJson(inputArrayList);
 
         //get the shared preference editor
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        //since we have added the old data to the new list, we can now delete the last entry
-        editor.remove(Constant.PREF_KEY_ARRAY).apply();
-        //add the new updated list
+//        //since we have added the old data to the new list, we can now delete the last entry
+//        editor.remove(Constant.PREF_KEY_ARRAY).apply();
+        //add the new updated list. If it already exists, it just replaces the old one so we wont need to delete first
         editor.putString(Constant.PREF_KEY_ARRAY, json);
         editor.apply();
     }//savedLocList
@@ -72,9 +69,6 @@ public class SaveLoadList {
      * @param input : Loc object to be added to the list
      */
     public static void addToLocList (Context context, Loc input) {
-        //get reference to shared pref
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-
         //create Gson object
         Gson gson = new Gson();
 
@@ -144,6 +138,14 @@ public class SaveLoadList {
         }//for
         return loc;
     }//getLocFromDb
+
+
+    public static void deleteDb(Context context) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.remove(Constant.PREF_KEY_ARRAY).apply();
+    }//removeAllFences
+
 
     //TODO: add method to replace a specific object in array list
 
