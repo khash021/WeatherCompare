@@ -6,7 +6,7 @@
         android:title="Refresh"
         android:id="@+id/action_refresh"
         app:showAsAction="always"
-        android:orderInCategory="1"
+        android:orderInCategory="20"
         android:icon="@drawable/ic_refresh"
         />
 

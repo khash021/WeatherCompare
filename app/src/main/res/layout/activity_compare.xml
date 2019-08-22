@@ -45,6 +45,18 @@
     <!--app:layout_constraintTop_toBottomOf="@id/button_open_weather"-->
     <!--android:scaleType="center" />-->
 
+    <!--Consider using SPinner-->
+    <TextView
+        android:id="@+id/text_city_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/button_dark_sky"/>
+
     <LinearLayout
         android:id="@+id/layout_results_main"
         android:layout_width="match_parent"
@@ -53,7 +65,7 @@
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/button_open_weather">
+        app:layout_constraintTop_toBottomOf="@id/text_city_name">
 
         <LinearLayout
             android:id="@+id/layout_title_row"

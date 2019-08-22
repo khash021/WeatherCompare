@@ -19,6 +19,7 @@ import org.json.JSONException;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 
 import tech.khash.weathercompare.model.Loc;
 import tech.khash.weathercompare.model.Weather;
@@ -56,6 +57,10 @@ public class CompareActivity extends AppCompatActivity {
     //it will be incremented so the last query to get finished will remove it
     private int tracker;
 
+    private TextView textCityName;
+    private ArrayList<Integer> menuIdList;
+    ArrayList<Loc> locArrayList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,6 +72,7 @@ public class CompareActivity extends AppCompatActivity {
 
         progressBar = findViewById(R.id.progress_bar);
 //        mIconImage = findViewById(R.id.image_icon);
+        textCityName = findViewById(R.id.text_city_name);
 
         //get the loc id from intent extra
         if (getIntent().hasExtra(MainActivity.COMPARE_EXTRA_LOC_ID)) {
@@ -76,9 +82,14 @@ public class CompareActivity extends AppCompatActivity {
                 Loc loc = SaveLoadList.getLocFromDb(this, id);
                 if (loc != null) {
                     currentLoc = loc;
+                    textCityName.setText(loc.getId());
                 }//null-loc
             }//empty string
         }//has extra
+
+
+
+        locArrayList = SaveLoadList.loadLocList(this);
 
         //Getting Open Weather
         Button buttonOpenWeather = findViewById(R.id.button_open_weather);
@@ -109,12 +120,36 @@ public class CompareActivity extends AppCompatActivity {
 
         getAllWeather();
 
+
     }//onCreate
 
-
+    /**
+     * Gets called every time the user presses the menu button.
+     * Use if your menu is dynamic.
+     */
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        //TODO: consider using a spinner for saved location compared to this
+        Log.v(TAG, "onPrepareOptionsMenu Called");
+        super.onPrepareOptionsMenu(menu);
+        menu.clear();
+        //TODO: TESTING
+        //load database
+        int i = 0;
+        menuIdList = new ArrayList<>();
+        for (Loc loc : locArrayList) {
+            menu.add(0, i, i+1, loc.getId());
+            //add id to list
+            menuIdList.add(i);
+            i++;
+        }//for
+        menu.add(0, R.id.action_refresh, 20, "Refresh");
+        return true;
+    }//onPrepareOptionsMenu
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        Log.v(TAG, "onCreateOptionsMenu Called");
         getMenuInflater().inflate(R.menu.compare_menu, menu);
 
         //return true since we have managed it
@@ -123,8 +158,22 @@ public class CompareActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        //get the size of array
+        //TODO: maybe use a dialog for showing all saved locations
         switch (item.getItemId()) {
             case R.id.action_refresh:
+                getAllWeather();
+                return true;
+            case 0:
+                currentLoc = locArrayList.get(0);
+                getAllWeather();
+                return true;
+            case 1:
+                currentLoc = locArrayList.get(1);
+                getAllWeather();
+                return true;
+            case 2:
+                currentLoc = locArrayList.get(2);
                 getAllWeather();
                 return true;
             default:
@@ -137,6 +186,9 @@ public class CompareActivity extends AppCompatActivity {
             Log.v(TAG, "getAllWeather - currentLoc is null");
             return;
         }//null loc
+
+        //set the name
+        textCityName.setText(currentLoc.getId());
 
         kickOffAccuWeather();
         kickOffDarkSky();
