@@ -2,6 +2,8 @@ package tech.khash.weathercompare;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,6 +16,7 @@ import android.widget.LinearLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ShareCompat;
@@ -27,6 +30,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Objects;
 
 import tech.khash.weathercompare.adapter.LocListAdapter;
@@ -171,11 +176,12 @@ public class MainActivity extends AppCompatActivity implements
     }//onDestroy
 
     /**
-     *          We start AddLocation activity for results to get the location data. This gets
-     *          called when we return from that.
+     * We start AddLocation activity for results to get the location data. This gets
+     * called when we return from that.
+     *
      * @param requestCode : request code we sent with the original intent
-     * @param resultCode : result code that the activity has set
-     * @param data : the data being sent back
+     * @param resultCode  : result code that the activity has set
+     * @param data        : the data being sent back
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -235,19 +241,20 @@ public class MainActivity extends AppCompatActivity implements
                 return true;
             case R.id.action_find_me:
                 //TODO:
-                HelperFunctions.showToast(this, "Find Me");
+//                HelperFunctions.showToast(this, "Find Me");
+                HelperFunctions.askLocationPermission(this, this);
                 return true;
             case R.id.action_sort_name_ascending:
-                //TODO:
+                sortNameAscending();
                 return true;
             case R.id.action_sort_name_descending:
-                //TODO:
+                sortNameDescending();
                 return true;
             case R.id.action_refresh:
                 recreate();
                 return true;
             case R.id.action_delete_all:
-                //TODO:
+                showDeleteAllDialog(this);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -314,8 +321,8 @@ public class MainActivity extends AppCompatActivity implements
 
                 }
                 return true;
-                default:
-                    return false;
+            default:
+                return false;
         }//switch
     }//onNavigationItemSelected
 
@@ -324,7 +331,7 @@ public class MainActivity extends AppCompatActivity implements
         //get the corresponding fence object
         Loc loc = mLocArrayList.get(clickedItemIndex);
         //show a dialog
-        HelperFunctions.showToast(this, "\"" +loc.getId() + "\"" + " clicked");
+        HelperFunctions.showToast(this, "\"" + loc.getId() + "\"" + " clicked");
     }//onListItemClick
 
     /*------------------------------------------------------------------------------------------
@@ -339,11 +346,64 @@ public class MainActivity extends AppCompatActivity implements
 
     //for testing
     private void logList(ArrayList<Loc> locArrayList) {
+        if (locArrayList == null || locArrayList.size() < 1) {
+            return;
+        }
         int counter = 1;
         for (Loc loc : locArrayList) {
             Log.v(TAG, counter + ": " + "\n" + "Name: " + loc.getId() + " ----- " + "LatLng: " + loc.getLatLng().toString());
         }
     }//logList
 
+    //Helper method for sorting list based on their name (ascending)
+    private void sortNameAscending() {
+        Collections.sort(mLocArrayList, new Comparator<Loc>() {
+            @Override
+            public int compare(Loc o1, Loc o2) {
+                return o1.getId().compareTo(o2.getId());
+            }
+        });
+        //notify the mAdapter that the data has changed, and it should update
+        mAdapter.notifyDataSetChanged();
+    }//sortNameAscending
+
+    //Helper method for sorting list based on their name (ascending)
+    private void sortNameDescending() {
+        Collections.sort(mLocArrayList, new Comparator<Loc>() {
+            @Override
+            public int compare(Loc o1, Loc o2) {
+                return o2.getId().compareTo(o1.getId());
+            }
+        });
+        //notify the mAdapter that the data has changed, and it should update
+        mAdapter.notifyDataSetChanged();
+    }//sortNameAscending
+
+    //Helper method for showing the dialog for deleting all data
+    private void showDeleteAllDialog(final Context context) {
+        //create the builder
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+
+        //add message and button functionality
+        builder.setMessage(R.string.delete_all_dialog_msg)
+                .setPositiveButton(R.string.delete_all, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //Delete all
+                        SaveLoadList.deleteDb(context);
+                        recreate();
+                    }
+                })
+                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //close the dialog
+                        dialog.dismiss();
+                    }
+                });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }//showUnsavedChangesDialog
 
 }//MainActivity

@@ -68,6 +68,12 @@
     <!--Main Activity-->
     <string name="no_saved_location">No Saved Locations</string>
     <string name="add_location_empty_view_text">Add locations using the button or from menu</string>
+    <string name="no_geofence_show_toast">No saved locations</string>
+
+    <!--Delete all alert dialog-->
+    <string name="delete_all_dialog_msg">Are you sure you want to delete all saved locations?</string>
+    <string name="cancel">Cancel</string>
+
 
 
 </resources>
