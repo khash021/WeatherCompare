@@ -33,17 +33,13 @@ import tech.khash.weathercompare.utilities.SaveLoadList;
 
 public class CompareActivity extends AppCompatActivity {
 
-    //TODO: remove ad for now
-
     //TODO: search for location, and automatic find me
     //TODO: move everything away from inner classes and use task loader
-    //TODO: do the forecast
-    //TODO: options for changing units
-    //TODO: sunrise and sunset
-    //TODO: make these buttons into fragments so we can swipe right and left
-    //TODO: create a comparison table
+
+
     //TODO: use divider for the results
-    //TODO: use somehow manage progress bar to go off once everything is loaded
+
+    //TODO: right now the int tracker is not working when we load them all (it works for single ones) - do something about that
 
     private final static String TAG = CompareActivity.class.getSimpleName();
 
@@ -89,21 +85,7 @@ public class CompareActivity extends AppCompatActivity {
         buttonOpenWeather.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //check current loc
-                if (currentLoc != null) {
-                    //get the current weather URL
-                    URL latLngUrl = OpenWeatherUtils.createCurrentUrlLatLng(currentLoc.getLatLng());
-
-                    if (latLngUrl == null) {
-                        showOpenWeatherError();
-                        Log.v(TAG, "OW - LatLng URL null");
-                    } else {
-                        OpenWeatherQueryTask openWeatherQueryTask = new OpenWeatherQueryTask();
-                        //set the tracker to -1 so we know it is a single load
-                        tracker = -1;
-                        openWeatherQueryTask.execute(latLngUrl);
-                    }//if-else null url
-                }//null loc
+                kickOffOpenWeather();
             }//onClick
         });//onClickListener
 
@@ -112,44 +94,7 @@ public class CompareActivity extends AppCompatActivity {
         buttonAccuWeather.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                //TODO: later we should just get the code from Loc
-                //check for null loc
-                if (currentLoc != null) {
-
-                    //get location code url
-                    //TODO: later we should just get the code from Loc
-                    if (!currentLoc.hasKey()) {
-                        //doesn't have key, so we need to get it
-                        //get the location code
-                        URL locationCodeUrl = AccuWeatherUtils.createLocationCodeUrl(currentLoc.getLatLng());
-
-                        if (locationCodeUrl == null) {
-                            showAccuWeatherError();
-                            Log.v(TAG, "AW - Location code URL null");
-                        } else {
-                            //instantiate AccuWeatherLocationQueryTask to get the location key
-                            AccuWeatherLocationQueryTask locationQueryTask = new AccuWeatherLocationQueryTask(getApplicationContext());
-                            //set the tracker to -1 so we know it is a single load
-                            tracker = -1;
-                            locationQueryTask.execute(locationCodeUrl);
-                        }//null-loc
-                    } else {
-                        //this means we already have a key, so just start query for weather
-                        //create weather URL
-                        URL url = AccuWeatherUtils.createCurrentWeatherUrlId(currentLoc.getKey());
-                        if (url == null) {
-                            showAccuWeatherError();
-                            Log.v(TAG, "AW - weather URL null");
-                        } else {
-                            //instantiate a AccuWeatherQueryTask object and then passing in our URL
-                            AccuWeatherQueryTask accuWeatherQueryTask = new AccuWeatherQueryTask();
-                            //set the tracker to -1 so we know it is a single load
-                            tracker = -1;
-                            accuWeatherQueryTask.execute(url);
-                        }//if-else null url
-                    }//if-else loc.hasKey
-                }//current loc-null
+                kickOffAccuWeather();
             }//onClick
         });//onClickListener
 
@@ -158,21 +103,15 @@ public class CompareActivity extends AppCompatActivity {
         buttonDarkSky.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                kickOffDarkSky();
+            }//onClick
+        });//onClickListener
 
-                URL url = DarkSkyUtils.createWeatherUrlId(CANMORE_LAT_LONG);
-
-                if (url == null) {
-                    showDarkSkyError();
-                } else {
-                    DarkSkyQueryTask darkSkyQueryTask = new DarkSkyQueryTask();
-                    //set the tracker to -1 so we know it is a single load
-                    tracker = -1;
-                    darkSkyQueryTask.execute(url);
-                }
-            }
-        });
+        getAllWeather();
 
     }//onCreate
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -184,44 +123,101 @@ public class CompareActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_refresh:
+                getAllWeather();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }//switch
+    }//onOptionsItemSelected
 
-        if (item.getItemId() == R.id.action_refresh) {
+    private void getAllWeather() {
+        if (currentLoc == null) {
+            Log.v(TAG, "getAllWeather - currentLoc is null");
+            return;
+        }//null loc
 
-            //open weather
-            URL openWeatherUrl = OpenWeatherUtils.createCurrentUrlId(CANMORE_ID_OPEN_WEATHER);
+        kickOffAccuWeather();
+        kickOffDarkSky();
+        kickOffOpenWeather();
+    }//getAllWeather
 
-            if (openWeatherUrl == null) {
-                showOpenWeatherError();
-            } else {
-                //instantiate a OpenWeatherQueryTask object and then passing in our URL
-                OpenWeatherQueryTask openWeatherQueryTask = new OpenWeatherQueryTask();
-                openWeatherQueryTask.execute(openWeatherUrl);
-            }
+    private void kickOffDarkSky() {
+        //check current loc
+        if (currentLoc != null) {
+            //get the current weather URL
+            URL latLngUrl = DarkSkyUtils.createCurrentUrl(currentLoc.getLatLng());
 
-            //Accu Weather
-            URL accuUrl = AccuWeatherUtils.createCurrentWeatherUrlId(CANMORE_ID_ACCU_WEATHER);
-
-            if (accuUrl == null) {
-                showAccuWeatherError();
-            } else {
-                //instantiate a AccuWeatherQueryTask object and then passing in our URL
-                AccuWeatherQueryTask accuWeatherQueryTask = new AccuWeatherQueryTask();
-                accuWeatherQueryTask.execute(accuUrl);
-            }
-
-            //DarkSky
-            URL darkSkyUrl = DarkSkyUtils.createWeatherUrlId(CANMORE_LAT_LONG);
-
-            if (darkSkyUrl == null) {
+            if (latLngUrl == null) {
                 showDarkSkyError();
+                Log.v(TAG, "DS - LatLng URL null");
             } else {
                 DarkSkyQueryTask darkSkyQueryTask = new DarkSkyQueryTask();
-                darkSkyQueryTask.execute(darkSkyUrl);
-            }
-        }//if
+                //set the tracker to -1 so we know it is a single load
+                tracker = -1;
+                darkSkyQueryTask.execute(latLngUrl);
+            }//if-else null url
+        }//null loc
+    }//kickOffDarkSky
 
-        return super.onOptionsItemSelected(item);
-    }//onOptionsItemSelected
+    private void kickOffAccuWeather() {
+        //TODO: later we should just get the code from Loc
+        //check for null loc
+        if (currentLoc != null) {
+
+            //get location code url
+            //TODO: later we should just get the code from Loc
+            if (!currentLoc.hasKey()) {
+                //doesn't have key, so we need to get it
+                //get the location code
+                URL locationCodeUrl = AccuWeatherUtils.createLocationCodeUrl(currentLoc.getLatLng());
+
+                if (locationCodeUrl == null) {
+                    showAccuWeatherError();
+                    Log.v(TAG, "AW - Location code URL null");
+                } else {
+                    //instantiate AccuWeatherLocationQueryTask to get the location key
+                    AccuWeatherLocationQueryTask locationQueryTask = new AccuWeatherLocationQueryTask(getApplicationContext());
+                    //set the tracker to -1 so we know it is a single load
+                    tracker = -1;
+                    locationQueryTask.execute(locationCodeUrl);
+                }//null-loc
+            } else {
+                //this means we already have a key, so just start query for weather
+                //create weather URL
+                URL url = AccuWeatherUtils.createCurrentWeatherUrlId(currentLoc.getKey());
+                if (url == null) {
+                    showAccuWeatherError();
+                    Log.v(TAG, "AW - weather URL null");
+                } else {
+                    //instantiate a AccuWeatherQueryTask object and then passing in our URL
+                    AccuWeatherQueryTask accuWeatherQueryTask = new AccuWeatherQueryTask();
+                    //set the tracker to -1 so we know it is a single load
+                    tracker = -1;
+                    accuWeatherQueryTask.execute(url);
+                }//if-else null url
+            }//if-else loc.hasKey
+        }//current loc-null
+    }//kickOffAccuWeather
+
+    private void kickOffOpenWeather() {
+        //check current loc
+        if (currentLoc != null) {
+            //get the current weather URL
+            URL latLngUrl = OpenWeatherUtils.createCurrentUrlLatLng(currentLoc.getLatLng());
+
+            if (latLngUrl == null) {
+                showOpenWeatherError();
+                Log.v(TAG, "OW - LatLng URL null");
+            } else {
+                OpenWeatherQueryTask openWeatherQueryTask = new OpenWeatherQueryTask();
+                //set the tracker to -1 so we know it is a single load
+                tracker = -1;
+                openWeatherQueryTask.execute(latLngUrl);
+            }//if-else null url
+        }//null loc
+    }//kickOffOpenWeather
 
     /**
      * For now we are using an AsyncTask loader class for getting the JSON response from Open Weather
@@ -471,6 +467,7 @@ public class CompareActivity extends AppCompatActivity {
 
             }//if-else
         }//onPostExecute
+
     }//AccuWeatherQueryTask - class
 
 
@@ -656,7 +653,6 @@ public class CompareActivity extends AppCompatActivity {
         cloud.setText(empty);
         visibility.setText(empty);
     }//showOpenWeatherError
-
 
 
 }//main-class

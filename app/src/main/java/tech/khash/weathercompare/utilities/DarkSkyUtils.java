@@ -2,6 +2,8 @@ package tech.khash.weathercompare.utilities;
 
 import android.util.Log;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -26,6 +28,8 @@ public class DarkSkyUtils {
 
     private static final String API_KEY = "f5e4285ed1e89d653fd1d99b04e375b7";
 
+    private static final String LOCATION = "%s,%s";
+
     private static final String UNITS = "units=";
 
     private static final String UNITS_METRIC = "ca"; //same as si except speed is km/h
@@ -36,14 +40,16 @@ public class DarkSkyUtils {
 
 
     /**
-     * This creates the URL using the city ID for the current weather
-     * @param id : city's id
+     * This creates the URL for current weather (notice exclude parameters) using LatLng
+     * @param latLng : LatLng
      * @return : URL
      */
-    public static URL createWeatherUrlId(String id) {
+    public static URL createCurrentUrl(LatLng latLng) {
+        String latLngString = String.format(LOCATION, latLng.latitude, latLng.longitude);
 
-        String url = DARK_SKY_BASE_URL + API_KEY + id + "?" + EXCLUDE + EXCLUDE_BLOCK_CURRENT +
-                "?" + UNITS + UNITS_METRIC;
+        String url = DARK_SKY_BASE_URL + API_KEY + "/" + latLngString + "?" + EXCLUDE +
+                EXCLUDE_BLOCK_CURRENT + "?" + UNITS + UNITS_METRIC;
+
         Log.d(TAG, "URL: " + url );
 
         URL queryUrl = null;

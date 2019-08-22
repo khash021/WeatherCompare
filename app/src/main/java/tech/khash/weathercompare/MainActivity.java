@@ -46,6 +46,8 @@ public class MainActivity extends AppCompatActivity implements
         LocListAdapter.ListItemClickListener {
 
     //TODO: check for duplicate name
+    //TODO: settings for units
+    //TODO: sunrise and sunset (?)
 
     private final static String TAG = MainActivity.class.getSimpleName();
 

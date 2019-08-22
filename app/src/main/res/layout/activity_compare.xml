@@ -77,7 +77,8 @@
                 android:gravity="center"
                 android:padding="6dp"
                 android:text="@string/open_weather"
-                android:textSize="12sp" />
+                android:textSize="12sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/text_title_dark_sky"
@@ -87,7 +88,8 @@
                 android:gravity="center"
                 android:padding="6dp"
                 android:text="@string/dark_sky"
-                android:textSize="12sp" />
+                android:textSize="12sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/text_title_accu"
@@ -97,7 +99,8 @@
                 android:gravity="center"
                 android:padding="6dp"
                 android:text="@string/accu_weather"
-                android:textSize="12sp" />
+                android:textSize="12sp"
+                android:textStyle="bold" />
 
         </LinearLayout>
 
@@ -169,7 +172,8 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:padding="6dp"
-                android:textSize="10sp" />
+                android:textSize="10sp"
+                android:textStyle="bold"/>
 
             <TextView
                 android:id="@+id/text_temp_dark_sky"
@@ -178,7 +182,8 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:padding="6dp"
-                android:textSize="10sp" />
+                android:textSize="10sp"
+                android:textStyle="bold"/>
 
             <TextView
                 android:id="@+id/text_temp_accu"
@@ -187,7 +192,8 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:padding="6dp"
-                android:textSize="10sp" />
+                android:textSize="10sp"
+                android:textStyle="bold"/>
 
         </LinearLayout>
 
