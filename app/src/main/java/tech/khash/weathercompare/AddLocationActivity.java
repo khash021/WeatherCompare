@@ -48,6 +48,7 @@ public class AddLocationActivity extends AppCompatActivity implements OnMapReady
     private static final String TAG = AddLocationActivity.class.getSimpleName();
 
     //TODO: check against duplicate names
+    //TODO: unsaved changes
 
     private GoogleMap mMap;
     private LatLng latLngCamera;
@@ -65,7 +66,7 @@ public class AddLocationActivity extends AppCompatActivity implements OnMapReady
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.v(TAG, "onCreate Called");
+        Log.d(TAG, "onCreate Called");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_location);
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -101,7 +102,7 @@ public class AddLocationActivity extends AppCompatActivity implements OnMapReady
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        Log.v(TAG, "onMapReady Called");
+        Log.d(TAG, "onMapReady Called");
         mMap = googleMap;
 
         //set the camera idle listener to get the location
@@ -119,12 +120,12 @@ public class AddLocationActivity extends AppCompatActivity implements OnMapReady
 
     @Override
     public void onCameraIdle() {
-        Log.v(TAG, "onCameraIdle Called");
+        Log.d(TAG, "onCameraIdle Called");
         //get LatLng
          if (isMapReady()) {
              latLngCamera = mMap.getCameraPosition().target;
          } else {
-             Log.v(TAG, "Map is null from onCameraIdle");
+             Log.d(TAG, "Map is null from onCameraIdle");
          }
     }//onCameraIdle
 
@@ -176,7 +177,7 @@ public class AddLocationActivity extends AppCompatActivity implements OnMapReady
             if (isMapReady()) {
                 getDeviceLocation();
             } else {
-                Log.v(TAG, "Map not ready from findMeMap");
+                Log.d(TAG, "Map not ready from findMeMap");
                 HelperFunctions.showToast(this, "Map not ready");
             }
         } else {
@@ -199,7 +200,7 @@ public class AddLocationActivity extends AppCompatActivity implements OnMapReady
                             setUserLocation();
                             moveCamera(latLngUser, 14.0f);
                         } else {
-                            Log.v(TAG, "Current location is null. Using defaults.");
+                            Log.d(TAG, "Current location is null. Using defaults.");
                             Log.e(TAG, "Exception: %s", task.getException());
                             mMap.moveCamera(CameraUpdateFactory
                                     .newLatLngZoom(DEFAULT_LAT_LNG_VANCOUVER, DEFAULT_ZOOM));
@@ -240,7 +241,7 @@ public class AddLocationActivity extends AppCompatActivity implements OnMapReady
         //check map first
         if (!isMapReady()) {
             HelperFunctions.showToast(this, "Map not ready");
-            Log.v(TAG, "Map not ready from moveCamera");
+            Log.d(TAG, "Map not ready from moveCamera");
             return;
         }//map not ready
         //use try catch in case there is something wrong with the input
@@ -261,7 +262,7 @@ public class AddLocationActivity extends AppCompatActivity implements OnMapReady
 
         if (latLngCamera == null) {
             HelperFunctions.showToast(this, getResources().getString(R.string.error_getting_location_toast));
-            Log.v(TAG, "latLngCamera is null from saveLocation method");
+            Log.d(TAG, "latLngCamera is null from saveLocation method");
             return;
         }
 
@@ -271,12 +272,12 @@ public class AddLocationActivity extends AppCompatActivity implements OnMapReady
         SaveLoadList.addToLocList(this, location);
 
         HelperFunctions.showToast(this, "\"" + name + "\"" + " " + getString(R.string.location_added_successfully_toast));
-        Log.v(TAG, "Location added.\nName: " + name + "\nLatLng: " + latLngCamera);
+        Log.d(TAG, "Location added.\nName: " + name + "\nLatLng: " + latLngCamera);
 
         //return to sender
         Intent returnIntent = new Intent();
         //we return the string name of the loc
-        returnIntent.putExtra(MainActivity.FENCE_EDIT_EXTRA_INTENT_LOC_NAME, name);
+        returnIntent.putExtra(MainActivity.INTENT_EXTRA_LOC_NAME, name);
         setResult(Activity.RESULT_OK, returnIntent);
         finish();
     }//saveLocation
@@ -322,7 +323,7 @@ public class AddLocationActivity extends AppCompatActivity implements OnMapReady
     private void searchAddress(String query) {
         //check for geocoder availability
         if (!Geocoder.isPresent()) {
-            Log.v(TAG, "Geocoder not available - searchAddress");
+            Log.d(TAG, "Geocoder not available - searchAddress");
             HelperFunctions.showToast(this, getString(R.string.geocoder_not_available_toast));
             return;
         }
@@ -340,13 +341,13 @@ public class AddLocationActivity extends AppCompatActivity implements OnMapReady
             //check to make sure we got results
             if (addresses.size() < 1) {
                 HelperFunctions.showToast(this, getString(R.string.no_results_found_toast));
-                Log.v(TAG, "No results - searchAddress");
+                Log.d(TAG, "No results - searchAddress");
                 return;
             }//if
 
             //check the map first
             if (mMap == null) {
-                Log.v(TAG, "Map not ready - searchAddress");
+                Log.d(TAG, "Map not ready - searchAddress");
                 return;
             }
 
@@ -365,7 +366,7 @@ public class AddLocationActivity extends AppCompatActivity implements OnMapReady
                 //include the marker
                 builder.include(latLng);
                 //TODO: for testing only
-                Log.v(TAG, "Search results: " + "\nFeature: " + result.getFeatureName() +
+                Log.d(TAG, "Search results: " + "\nFeature: " + result.getFeatureName() +
                         "  ---   " + "Admin area: " + result.getAdminArea() + "  ---   " +
                         "Country code: " + result.getCountryCode() + "  ---   " +
                         "Country name: " + result.getCountryName() + "  ---   " +

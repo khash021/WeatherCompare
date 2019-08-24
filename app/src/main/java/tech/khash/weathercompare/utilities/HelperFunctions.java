@@ -81,7 +81,6 @@ public class HelperFunctions {
                         is false, and the build version is higher than 23 (that feature is only
                         available to >= 23 then send them to the
                          */
-                        //TODO: this is still weird with the second condition. I removed ! but still needs work
                         if (Build.VERSION.SDK_INT >= 23 && !(activity.shouldShowRequestPermissionRationale(android.Manifest.permission.ACCESS_FINE_LOCATION))) {
                             //This is the case when the user checked the box, so we send them to the settings
                             openPermissionSettings(activity);

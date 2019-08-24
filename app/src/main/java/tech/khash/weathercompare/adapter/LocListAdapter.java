@@ -82,7 +82,7 @@ public class LocListAdapter extends RecyclerView.Adapter<LocListAdapter.LocViewH
         holder.idTextView.setText(loc.getId());
 
         //code
-        String code = loc.getKey();
+        String code = loc.getKeyAW();
         if (!TextUtils.isEmpty(code)) {
             holder.codeTextView.setText(code);
         }

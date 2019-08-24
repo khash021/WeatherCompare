@@ -47,7 +47,7 @@ public class OpenWeatherUtils {
     public static URL createCurrentUrlId(int id) {
 
         String url = OPENWEATHER_WEATHER_BASE_URL_CITY_CODE + id + UNIT + METRIC + API_ID + API_KEY;
-        Log.v(TAG, "URL: " + url );
+        Log.d(TAG, "URL: " + url );
 
         URL queryUrl = null;
         try {
@@ -63,7 +63,7 @@ public class OpenWeatherUtils {
         String latLngString = String.format(LAT_LNG, latLng.latitude, latLng.longitude);
 
         String url = OPENWEATHER_WEATHER_BASE_URL_LAT_LNG + latLngString + UNIT + METRIC + API_ID + API_KEY;
-        Log.v(TAG, "URL - LatLng: " + url );
+        Log.d(TAG, "URL - LatLng: " + url );
 
         URL queryUrl = null;
         try {
@@ -83,7 +83,7 @@ public class OpenWeatherUtils {
     public static URL createForecastUrlId(int id) {
 
         String url = OPENWEATHER_FORECAST_BASE_URL + id + UNIT + METRIC + API_ID + API_KEY;
-        Log.v(TAG, "URL - city ID: " + url );
+        Log.d(TAG, "URL - city ID: " + url );
 
         URL queryUrl = null;
         try {

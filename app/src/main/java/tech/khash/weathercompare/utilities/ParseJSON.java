@@ -180,7 +180,7 @@ public class ParseJSON {
         //by using optString, if such string does not exists, it returns an empty string.
         locationCode = responseObject.optString(JSON_AW_LOCATION_KEY);
 
-        Log.v(TAG, "location code: " + locationCode);
+        Log.d(TAG, "location code: " + locationCode);
 
         return locationCode;
     }//parseAccuLocationCode

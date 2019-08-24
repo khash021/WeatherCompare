@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.SeekBar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -26,10 +27,10 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -37,15 +38,14 @@ import java.util.Objects;
 
 import tech.khash.weathercompare.adapter.LocListAdapter;
 import tech.khash.weathercompare.model.Loc;
-import tech.khash.weathercompare.utilities.AccuWeatherUtils;
 import tech.khash.weathercompare.utilities.HelperFunctions;
+import tech.khash.weathercompare.utilities.NetworkCallAccuWeatherCode;
 import tech.khash.weathercompare.utilities.SaveLoadList;
 
 public class MainActivity extends AppCompatActivity implements
         NavigationView.OnNavigationItemSelectedListener,
         LocListAdapter.ListItemClickListener {
 
-    //TODO: check for duplicate name
     //TODO: settings for units
     //TODO: sunrise and sunset (?)
 
@@ -53,26 +53,26 @@ public class MainActivity extends AppCompatActivity implements
 
     //for sending and receiving location from add location activity
     private static final int ADD_LOCATION_REQUEST_CODE = 1;
-    public final static String FENCE_EDIT_EXTRA_INTENT_LOC_NAME = "fence-edit-extra-intent-loc_name";
+    public final static String INTENT_EXTRA_LOC_NAME = "intent--extra-loc_name";
     public final static String COMPARE_EXTRA_LOC_ID = "compare-extra-loc-id";
 
     //drawer layout used for navigation drawer
     private DrawerLayout drawerLayout;
-
-    //for holding the current location
-    private Loc locCurrent;
+    private SeekBar seekBar;
 
     //adapter
     private ArrayList<Loc> locArrayList;
     private LocListAdapter adapter;
     private RecyclerView recyclerView;
 
+    private Loc currentLoc;
+
     //for tracking changes that needs the list to be updated/recreated
     private boolean needsUpdate = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.v(TAG, "onCreate Called");
+        Log.d(TAG, "onCreate Called");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //Set the tool bar
@@ -95,32 +95,10 @@ public class MainActivity extends AppCompatActivity implements
             navigationView.setNavigationItemSelectedListener(this);
         }
 
-        //view containing the empty view
-        LinearLayout emptyView = findViewById(R.id.empty_view);
+        seekBar = findViewById(R.id.seekbar);
 
-        //get the arrayList, and set the visibility of empty view accordingly
-        locArrayList = SaveLoadList.loadLocList(this);
-        if (locArrayList == null || locArrayList.size() < 1) {
-            emptyView.setVisibility(View.VISIBLE);
-        } else {
-            emptyView.setVisibility(View.GONE);
-        }
-
-        //TODO: testing
-        logList(locArrayList);
-
-        // Get a handle to the RecyclerView.
-        recyclerView = findViewById(R.id.recycler_view);
-        // Create an adapter and supply the data to be displayed.
-        adapter = new LocListAdapter(this, locArrayList, this);
-        // Connect the adapter with the RecyclerView.
-        recyclerView.setAdapter(adapter);
-        // Give the RecyclerView a default layout manager.
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        //Add divider between items using the DividerItemDecoration
-        DividerItemDecoration decoration = new DividerItemDecoration(recyclerView.getContext(),
-                DividerItemDecoration.VERTICAL);
-        recyclerView.addItemDecoration(decoration);
+        //this gets the db, and set the corresponding empty view/recycler view
+        updateRecyclerView();
 
         //find the fab and set it up
         FloatingActionButton fabAdd = findViewById(R.id.fab_add);
@@ -132,37 +110,27 @@ public class MainActivity extends AppCompatActivity implements
                 openAddLocation();
             }
         });
-
-
-        LatLng latLng = new LatLng(49.273367, -123.102950);
-        String lat = "lat=%s&lon=%s";
-        String outPut = String.format(lat, latLng.latitude, latLng.longitude );
-
-        Log.v(TAG, "OUTPUT IS: " + outPut);
     }//onCreate
 
     @Override
     protected void onResume() {
-        Log.v(TAG, "onResume Called");
+        Log.d(TAG, "onResume Called");
         super.onResume();
     }//onResume
 
     @Override
     protected void onStart() {
-        Log.v(TAG, "onStart Called");
+        Log.d(TAG, "onStart Called");
         //check for update boolean
         if (needsUpdate) {
             recreate();
         }
         super.onStart();
-//        if (!mGoogleApiClient.isConnecting() || !mGoogleApiClient.isConnected()) {
-//            mGoogleApiClient.connect();
-//        }
     }//onStart
 
     @Override
     protected void onPause() {
-        Log.v(TAG, "onPause Called");
+        Log.d(TAG, "onPause Called");
         super.onPause();
         //if the navigation drawer is open, we close it so when the user is directed back, it doesn't stay open
         if (drawerLayout != null) {
@@ -174,22 +142,20 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     protected void onStop() {
-        Log.v(TAG, "onStop Called");
+        Log.d(TAG, "onStop Called");
         super.onStop();
-//        if (mGoogleApiClient.isConnecting() || mGoogleApiClient.isConnected()) {
-//            mGoogleApiClient.disconnect();
-//        }
+
     }//onStop
 
     @Override
     protected void onDestroy() {
-        Log.v(TAG, "onDestroy Called");
+        Log.d(TAG, "onDestroy Called");
         super.onDestroy();
     }//onDestroy
 
     /**
-     * We start AddLocation activity for results to get the location data. This gets
-     * called when we return from that.
+     * We start AddLocation activity for results for adding new location. This gets
+     * called when we return from addLocationActivity
      *
      * @param requestCode : request code we sent with the original intent
      * @param resultCode  : result code that the activity has set
@@ -197,24 +163,29 @@ public class MainActivity extends AppCompatActivity implements
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        Log.d(TAG, "onActivityResult called");
         //check to make sure it is the right one
         if (requestCode == ADD_LOCATION_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             //get the name of the loc
-            String nameLoc = data.getStringExtra(FENCE_EDIT_EXTRA_INTENT_LOC_NAME);
+            String nameLoc = data.getStringExtra(INTENT_EXTRA_LOC_NAME);
             if (nameLoc == null || nameLoc.isEmpty()) {
+                Log.d(TAG, "onActivityResult - Loc Name = null/empty");
                 return;
             }//null name
             //get the corresponding Loc object
             Loc loc = SaveLoadList.getLocFromDb(this, nameLoc);
             //set the current loc only if it is not null
-            if (loc != null) {
-                locCurrent = loc;
-            } else {
+            if (loc == null) {
+                Log.d(TAG, "onActivityResult - Loc =null ; name: " + nameLoc);
                 return;
-            }
+            }//loc-null
+            //we setup the loc info (setting URLs, and AW location code) and update db
+            currentLoc = loc;
+            setLocInfo(this);
         }
         super.onActivityResult(requestCode, resultCode, data);
     }//onActivityResult
+
 
     /**
      * Handles the Back button: closes the nav drawer.
@@ -254,9 +225,12 @@ public class MainActivity extends AppCompatActivity implements
             case R.id.action_find_me:
                 //TODO:
                 //Testing only
-                for (Loc loc : locArrayList) {
-                    AccuWeatherUtils.createLocationCodeUrl(loc.getLatLng());
-                }
+//                for (Loc loc : locArrayList) {
+//                    AccuWeatherUtils.createLocationCodeUrl(loc.getLatLng());
+//                }
+                return true;
+            case R.id.action_log_db:
+                logList();
                 return true;
             case R.id.action_sort_name_ascending:
                 sortNameAscending();
@@ -358,6 +332,87 @@ public class MainActivity extends AppCompatActivity implements
                     ---------------    HELPER METHODS    ---------------
     ------------------------------------------------------------------------------------------*/
 
+    /**
+     * This gets called only from onResultResults when we return from add location.
+     * This helper method, sets the Loc's info such as create URLs, and make the network call
+     * to get the AW location code.
+     * Then it updates the db so all consequent weather calls could be done using saved URls/codes
+     *
+     */
+    private void setLocInfo(final Context context) {
+        if (currentLoc == null) {
+            Log.d(TAG, "setLocInfo - currentLoc = null");
+            return;
+        }
+        //first we need to get the codeURL and then get the code
+        URL locationCodeUrl = currentLoc.getLocationCodeUrlAW();
+        if (locationCodeUrl == null) {
+            Log.d(TAG, "setLocInfo - codeURL = null");
+            return;
+        }
+
+        //show seekbar
+        seekBar.setVisibility(View.VISIBLE);
+        NetworkCallAccuWeatherCode networkCallAccuWeatherCode = new NetworkCallAccuWeatherCode(
+                new NetworkCallAccuWeatherCode.AsyncResponse() {
+                    /**
+                     *  This gets called when the code is ready from the background network
+                     *  call and we set the data on loc
+                     * @param output : AW location key
+                     */
+                    @Override
+                    public void processFinish(String output) {
+                        if (output == null) {
+                            Log.d(TAG, "processFinish - null response");
+                        }
+                        //set the key
+                        currentLoc.setKeyAW(output);
+
+                        //set all urls
+                        currentLoc.setAllUrls();
+
+                        //update database here
+                        SaveLoadList.replaceLocInDb(context, currentLoc);
+
+                        //remove seekbar
+                        seekBar.setVisibility(View.GONE);
+
+                        //update list
+                        updateRecyclerView();
+
+                    }
+                }
+        );
+        networkCallAccuWeatherCode.execute(locationCodeUrl);
+    }//setLocInfo
+
+    //Helper method for getting the arrayList and set the recycler view
+    private void updateRecyclerView() {
+        //view containing the empty view
+        LinearLayout emptyView = findViewById(R.id.empty_view);
+
+        //get the arrayList, and set the visibility of empty view accordingly
+        locArrayList = SaveLoadList.loadLocList(this);
+        if (locArrayList == null || locArrayList.size() < 1) {
+            emptyView.setVisibility(View.VISIBLE);
+        } else {
+            emptyView.setVisibility(View.GONE);
+        }
+
+        // Get a handle to the RecyclerView.
+        recyclerView = findViewById(R.id.recycler_view);
+        // Create an adapter and supply the data to be displayed.
+        adapter = new LocListAdapter(this, locArrayList, this);
+        // Connect the adapter with the RecyclerView.
+        recyclerView.setAdapter(adapter);
+        // Give the RecyclerView a default layout manager.
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        //Add divider between items using the DividerItemDecoration
+        DividerItemDecoration decoration = new DividerItemDecoration(recyclerView.getContext(),
+                DividerItemDecoration.VERTICAL);
+        recyclerView.addItemDecoration(decoration);
+    }//updateRecyclerView
+
     //open add location activity for results
     private void openAddLocation() {
         Intent addLocationIntent = new Intent(MainActivity.this, AddLocationActivity.class);
@@ -365,14 +420,35 @@ public class MainActivity extends AppCompatActivity implements
     }//openAddLocation
 
     //for testing
-    private void logList(ArrayList<Loc> locArrayList) {
+    private void logList() {
         if (locArrayList == null || locArrayList.size() < 1) {
+            Log.d(TAG, "LogList - empty");
             return;
         }
         int counter = 1;
         for (Loc loc : locArrayList) {
-            Log.v(TAG, counter + ": " + "\n" + "Name: " + loc.getId() + " ----- " + "LatLng: " + loc.getLatLng().toString());
-        }
+            boolean hasLocationCodeUrlAW = loc.hasLocationCodeUrlAW();
+            boolean hasCurrentUrlAW = loc.hasCurrentUrlAW();
+            boolean hasCurrentUrlOW = loc.hasCurrentUrlOW();
+            boolean hasCurrentUrlDS = loc.hasCurrentUrlDS();
+
+            URL locationCodeUrlAW = loc.getLocationCodeUrlAW();
+            URL currentUrlAW = loc.getCurrentUrlAW();
+            URL currentUrlOW = loc.getCurrentUrlOW();
+            URL currentUrlDS = loc.getCurrentUrlDS();
+
+            String locationCodeAW = loc.getKeyAW();
+
+
+            Log.d(TAG, "LogList\n" + counter + ": " + "\nName: " + loc.getId() + "\nLatLng: " + loc.getLatLng().toString()
+                    + "\nhasLocationCodeUrlAW : " + hasLocationCodeUrlAW + "\n" +
+                    "hasCurrentUrlAW : " + hasCurrentUrlAW + "\n" +
+                    "hasCurrentUrlOW : " + hasCurrentUrlOW + "\n" +
+                    "hasCurrentUrlDS : " + hasCurrentUrlDS +
+                    "\nCode: " + locationCodeAW);
+
+            counter++;
+        }//for
     }//logList
 
     //Helper method for sorting list based on their name (ascending)

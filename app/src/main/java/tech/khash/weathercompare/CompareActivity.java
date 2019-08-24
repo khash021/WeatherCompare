@@ -1,6 +1,7 @@
 package tech.khash.weathercompare;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -25,6 +26,7 @@ import tech.khash.weathercompare.model.Loc;
 import tech.khash.weathercompare.model.Weather;
 import tech.khash.weathercompare.utilities.AccuWeatherUtils;
 import tech.khash.weathercompare.utilities.DarkSkyUtils;
+import tech.khash.weathercompare.utilities.HelperFunctions;
 import tech.khash.weathercompare.utilities.OpenWeatherUtils;
 import tech.khash.weathercompare.utilities.ParseJSON;
 import tech.khash.weathercompare.utilities.SaveLoadList;
@@ -44,12 +46,10 @@ public class CompareActivity extends AppCompatActivity {
 
     private final static String TAG = CompareActivity.class.getSimpleName();
 
-    private final static String CANMORE = "canmore";
-    private static final int CANMORE_ID_OPEN_WEATHER = 7871396;
-    private static final String CANMORE_ID_ACCU_WEATHER = "52903_PC";
-    static final String CANMORE_LAT_LONG = "/51.09,-115.35";
     private ImageView mIconImage;
     private ProgressBar progressBar;
+
+    public final static String INTENT_EXTRA_OW_LOC = "intent--extra-ow_loc";
 
     private Loc currentLoc;
 
@@ -65,8 +65,8 @@ public class CompareActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_compare);
-        Log.v(TAG, "onCreate Called");
-        Log.v(TAG, "Package name: " + getPackageName());
+        Log.d(TAG, "onCreate Called");
+        Log.d(TAG, "Package name: " + getPackageName());
 
         tracker = 0;
 
@@ -88,7 +88,6 @@ public class CompareActivity extends AppCompatActivity {
         }//has extra
 
 
-
         locArrayList = SaveLoadList.loadLocList(this);
 
         //Getting Open Weather
@@ -96,7 +95,15 @@ public class CompareActivity extends AppCompatActivity {
         buttonOpenWeather.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                kickOffOpenWeather();
+                if (currentLoc != null) {
+                    Intent forecastIntetn = new Intent(getApplicationContext(), OpenWeatherForecast.class);
+                    forecastIntetn.putExtra(INTENT_EXTRA_OW_LOC, currentLoc.getId());
+                    startActivity(forecastIntetn);
+                } else {
+                    Log.d(TAG, "Forecast Intent - OW : current loc null");
+                    HelperFunctions.showToast(getApplicationContext(), "current loc nuln");
+                }
+
             }//onClick
         });//onClickListener
 
@@ -130,7 +137,7 @@ public class CompareActivity extends AppCompatActivity {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         //TODO: consider using a spinner for saved location compared to this
-        Log.v(TAG, "onPrepareOptionsMenu Called");
+        Log.d(TAG, "onPrepareOptionsMenu Called");
         super.onPrepareOptionsMenu(menu);
         menu.clear();
         //TODO: TESTING
@@ -138,7 +145,7 @@ public class CompareActivity extends AppCompatActivity {
         int i = 0;
         menuIdList = new ArrayList<>();
         for (Loc loc : locArrayList) {
-            menu.add(0, i, i+1, loc.getId());
+            menu.add(0, i, i + 1, loc.getId());
             //add id to list
             menuIdList.add(i);
             i++;
@@ -149,7 +156,7 @@ public class CompareActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        Log.v(TAG, "onCreateOptionsMenu Called");
+        Log.d(TAG, "onCreateOptionsMenu Called");
         getMenuInflater().inflate(R.menu.compare_menu, menu);
 
         //return true since we have managed it
@@ -183,7 +190,7 @@ public class CompareActivity extends AppCompatActivity {
 
     private void getAllWeather() {
         if (currentLoc == null) {
-            Log.v(TAG, "getAllWeather - currentLoc is null");
+            Log.d(TAG, "getAllWeather - currentLoc is null");
             return;
         }//null loc
 
@@ -199,11 +206,13 @@ public class CompareActivity extends AppCompatActivity {
         //check current loc
         if (currentLoc != null) {
             //get the current weather URL
-            URL latLngUrl = DarkSkyUtils.createCurrentUrl(currentLoc.getLatLng());
+//            URL latLngUrl = DarkSkyUtils.createCurrentUrl(currentLoc.getLatLng());
+            URL latLngUrl = currentLoc.getCurrentUrlDS();
+            //TODO: update database
 
             if (latLngUrl == null) {
                 showDarkSkyError();
-                Log.v(TAG, "DS - LatLng URL null");
+                Log.d(TAG, "DS - LatLng URL null");
             } else {
                 DarkSkyQueryTask darkSkyQueryTask = new DarkSkyQueryTask();
                 //set the tracker to -1 so we know it is a single load
@@ -220,14 +229,14 @@ public class CompareActivity extends AppCompatActivity {
 
             //get location code url
             //TODO: later we should just get the code from Loc
-            if (!currentLoc.hasKey()) {
+            if (!currentLoc.hasKeyAW()) {
                 //doesn't have key, so we need to get it
                 //get the location code
                 URL locationCodeUrl = AccuWeatherUtils.createLocationCodeUrl(currentLoc.getLatLng());
 
                 if (locationCodeUrl == null) {
                     showAccuWeatherError();
-                    Log.v(TAG, "AW - Location code URL null");
+                    Log.d(TAG, "AW - Location code URL null");
                 } else {
                     //instantiate AccuWeatherLocationQueryTask to get the location key
                     AccuWeatherLocationQueryTask locationQueryTask = new AccuWeatherLocationQueryTask(getApplicationContext());
@@ -238,10 +247,10 @@ public class CompareActivity extends AppCompatActivity {
             } else {
                 //this means we already have a key, so just start query for weather
                 //create weather URL
-                URL url = AccuWeatherUtils.createCurrentWeatherUrlId(currentLoc.getKey());
+                URL url = AccuWeatherUtils.createCurrentWeatherUrlId(currentLoc.getKeyAW());
                 if (url == null) {
                     showAccuWeatherError();
-                    Log.v(TAG, "AW - weather URL null");
+                    Log.d(TAG, "AW - weather URL null");
                 } else {
                     //instantiate a AccuWeatherQueryTask object and then passing in our URL
                     AccuWeatherQueryTask accuWeatherQueryTask = new AccuWeatherQueryTask();
@@ -249,7 +258,7 @@ public class CompareActivity extends AppCompatActivity {
                     tracker = -1;
                     accuWeatherQueryTask.execute(url);
                 }//if-else null url
-            }//if-else loc.hasKey
+            }//if-else loc.hasKeyAW
         }//current loc-null
     }//kickOffAccuWeather
 
@@ -261,7 +270,7 @@ public class CompareActivity extends AppCompatActivity {
 
             if (latLngUrl == null) {
                 showOpenWeatherError();
-                Log.v(TAG, "OW - LatLng URL null");
+                Log.d(TAG, "OW - LatLng URL null");
             } else {
                 OpenWeatherQueryTask openWeatherQueryTask = new OpenWeatherQueryTask();
                 //set the tracker to -1 so we know it is a single load
@@ -292,7 +301,7 @@ public class CompareActivity extends AppCompatActivity {
             try {
                 //get the response using the class, passing in our url
                 String httpResponse = OpenWeatherUtils.getResponseFromHttpUrl(urls[0]);
-                Log.v(TAG, "OpenWeather JSON response: " + httpResponse);
+                Log.d(TAG, "OpenWeather JSON response: " + httpResponse);
                 return httpResponse;
             } catch (IOException e) {
                 Log.e(TAG, "Error establishing connection - OpenWeather ", e);
@@ -371,7 +380,7 @@ public class CompareActivity extends AppCompatActivity {
                 String locationCode = ParseJSON.parseAccuLocationCode(s);
                 //set the loc
                 if (currentLoc != null) {
-                    currentLoc.setKey(locationCode);
+                    currentLoc.setKeyAW(locationCode);
                     //TODO: testing
                     //update the Loc in list
                     SaveLoadList.replaceLocInDb(context, currentLoc);
@@ -380,7 +389,7 @@ public class CompareActivity extends AppCompatActivity {
                 URL url = AccuWeatherUtils.createCurrentWeatherUrlId(locationCode);
                 if (url == null) {
                     showAccuWeatherError();
-                    Log.v(TAG, "AW - weather URL null");
+                    Log.d(TAG, "AW - weather URL null");
                 } else {
                     //instantiate a AccuWeatherQueryTask object and then passing in our URL
                     AccuWeatherQueryTask accuWeatherQueryTask = new AccuWeatherQueryTask();
@@ -413,7 +422,7 @@ public class CompareActivity extends AppCompatActivity {
             try {
                 //get the response using the class, passing in our url
                 String httpResponse = AccuWeatherUtils.getResponseFromHttpUrl(urls[0]);
-                Log.v(TAG, "AccuWeather - JSON response: " + httpResponse);
+                Log.d(TAG, "AccuWeather - JSON response: " + httpResponse);
                 return httpResponse;
             } catch (IOException e) {
                 Log.e(TAG, "Error establishing connection - AccuWeather ", e);
@@ -476,7 +485,7 @@ public class CompareActivity extends AppCompatActivity {
             try {
                 //get the response using the class, passing in our url
                 String httpResponse = DarkSkyUtils.getResponseFromHttpUrl(urls[0]);
-                Log.v(TAG, "DarkSky - JSON response: " + httpResponse);
+                Log.d(TAG, "DarkSky - JSON response: " + httpResponse);
                 return httpResponse;
             } catch (IOException e) {
                 Log.e(TAG, "Error establishing connection - DarkSky ", e);

@@ -48,7 +48,7 @@ public class AccuWeatherUtils {
         URL url = null;
         try {
             url = new URL(urlString);
-            Log.v(TAG, "Location URL: " + url.toString());
+            Log.d(TAG, "Location URL: " + url.toString());
         } catch (MalformedURLException e) {
             Log.e(TAG, "Error creating location URL from string", e);
         }
@@ -64,12 +64,12 @@ public class AccuWeatherUtils {
     public static URL createCurrentWeatherUrlId(String id) {
 
         String url = ACCU_WEATHER_BASE_URL_CURRENT + id + API_ID + API_KEY + DETAILS_TRUE;
-        Log.v(TAG, "current weather URL: " + url );
+        Log.d(TAG, "current weather URL: " + url );
 
         URL queryUrl = null;
         try {
             queryUrl = new URL(url);
-            Log.v(TAG, "generated current url: " + queryUrl.toString());
+            Log.d(TAG, "generated current url: " + queryUrl.toString());
         } catch (MalformedURLException e) {
 
             Log.e(TAG, "Error creating current weather URL from string", e);
@@ -110,4 +110,8 @@ public class AccuWeatherUtils {
             urlConnection.disconnect();
         }
     }//getResponseFromHttpUrl
+
+
+
+
 }//class
