@@ -16,7 +16,9 @@ import java.net.URL;
  *
  * We also create query URLs here in this class
  *
- * AccuWeather needs a location keyAW (cannot be done using LatLng), so the AW stands for AccuWeather
+ * AccuWeather needs a location keyAW (cannot be done using LatLng).
+ *
+ * AW = AccuWeather ; DS = DarkSky ; OW = OpenWeather
  */
 
 //TODO: add methods for creating OW, AW, and DS URLs

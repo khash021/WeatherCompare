@@ -40,6 +40,7 @@ import tech.khash.weathercompare.adapter.LocListAdapter;
 import tech.khash.weathercompare.model.Loc;
 import tech.khash.weathercompare.utilities.HelperFunctions;
 import tech.khash.weathercompare.utilities.NetworkCallAccuWeatherCode;
+import tech.khash.weathercompare.utilities.NetworkCallsUtils;
 import tech.khash.weathercompare.utilities.SaveLoadList;
 
 public class MainActivity extends AppCompatActivity implements
@@ -350,10 +351,9 @@ public class MainActivity extends AppCompatActivity implements
             Log.d(TAG, "setLocInfo - codeURL = null");
             return;
         }
-
         //show seekbar
         seekBar.setVisibility(View.VISIBLE);
-        NetworkCallAccuWeatherCode networkCallAccuWeatherCode = new NetworkCallAccuWeatherCode(
+        NetworkCallsUtils.NetworkCallAccuWeatherCode networkCallAccuWeatherCode = new NetworkCallsUtils.NetworkCallAccuWeatherCode(
                 new NetworkCallAccuWeatherCode.AsyncResponse() {
                     /**
                      *  This gets called when the code is ready from the background network
@@ -384,6 +384,7 @@ public class MainActivity extends AppCompatActivity implements
                 }
         );
         networkCallAccuWeatherCode.execute(locationCodeUrl);
+
     }//setLocInfo
 
     //Helper method for getting the arrayList and set the recycler view
