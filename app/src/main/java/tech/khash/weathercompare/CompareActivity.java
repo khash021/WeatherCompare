@@ -1,7 +1,6 @@
 package tech.khash.weathercompare;
 
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -15,19 +14,13 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import org.json.JSONException;
-
-import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 
 import tech.khash.weathercompare.model.Loc;
 import tech.khash.weathercompare.model.Weather;
-import tech.khash.weathercompare.utilities.AccuWeatherUtils;
 import tech.khash.weathercompare.utilities.HelperFunctions;
 import tech.khash.weathercompare.utilities.NetworkCallsUtils;
-import tech.khash.weathercompare.utilities.OpenWeatherUtils;
-import tech.khash.weathercompare.utilities.ParseJSON;
 import tech.khash.weathercompare.utilities.SaveLoadList;
 
 //TODO: extensive cleaning, commenting, and re-thinking the entire architecture of the desing and flow
@@ -111,7 +104,8 @@ public class CompareActivity extends AppCompatActivity {
         buttonAccuWeather.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                kickOffAccuWeather();
+                //TODO: forecast
+//                kickOffAccuWeather();
             }//onClick
         });//onClickListener
 
@@ -120,7 +114,8 @@ public class CompareActivity extends AppCompatActivity {
         buttonDarkSky.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                kickOffDarkSky();
+                //TODO: forecast
+//                kickOffDarkSky();
             }//onClick
         });//onClickListener
 
@@ -202,29 +197,54 @@ public class CompareActivity extends AppCompatActivity {
         //set the name
         textCityName.setText(currentLoc.getId());
 
+        //make the progress bar visible
+        progressBar.setVisibility(View.VISIBLE);
+
         kickOffAccuWeather();
         kickOffDarkSky();
         kickOffOpenWeather();
     }//getAllWeather
 
     private void kickOffDarkSky() {
-        //check current loc
+        //check for null loc
         if (currentLoc == null) {
             Log.d(TAG, "kickOffDarkSky - currentLoc = null");
             return;
         }
 
-        //get the URL
+        //get the location code
         URL currentUrlDS = currentLoc.getCurrentUrlDS();
+
         if (currentUrlDS == null) {
+            Log.d(TAG, "kickOffDarkSky - currentUrl = null");
             showDarkSkyError();
-            Log.d(TAG, "kickOffDarkSky - LatLng URL null");
         } else {
-            DarkSkyQueryTask darkSkyQueryTask = new DarkSkyQueryTask();
-            //set the tracker to -1 so we know it is a single load
-            tracker = -1;
+            NetworkCallsUtils.DarkSkyQueryTask darkSkyQueryTask = new
+                    NetworkCallsUtils.DarkSkyQueryTask(new NetworkCallsUtils.DarkSkyQueryTask.AsyncResponse() {
+                @Override
+                public void processFinish(Weather output) {
+                    //if it is 2 (meaning all tasks are finished), remove, otherwise increment
+                    if (tracker == 2) {
+                        //remove progress bar and reset the tracker
+                        progressBar.setVisibility(View.INVISIBLE);
+                        tracker = 0;
+                    } else {
+                        //this means this is part the group load and just increment
+                        tracker++;
+                    }
+
+                    //if the call fails, it returns null, so check that first
+                    if (output == null) {
+                        Log.v(TAG, "kickOffDarkSky - processFinish - Weather = null");
+                        showDarkSkyError();
+                    } else {
+                        showDarkSkyResults(output);
+                    }
+
+                }//processFinish
+            });
             darkSkyQueryTask.execute(currentUrlDS);
-        }//if-else null url
+        }////if-else URL
     }//kickOffDarkSky
 
     private void kickOffAccuWeather() {
@@ -246,231 +266,74 @@ public class CompareActivity extends AppCompatActivity {
             Log.d(TAG, "kickOffAccuWeather - currentUrl = null");
             showAccuWeatherError();
         } else {
-            AccuWeatherQueryTask accuWeatherQueryTask = new AccuWeatherQueryTask();
-            //set the tracker to -1 so we know it is a single load
-            tracker = -1;
+            NetworkCallsUtils.AccuWeatherQueryTask accuWeatherQueryTask = new
+                    NetworkCallsUtils.AccuWeatherQueryTask(new NetworkCallsUtils.AccuWeatherQueryTask.AsyncResponse() {
+                @Override
+                public void processFinish(Weather output) {
+                    //if it is 2 (meaning all tasks are finished), remove, otherwise increment
+                    if (tracker == 2) {
+                        //remove progress bar and reset the tracker
+                        progressBar.setVisibility(View.INVISIBLE);
+                        tracker = 0;
+                    } else {
+                        //this means this is part the group load and just increment
+                        tracker++;
+                    }
+
+                    //if the call fails, it returns null, so check that first
+                    if (output == null) {
+                        Log.v(TAG, "kickOffAccuWeather - processFinish - Weather = null");
+                        showAccuWeatherError();
+                    } else {
+                        showAccuWeatherResults(output);
+                    }
+
+                }//processFinish
+            });
             accuWeatherQueryTask.execute(currentUrlAW);
-        }
+        }//if-else URL
     }//kickOffAccuWeather
 
     private void kickOffOpenWeather() {
-        //check current loc
+        //check for null loc
         if (currentLoc == null) {
             Log.d(TAG, "kickOffOpenWeather - currentLoc = null");
             return;
         }
 
-        //get the URL
+        //get the location code
         URL currentUrlOW = currentLoc.getCurrentUrlOW();
+
         if (currentUrlOW == null) {
+            Log.d(TAG, "kickOffOpenWeather - currentUrl = null");
             showOpenWeatherError();
-            Log.d(TAG, "kickOffOpenWeather - currentUrlOW = null");
         } else {
-            OpenWeatherQueryTask openWeatherQueryTask = new OpenWeatherQueryTask();
-            //set the tracker to -1 so we know it is a single load
-            tracker = -1;
+            NetworkCallsUtils.OpenWeatherQueryTask openWeatherQueryTask = new
+                    NetworkCallsUtils.OpenWeatherQueryTask(new NetworkCallsUtils.OpenWeatherQueryTask.AsyncResponse() {
+                @Override
+                public void processFinish(Weather output) {
+                    //if it is 2 (meaning all tasks are finished), remove, otherwise increment
+                    if (tracker == 2) {
+                        //remove progress bar and reset the tracker
+                        progressBar.setVisibility(View.INVISIBLE);
+                        tracker = 0;
+                    } else {
+                        //this means this is part the group load and just increment
+                        tracker++;
+                    }
+
+                    //if the call fails, it returns null, so check that first
+                    if (output == null) {
+                        Log.v(TAG, "kickOffOpenWeather - processFinish - Weather = null");
+                        showOpenWeatherError();
+                    } else {
+                        showOpenWeatherResults(output);
+                    }
+                }
+            });
             openWeatherQueryTask.execute(currentUrlOW);
-        }//if-else null url
+        }//if-else URL null
     }//kickOffOpenWeather
-
-
-    /*------------------------------------------------------------------------------------------
-                    ---------------    AsyncTask Inner Classes    ---------------
-    ------------------------------------------------------------------------------------------*/
-
-
-    /**
-     * For now we are using an AsyncTask loader class for getting the JSON response from Open Weather
-     */
-
-    public class OpenWeatherQueryTask extends AsyncTask<URL, Void, String> {
-
-        //show the progress bar
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            progressBar.setVisibility(View.VISIBLE);
-        }//onPreExecute
-
-        //http query
-        @Override
-        protected String doInBackground(URL... urls) {
-
-            //Make the request
-            try {
-                //get the response using the class, passing in our url
-                String httpResponse = OpenWeatherUtils.getResponseFromHttpUrl(urls[0]);
-                Log.d(TAG, "OpenWeather JSON response: " + httpResponse);
-                return httpResponse;
-            } catch (IOException e) {
-                Log.e(TAG, "Error establishing connection - OpenWeather ", e);
-                return null;
-            }
-        }//doInBackground
-
-        //update UI
-        @Override
-        protected void onPostExecute(String s) {
-            //if it was a single load, then remove progress bar and set it back to 0; otherwise
-            //if it is not 2, just increment
-            if (tracker == -1 || tracker == 2) {
-
-                //remove progress bar and reset the tracker
-                progressBar.setVisibility(View.INVISIBLE);
-                tracker = 0;
-            } else {
-                //this means this is part the group load and just increment
-                tracker++;
-            }
-
-            //dummy check
-            if (s == null || TextUtils.isEmpty(s)) {
-                //show error if the response is empty or null
-                showOpenWeatherError();
-            } else {
-                Weather current = null;
-                try {
-                    current = ParseJSON.parseOpenWeatherCurrent(s);
-                } catch (JSONException e) {
-                    Log.e(TAG, "Error getting results decoded - OpenWeather", e);
-                }//try-catch
-                //check the results for null
-                if (current == null) {
-                    showOpenWeatherError();
-                } else {
-                    showOpenWeatherResults(current);
-                }
-
-            }//if-else
-        }//onPostExecute
-    }//OpenWeatherQueryTask
-
-    /**
-     * For now we are using an AsyncTask loader class for getting the JSON response from AccuWeather
-     */
-    public class AccuWeatherQueryTask extends AsyncTask<URL, Void, String> {
-
-        //show the progress bar
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            progressBar.setVisibility(View.VISIBLE);
-        }//onPreExecute
-
-        @Override
-        protected String doInBackground(URL... urls) {
-            //Make the request
-            try {
-                //get the response using the class, passing in our url
-                String httpResponse = AccuWeatherUtils.getResponseFromHttpUrl(urls[0]);
-                Log.d(TAG, "AccuWeather - JSON response: " + httpResponse);
-                return httpResponse;
-            } catch (IOException e) {
-                Log.e(TAG, "Error establishing connection - AccuWeather ", e);
-                return null;
-            }
-        }//doInBackground
-
-        //update UI
-        @Override
-        protected void onPostExecute(String s) {
-            //if it was a single load, then remove progress bar and set it back to 0; otherwise
-            //if it is not 2, just increment
-            if (tracker == -1 || tracker == 2) {
-
-                //remove progress bar and reset the tracker
-                progressBar.setVisibility(View.INVISIBLE);
-                tracker = 0;
-            } else {
-                //this means this is part the group load and just increment
-                tracker++;
-            }
-
-            //dummy check
-            if (s == null || TextUtils.isEmpty(s)) {
-                //show error if the response is empty or null
-                showAccuWeatherError();
-            } else {
-                Weather current = null;
-                try {
-                    current = ParseJSON.parseAccuWeatherCurrent(s);
-                } catch (JSONException e) {
-                    Log.e(TAG, "Error getting results decoded - AccuWeather", e);
-                }//try-catch
-                //check the results for null
-                if (current == null) {
-                    showAccuWeatherError();
-                } else {
-                    showAccuWeatherResults(current);
-                }
-
-            }//if-else
-        }//onPostExecute
-    }//AccuWeatherQueryTask - class
-
-    /**
-     * For now we are using an AsyncTask loader class for getting the JSON response from DarkSkay
-     */
-    public class DarkSkyQueryTask extends AsyncTask<URL, Void, String> {
-
-        //show the progress bar
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            progressBar.setVisibility(View.VISIBLE);
-        }//onPreExecute
-
-        @Override
-        protected String doInBackground(URL... urls) {
-            //Make the request
-            try {
-                //get the response using the class, passing in our url
-                String httpResponse = NetworkCallsUtils.getResponseFromHttpUrl(urls[0]);
-                Log.d(TAG, "DarkSky - JSON response: " + httpResponse);
-                return httpResponse;
-            } catch (IOException e) {
-                Log.e(TAG, "Error establishing connection - DarkSky ", e);
-                return null;
-            }
-        }//doInBackground
-
-        //update UI
-        @Override
-        protected void onPostExecute(String s) {
-            //if it was a single load, then remove progress bar and set it back to 0; otherwise
-            //if it is not 2, just increment
-            if (tracker == -1 || tracker == 2) {
-
-                //remove progress bar and reset the tracker
-                progressBar.setVisibility(View.INVISIBLE);
-                tracker = 0;
-            } else {
-                //this means this is part the group load and just increment
-                tracker++;
-            }
-
-            //dummy check
-            if (s == null || TextUtils.isEmpty(s)) {
-                //show error if the response is empty or null
-                showDarkSkyError();
-            } else {
-                Weather current = null;
-                try {
-                    current = ParseJSON.parseDarkSkyCurrent(s);
-                } catch (JSONException e) {
-                    Log.e(TAG, "Error getting results decoded - DarkSky", e);
-                }//try-catch
-                //check the results for null or empty
-                if (current == null) {
-                    showDarkSkyError();
-                } else {
-                    showDarkSkyResults(current);
-                }
-
-            }//if-else
-        }//onPostExecute
-
-    }//AccuWeatherQueryTask - class
 
 
     /*------------------------------------------------------------------------------------------
