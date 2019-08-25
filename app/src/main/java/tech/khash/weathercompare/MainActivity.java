@@ -39,7 +39,6 @@ import java.util.Objects;
 import tech.khash.weathercompare.adapter.LocListAdapter;
 import tech.khash.weathercompare.model.Loc;
 import tech.khash.weathercompare.utilities.HelperFunctions;
-import tech.khash.weathercompare.utilities.NetworkCallAccuWeatherCode;
 import tech.khash.weathercompare.utilities.NetworkCallsUtils;
 import tech.khash.weathercompare.utilities.SaveLoadList;
 
@@ -353,38 +352,36 @@ public class MainActivity extends AppCompatActivity implements
         }
         //show seekbar
         seekBar.setVisibility(View.VISIBLE);
-        NetworkCallsUtils.NetworkCallAccuWeatherCode networkCallAccuWeatherCode = new NetworkCallsUtils.NetworkCallAccuWeatherCode(
-                new NetworkCallAccuWeatherCode.AsyncResponse() {
-                    /**
-                     *  This gets called when the code is ready from the background network
-                     *  call and we set the data on loc
-                     * @param output : AW location key
-                     */
-                    @Override
-                    public void processFinish(String output) {
-                        if (output == null) {
-                            Log.d(TAG, "processFinish - null response");
-                        }
-                        //set the key
-                        currentLoc.setKeyAW(output);
-
-                        //set all urls
-                        currentLoc.setAllUrls();
-
-                        //update database here
-                        SaveLoadList.replaceLocInDb(context, currentLoc);
-
-                        //remove seekbar
-                        seekBar.setVisibility(View.GONE);
-
-                        //update list
-                        updateRecyclerView();
-
-                    }
+        NetworkCallsUtils.NetworkCallAccuWeatherCode networkCallAccuWeatherCode = new
+                NetworkCallsUtils.NetworkCallAccuWeatherCode(new NetworkCallsUtils.NetworkCallAccuWeatherCode.AsyncResponse() {
+            /**
+             *  This gets called when the code is ready from the background network
+             *  call and we set the data on loc
+             * @param output : AW location key
+             */
+            @Override
+            public void processFinish(String output) {
+                if (output == null) {
+                    Log.d(TAG, "processFinish - null response");
                 }
-        );
-        networkCallAccuWeatherCode.execute(locationCodeUrl);
+                //set the key
+                currentLoc.setKeyAW(output);
 
+                //set all urls
+                currentLoc.setAllUrls();
+
+                //update database here
+                SaveLoadList.replaceLocInDb(context, currentLoc);
+
+                //remove seekbar
+                seekBar.setVisibility(View.GONE);
+
+                //update list
+                updateRecyclerView();
+
+            }//processFinish
+        });
+        networkCallAccuWeatherCode.execute(locationCodeUrl);
     }//setLocInfo
 
     //Helper method for getting the arrayList and set the recycler view

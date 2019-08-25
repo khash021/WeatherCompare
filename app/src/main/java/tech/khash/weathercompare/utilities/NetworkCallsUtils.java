@@ -25,6 +25,7 @@ public class NetworkCallsUtils {
 
     private static final String TAG = NetworkCallsUtils.class.getSimpleName();
 
+
     /**
      * This method returns the entire result from the HTTP response.
      *
@@ -63,17 +64,28 @@ public class NetworkCallsUtils {
         }
     }//getResponseFromHttpUrl
 
+
+
+
+    /*
+        ----------------------------- AW --------------------------------------
+     */
+
+    /**
+     * This is for getting the AW location code
+     */
     public static class NetworkCallAccuWeatherCode extends AsyncTask<URL, Void, String> {
 
-        private final String TAG = tech.khash.weathercompare.utilities.NetworkCallAccuWeatherCode.class.getSimpleName();
+        private final String TAG = NetworkCallAccuWeatherCode.class.getSimpleName();
 
         public interface AsyncResponse {
             void processFinish(String output);
         }//AsyncResponse
 
-        public tech.khash.weathercompare.utilities.NetworkCallAccuWeatherCode.AsyncResponse delegate = null;
+        private AsyncResponse delegate = null;
 
-        public NetworkCallAccuWeatherCode (tech.khash.weathercompare.utilities.NetworkCallAccuWeatherCode.AsyncResponse delegate) {
+
+        public NetworkCallAccuWeatherCode (AsyncResponse delegate) {
             this.delegate = delegate;
         }
 
@@ -104,12 +116,6 @@ public class NetworkCallsUtils {
             }
         }//onPostExecute
     }//NetworkCallAccuWeatherCode
-
-
-    /*
-        ----------------------------- AW --------------------------------------
-     */
-
 
 
     /*
