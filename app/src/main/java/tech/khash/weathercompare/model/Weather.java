@@ -10,6 +10,8 @@ import android.net.Uri;
 
 public class Weather {
 
+    //TODO: make the variables match the return type from API (float, etc) and then convert on returning
+
     private String summary, temperature, humidity, dewPoint, pressure, windSpeed, windDirection,
             windGust, visibility, cloudCoverage, pop, popType, iconUrl;
     private Uri iconUri;
@@ -98,6 +100,14 @@ public class Weather {
         if (temperature == null) {
             return "";
         }
+        //Open weather data is a float, here we convert to float, and then return the rounded version
+        if (temperature.contains(".")) {
+            float tempFloat = Float.valueOf(temperature);
+            int rounded = Math.round(tempFloat);
+            String output = String.valueOf(rounded);
+            return output;
+        }
+
         return temperature;
     }//getTemperature
 

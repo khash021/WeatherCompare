@@ -112,6 +112,7 @@ public class NetworkCallsUtils {
 
             } catch (JSONException e) {
                 Log.e(TAG, "Error parsing location code response - AccuWeather ", e);
+                delegate.processFinish(null);
             }
         }//onPostExecute
     }//NetworkCallAccuWeatherCode
