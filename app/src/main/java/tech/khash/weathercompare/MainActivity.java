@@ -30,10 +30,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Objects;
 
 import tech.khash.weathercompare.adapter.LocListAdapter;
@@ -110,6 +117,23 @@ public class MainActivity extends AppCompatActivity implements
                 openAddLocation();
             }
         });
+
+
+        //TODO: testing
+        String epoch = "1566817200";
+        long epochLong = Long.valueOf(epoch);
+        epochLong *= 1000;//AW gives seconds epoch, we need to convert to milliseconds
+        Date date = new Date(epochLong);
+
+        SimpleDateFormat formatter = new SimpleDateFormat("EEE, MMM.dd", Locale.getDefault());
+        String output = formatter.format(date);
+
+        DateTimeFormatter jodaFormatter = DateTimeFormat.forPattern("EEE, MMM.dd");
+        DateTime dateTime = new DateTime(epochLong);
+        String output2 = jodaFormatter.withLocale(Locale.getDefault()).print(dateTime);
+
+
+        Log.d(TAG, "EPOCH formatted 1: " + output + "\nJoda : " + output2);
     }//onCreate
 
     @Override
@@ -429,11 +453,15 @@ public class MainActivity extends AppCompatActivity implements
             boolean hasCurrentUrlAW = loc.hasCurrentUrlAW();
             boolean hasCurrentUrlOW = loc.hasCurrentUrlOW();
             boolean hasCurrentUrlDS = loc.hasCurrentUrlDS();
+            boolean hasForecastUrlAW = loc.hasForecastUrlAW();
 
-            URL locationCodeUrlAW = loc.getLocationCodeUrlAW();
-            URL currentUrlAW = loc.getCurrentUrlAW();
-            URL currentUrlOW = loc.getCurrentUrlOW();
-            URL currentUrlDS = loc.getCurrentUrlDS();
+            URL forecastUrlAW = loc.getForecastUrlAW();
+            String urlString;
+            if (forecastUrlAW != null) {
+                urlString = forecastUrlAW.toString();
+            } else {
+                urlString = "null";
+            }
 
             String locationCodeAW = loc.getKeyAW();
 
@@ -443,7 +471,8 @@ public class MainActivity extends AppCompatActivity implements
                     "hasCurrentUrlAW : " + hasCurrentUrlAW + "\n" +
                     "hasCurrentUrlOW : " + hasCurrentUrlOW + "\n" +
                     "hasCurrentUrlDS : " + hasCurrentUrlDS +
-                    "\nCode: " + locationCodeAW);
+                    "\nCode: " + locationCodeAW + "\nhasForecastUrlAW : " + hasForecastUrlAW +
+                    "\nforecastAwUrl : " + urlString);
 
             counter++;
         }//for

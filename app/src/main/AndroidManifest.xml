@@ -46,7 +46,7 @@
         </activity>
 
         <activity
-            android:name=".OpenWeatherForecast"
+            android:name=".AccuWeatherForecast"
             android:label="@string/title_activity_open_weather_forecast">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

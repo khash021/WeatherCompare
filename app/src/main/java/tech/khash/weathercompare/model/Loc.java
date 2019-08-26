@@ -28,7 +28,7 @@ public class Loc {
     private final static String TAG = Loc.class.getSimpleName();
 
     //constants for creating URLS
-    //Accu Wethaer
+    //---------------------   Accu Wethaer  -----------------------------------
     private static final String ACCU_WEATHER_BASE_URL_CURRENT =
             "http://dataservice.accuweather.com/currentconditions/v1/";
     private static final String ACCU_WEATHER_QUERY = "&q=";
@@ -37,9 +37,23 @@ public class Loc {
     private static final String ACCU_WEATHER_API_ID = "?apikey=";
     private static final String ACCU_WEATHER_API_KEY = "Lxds8cj5vJGWk7n1XBe8McAhJhyFnCaw";
     private static final String ACCU_WEATHER_DETAILS_TRUE = "&details=true";
+    //forecast (5-day)
+    private static final String ACC_WEATHER_BASE_URL_FORECAST =
+            "http://dataservice.accuweather.com/forecasts/v1/daily/5day/";
+    private static final String ACCU_WEATHER_METRIC_TRUE = "&metric=true";
 
-    //Open Weather
-    //for current
+
+    //---------------------   Dark Sky   ---------------------------------------
+    private static final String DARK_SKY_BASE_URL = "https://api.darksky.net/forecast/";
+    private static final String DARK_SKY_API_KEY = "f5e4285ed1e89d653fd1d99b04e375b7";
+    private static final String DARK_SKY_LOCATION = "%s,%s";
+    private static final String DARK_SKY_UNITS = "units=";
+    private static final String DARK_SKY_UNITS_METRIC = "ca"; //same as si except speed is km/h
+    private static final String DARK_SKY_EXCLUDE = "exclude=";
+    private static final String DARK_SKY_EXCLUDE_BLOCK_CURRENT = "minutely,hourly,daily,alerts,flags";
+
+    //----------------------   Open Weather   -----------------------------------------------
+    //current
     private static final String OPEN_WEATHER_BASE_URL_CITY_CODE = "https://api.openweathermap.org/data/2.5/weather?id=";
     private static final String OPEN_WEATHER_BASE_URL_LAT_LNG = "https://api.openweathermap.org/data/2.5/weather?";
     //forecast
@@ -50,23 +64,20 @@ public class Loc {
     private static final String OPEN_WEATHER_UNIT = "&units=";
     private static final String OPEN_WEATHER_METRIC = "metric";
 
-    //Dark Sky
-    private static final String DARK_SKY_BASE_URL = "https://api.darksky.net/forecast/";
-    private static final String DARK_SKY_API_KEY = "f5e4285ed1e89d653fd1d99b04e375b7";
-    private static final String DARK_SKY_LOCATION = "%s,%s";
-    private static final String DARK_SKY_UNITS = "units=";
-    private static final String DARK_SKY_UNITS_METRIC = "ca"; //same as si except speed is km/h
-    private static final String DARK_SKY_EXCLUDE = "exclude=";
-    private static final String DARK_SKY_EXCLUDE_BLOCK_CURRENT = "minutely,hourly,daily,alerts,flags";
+
 
     //Variable
     private LatLng latLng;
     private String id;
+
     private String keyAW; //used only for AccuWeather
     private URL locationCodeUrlAW;
+
     private URL currentUrlAW;
     private URL currentUrlOW;
     private URL currentUrlDS;
+
+    private URL forecastUrlAW;
 
 
     //default constructor
@@ -139,6 +150,29 @@ public class Loc {
         }//if-else keyAW
     }//getCurrentUrlAW
 
+    public URL getForecastUrlAW() {
+        if (forecastUrlAW != null) {
+            return forecastUrlAW;
+        }
+
+        if (hasKeyAW()) {
+            URL url = createForecastUrlAW(keyAW);
+            if (url == null) {
+                Log.d(TAG, "getForecastUrlAW - URL null......Name: " + id);
+                return null;
+            } else {
+                forecastUrlAW = url;
+                return forecastUrlAW;
+            }//url null
+        } else {
+            //we need keyAW
+            //TODO:
+            //get keyAW
+            Log.d(TAG, "getForecastUrlAW - no keyAW......Name: " + id);
+            return null;
+        }//if-else keyAW
+    }//getForecastUrlAW
+
     public URL getCurrentUrlOW() {
         if (currentUrlOW != null) {
             return currentUrlOW;
@@ -170,6 +204,7 @@ public class Loc {
     }//getCurrentUrlDS
 
 
+
     /*
         ------------------------ SETTER METHODS -----------------------------------------
      */
@@ -187,10 +222,12 @@ public class Loc {
     }//setLatLng
 
     public void setAllUrls() {
+        //code
         if (!hasLocationCodeUrlAW()) {
             getLocationCodeUrlAW();
         }
 
+        //current
         if (!hasCurrentUrlAW()) {
             getCurrentUrlAW();
         }
@@ -202,6 +239,12 @@ public class Loc {
         if (!hasCurrentUrlDS()) {
             getCurrentUrlDS();
         }
+
+        //forecast
+        if (!hasForecastUrlAW()) {
+            getForecastUrlAW();
+        }
+
     }//setAllUrls
 
 
@@ -229,6 +272,10 @@ public class Loc {
         return currentUrlDS != null;
     }//hasCurrentUrlDS
 
+    public boolean hasForecastUrlAW() {
+        return forecastUrlAW != null;
+    }//hasForecastUrlAW
+
     /**
      *  This creates a URL for getting location code from LatLng
      * @param latLng : LatLng of the location
@@ -252,24 +299,38 @@ public class Loc {
 
     /**
      * This creates the URL for current weather using city ID
-     * @param awId : city's id
+     * @param locCode : city's code
      * @return : URL
      */
-    private static URL createCurrentUrlAW (String awId) {
-        String urlString = ACCU_WEATHER_BASE_URL_CURRENT + awId + ACCU_WEATHER_API_ID +
+    private static URL createCurrentUrlAW (String locCode) {
+        String urlString = ACCU_WEATHER_BASE_URL_CURRENT + locCode + ACCU_WEATHER_API_ID +
                 ACCU_WEATHER_API_KEY + ACCU_WEATHER_DETAILS_TRUE;
         Log.d(TAG, "Current URL string - AW: " + urlString );
 
         URL url = null;
         try {
-            url = new URL(urlString);
+            url = new URL (urlString);
             Log.d(TAG, "generated current url: " + url.toString());
         } catch (MalformedURLException e) {
-
             Log.e(TAG, "Error creating current weather URL from string", e);
         }
         return url;
     }//createCurrentWeatherUrlId
+
+    private static URL createForecastUrlAW (String locCode) {
+        String urlString = ACC_WEATHER_BASE_URL_FORECAST + locCode + ACCU_WEATHER_API_ID +
+                ACCU_WEATHER_API_KEY + ACCU_WEATHER_DETAILS_TRUE + ACCU_WEATHER_METRIC_TRUE;
+        Log.d(TAG, "Forecast URL String - AW: " + urlString);
+
+        URL url = null;
+        try {
+            url = new URL (urlString);
+            Log.d(TAG, "generated forecast url: " + url.toString());
+        } catch (MalformedURLException e) {
+            Log.e(TAG, "Error creating forecast weather URL from string", e);
+        }
+        return url;
+    }//createForecastUrlAW
 
     /**
      * This creates the URL for current weather using LatLng

@@ -7,6 +7,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
+
 import tech.khash.weathercompare.model.Weather;
 
 /**
@@ -50,8 +55,18 @@ public class ParseJSON {
     private static final String JSON_AW_CLOUD_COVER = "CloudCover";
     private static final String JSON_AW_PRESSURE = "Pressure";
     private static final String JSON_AW_LOCATION_KEY = "Key";
-
     private static final String JSON_AW_ICON = "WeatherIcon";
+
+    //forecast AW
+    private static final String JSON_AW_DAILY_FORECASTS = "DailyForecasts";
+    private static final String JSON_AW_FORECAST_EPOCH = "EpochDate";
+    private static final String JSON_AW_FORECAST_MIN = "Minimum";
+    private static final String JSON_AW_FORECAST_MAX = "Maximum";
+    private static final String JSON_AW_FORECAST_DAY = "Day";
+    private static final String JSON_AW_FORECAST_NIGHT = "Night";
+    private static final String JSON_AW_FORECAST_SUMMARY = "ShortPhrase";
+    private static final String JSON_AW_FORECAST_POP = "PrecipitationProbability";
+
 
     //constants for DarkSky
     private static final String JSON_DS_CURRENTLY = "currently";
@@ -282,6 +297,89 @@ public class ParseJSON {
 
         return weather;
     }//parseAccuWeatherCurrent
+
+    /**
+     *      This methods goes through the forecast data and create 3 Weather objects for next 3
+     *      days and return the list
+     * @param jsonString : response
+     * @return : ArrayList<Weather> for the next 3 days
+     * @throws JSONException
+     */
+    public static ArrayList<Weather> parseAccuWeatherForecast (String jsonString) throws JSONException {
+        if (TextUtils.isEmpty(jsonString)) {
+            return null;
+        }
+
+        String date, tempMin, tempMax, summaryDay, popDay, cloudDay, summaryNight, popNight, cloudNight;
+        ArrayList<Weather> weatherArrayList = new ArrayList<>();
+        Weather weather;
+        //for formatting date
+        SimpleDateFormat formatter = new SimpleDateFormat("EEE, MMM.dd", Locale.getDefault());
+
+        JSONObject rootObject = new JSONObject(jsonString);
+        JSONArray forecastArray = rootObject.getJSONArray(JSON_AW_DAILY_FORECASTS);
+
+        /*we want data for the next three days (first object is for today, which we ignore for now
+        So we get index 1, 2, and 3
+         */
+        for (int i = 1; i < 4; i++) {
+            weather = new Weather();
+            JSONObject mainObject = forecastArray.getJSONObject(i);
+
+            //date
+            long epoch = (long) mainObject.optInt(JSON_AW_FORECAST_EPOCH, -1);
+            //check for -1
+            if (epoch != -1) {
+                //convert to milli sec
+                epoch *= 1000;
+                //create a date
+                Date dateObject = new Date(epoch);
+                date = formatter.format(dateObject);
+            } else {
+                date = "";
+            }
+            weather.setDate(date);
+
+            //temps
+            JSONObject tempObject = mainObject.optJSONObject(JSON_AW_TEMPERATURE);
+
+            JSONObject minObject = tempObject.optJSONObject(JSON_AW_FORECAST_MIN);
+            tempMin = String.valueOf(minObject.optLong(JSON_AW_METRIC_VALUE));
+            weather.setTempMin(tempMin);
+
+            JSONObject manObject = tempObject.optJSONObject(JSON_AW_FORECAST_MAX);
+            tempMax = String.valueOf(manObject.optLong(JSON_AW_METRIC_VALUE));
+            weather.setTempMax(tempMax);
+
+            //day
+            JSONObject dayObject = mainObject.optJSONObject(JSON_AW_FORECAST_DAY);
+
+            summaryDay = dayObject.optString(JSON_AW_FORECAST_SUMMARY);
+            weather.setSummaryDay(summaryDay);
+
+            popDay = String.valueOf(dayObject.optInt(JSON_AW_FORECAST_POP));
+            weather.setPopDay(popDay);
+
+            cloudDay = String.valueOf(dayObject.optInt(JSON_AW_CLOUD_COVER));
+            weather.setCloudDay(cloudDay);
+
+            //night
+            JSONObject nightObject = mainObject.optJSONObject(JSON_AW_FORECAST_NIGHT);
+
+            summaryNight = nightObject.optString(JSON_AW_FORECAST_SUMMARY);
+            weather.setSummaryNight(summaryNight);
+
+            popNight = String.valueOf(nightObject.optInt(JSON_AW_FORECAST_POP));
+            weather.setPopNight(popNight);
+
+            cloudNight = String.valueOf(nightObject.optInt(JSON_AW_CLOUD_COVER));
+            weather.setCloudNight(cloudNight);
+
+            weatherArrayList.add(weather);
+
+        }//for
+        return weatherArrayList;
+    }//parseAccuWeatherForecast
 
     /**
      * This method is for parsing the current weather from DarkSky

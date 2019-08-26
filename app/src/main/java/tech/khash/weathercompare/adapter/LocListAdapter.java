@@ -18,7 +18,7 @@ import tech.khash.weathercompare.model.Loc;
 /**
  * Created by Khashayar "Khash" Mortazavi
  * <p>
- * Main adapter class to be used with RecyclerView in the MainActivity
+ * Main adapter class for Loc object to be used with RecyclerView in the MainActivity
  */
 
 public class LocListAdapter extends RecyclerView.Adapter<LocListAdapter.LocViewHolder> {
@@ -58,7 +58,7 @@ public class LocListAdapter extends RecyclerView.Adapter<LocListAdapter.LocViewH
     @NonNull
     @Override
     public LocListAdapter.LocViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int i) {
-        View itemView = inflater.inflate(R.layout.list_item,
+        View itemView = inflater.inflate(R.layout.list_item_loc,
                 parent, false);
         return new LocViewHolder(itemView, this, context);
     }//onCreateViewHolder
@@ -71,6 +71,7 @@ public class LocListAdapter extends RecyclerView.Adapter<LocListAdapter.LocViewH
      */
     @Override
     public void onBindViewHolder(@NonNull LocListAdapter.LocViewHolder holder, int position) {
+
         //Get the corresponding Fence object
         Loc loc = locArrayList.get(position);
         //check for null fence

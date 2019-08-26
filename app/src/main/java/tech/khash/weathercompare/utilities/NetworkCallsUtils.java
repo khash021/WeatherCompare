@@ -34,7 +34,7 @@ public class NetworkCallsUtils {
      * @return The contents of the HTTP response.
      * @throws IOException Related to network and stream reading
      */
-    public static String getResponseFromHttpUrl(URL url) throws IOException {
+    private static String getResponseFromHttpUrl(URL url) throws IOException {
         //establish the connection
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         try {
@@ -121,9 +121,9 @@ public class NetworkCallsUtils {
     /**
      * For now we are using an AsyncTask loader class for getting the JSON response from AccuWeather
      */
-    public static class AccuWeatherQueryTask extends AsyncTask<URL, Void, String> {
+    public static class AccuWeatherCurrentTask extends AsyncTask<URL, Void, String> {
 
-        private final String TAG = AccuWeatherQueryTask.class.getSimpleName();
+        private final String TAG = AccuWeatherCurrentTask.class.getSimpleName();
 
         public interface AsyncResponse {
             void processFinish(Weather output);
@@ -131,7 +131,7 @@ public class NetworkCallsUtils {
 
         private AsyncResponse delegate = null;
 
-        public AccuWeatherQueryTask(AsyncResponse delegate) {
+        public AccuWeatherCurrentTask(AsyncResponse delegate) {
             this.delegate = delegate;
         }
 
@@ -141,10 +141,10 @@ public class NetworkCallsUtils {
             try {
                 //get the response using the class, passing in our url
                 String httpResponse = NetworkCallsUtils.getResponseFromHttpUrl(urls[0]);
-                Log.d(TAG, "AccuWeather - JSON response: " + httpResponse);
+                Log.d(TAG, "AccuWeatherCurrent - JSON response: " + httpResponse);
                 return httpResponse;
             } catch (IOException e) {
-                Log.e(TAG, "Error establishing connection - AccuWeather ", e);
+                Log.e(TAG, "Error establishing connection - AccuWeatherCurrent ", e);
                 return null;
             }
         }//doInBackground
@@ -153,7 +153,7 @@ public class NetworkCallsUtils {
         @Override
         protected void onPostExecute(String s) {
             if (TextUtils.isEmpty(s)) {
-                Log.e(TAG, "AccuWeatherQueryTask - postExecute - response = null");
+                Log.e(TAG, "AccuWeatherCurrent - postExecute - response = null");
 
             }
             //parse response and get the code
@@ -163,11 +163,55 @@ public class NetworkCallsUtils {
                 //pass data to interface
                 delegate.processFinish(current);
             } catch (JSONException e) {
-                Log.e(TAG, "AccuWeatherQueryTask - postExecute - error parsing response");
+                Log.e(TAG, "AccuWeatherCurrent - postExecute - error parsing response");
                 delegate.processFinish(null);
             }//try-catch
         }//onPostExecute
-    }//AccuWeatherQueryTask - class
+    }//AccuWeatherCurrentTask - class
+
+    /**
+     * Gets the AW forecast response from web.
+     * It does not parse data here, it is done in the parent activity
+     */
+    public static class AccuWeatherForecastTask extends AsyncTask<URL, Void, String> {
+
+        private static final String TAG = AccuWeatherForecastTask.class.getSimpleName();
+
+        public interface AsyncResponse {
+            void processFinish(String jsonResponse);
+        }//interface
+
+        private AsyncResponse delegate = null;
+
+        //constructor
+        public AccuWeatherForecastTask (AsyncResponse delegate) {
+            this.delegate = delegate;
+        }//constructor
+
+        @Override
+        protected String doInBackground(URL... urls) {
+            //make the request
+            try {
+                //get the response using the class, passing in our url
+                String httpResponse = NetworkCallsUtils.getResponseFromHttpUrl(urls[0]);
+                Log.d(TAG, "AccuWeatherForecast - JSON response: " + httpResponse);
+                return httpResponse;
+            } catch (IOException e) {
+                Log.e(TAG, "Error establishing connection - AccuWeatherForecast ", e);
+                return null;
+            }
+        }//doInBackground
+
+        @Override
+        protected void onPostExecute(String s) {
+            if (TextUtils.isEmpty(s)) {
+                Log.e(TAG, "AccuWeatherForecast - postExecute - response = null");
+                return;
+            }
+            Log.d(TAG, "AccuWeatherForecast response : " + s);
+            delegate.processFinish(s);
+        }//onPostExecute
+    }//AccuWeatherForecastTask
 
     /*
         ----------------------------- DS --------------------------------------
@@ -227,9 +271,9 @@ public class NetworkCallsUtils {
         ----------------------------- OW --------------------------------------
      */
 
-    public static class OpenWeatherQueryTask extends AsyncTask<URL, Void, String> {
+    public static class OpenWeatherCurrentTask extends AsyncTask<URL, Void, String> {
 
-        private final String TAG = OpenWeatherQueryTask.class.getSimpleName();
+        private final String TAG = OpenWeatherCurrentTask.class.getSimpleName();
 
         public interface AsyncResponse {
             void processFinish(Weather output);
@@ -237,7 +281,7 @@ public class NetworkCallsUtils {
 
         private AsyncResponse deletegate = null;
 
-        public OpenWeatherQueryTask(AsyncResponse deletegate) {
+        public OpenWeatherCurrentTask(AsyncResponse deletegate) {
             this.deletegate = deletegate;
         }
 
@@ -272,6 +316,6 @@ public class NetworkCallsUtils {
                 deletegate.processFinish(null);
             }//try-catch
         }//onPostExecute
-    }//OpenWeatherQueryTask
+    }//OpenWeatherCurrentTask
 
 }//NetworkCallsUtils - class

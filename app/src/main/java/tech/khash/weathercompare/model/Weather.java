@@ -14,6 +14,9 @@ public class Weather {
 
     private String summary, temperature, humidity, dewPoint, pressure, windSpeed, windDirection,
             windGust, visibility, cloudCoverage, pop, popType, iconUrl;
+    //for forecast (AW now)
+    private String date, tempMin, TempMax, summaryDay, popDay, cloudDay, summaryNight, popNight, cloudNight;
+
     private Uri iconUri;
 
     //default public constructor
@@ -195,4 +198,80 @@ public class Weather {
             return null;
         }
     }//getIconUri
+
+
+/*
+---------------------------------------------- AW FORECAST ---------------------------------------
+ */
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public String getTempMin() {
+        return tempMin;
+    }
+
+    public void setTempMin(String tempMin) {
+        this.tempMin = tempMin;
+    }
+
+    public String getTempMax() {
+        return TempMax;
+    }
+
+    public void setTempMax(String tempMax) {
+        TempMax = tempMax;
+    }
+
+    public String getSummaryDay() {
+        return summaryDay;
+    }
+
+    public void setSummaryDay(String summaryDay) {
+        this.summaryDay = summaryDay;
+    }
+
+    public String getPopDay() {
+        return popDay;
+    }
+
+    public void setPopDay(String popDay) {
+        this.popDay = popDay;
+    }
+
+    public String getCloudDay() {
+        return cloudDay;
+    }
+
+    public void setCloudDay(String cloudDay) {
+        this.cloudDay = cloudDay;
+    }
+
+    public String getSummaryNight() {
+        return summaryNight;
+    }
+
+    public void setSummaryNight(String summaryNight) {
+        this.summaryNight = summaryNight;
+    }
+
+    public String getPopNight() {
+        return popNight;
+    }
+
+    public void setPopNight(String popNight) {
+        this.popNight = popNight;
+    }
+
+    public String getCloudNight() {
+        return cloudNight;
+    }
+
+    public void setCloudNight(String cloudNight) {
+        this.cloudNight = cloudNight;
+    }
 }

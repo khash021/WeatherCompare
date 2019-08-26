@@ -41,7 +41,7 @@ public class CompareActivity extends AppCompatActivity {
     private ImageView mIconImage;
     private ProgressBar progressBar;
 
-    public final static String INTENT_EXTRA_OW_LOC = "intent--extra-ow_loc";
+    public final static String INTENT_EXTRA_AC_LOC = "intent-extra-aw-loc";
 
     private Loc currentLoc;
 
@@ -87,15 +87,7 @@ public class CompareActivity extends AppCompatActivity {
         buttonOpenWeather.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (currentLoc != null) {
-                    Intent forecastIntetn = new Intent(getApplicationContext(), OpenWeatherForecast.class);
-                    forecastIntetn.putExtra(INTENT_EXTRA_OW_LOC, currentLoc.getId());
-                    startActivity(forecastIntetn);
-                } else {
-                    Log.d(TAG, "Forecast Intent - OW : current loc null");
-                    HelperFunctions.showToast(getApplicationContext(), "current loc nuln");
-                }
-
+                //TODO: forecast
             }//onClick
         });//onClickListener
 
@@ -104,8 +96,14 @@ public class CompareActivity extends AppCompatActivity {
         buttonAccuWeather.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO: forecast
-//                kickOffAccuWeather();
+                if (currentLoc != null) {
+                    Intent forecastIntetn = new Intent(getApplicationContext(), AccuWeatherForecast.class);
+                    forecastIntetn.putExtra(INTENT_EXTRA_AC_LOC, currentLoc.getId());
+                    startActivity(forecastIntetn);
+                } else {
+                    Log.d(TAG, "Forecast Intent - AW : current loc null");
+                    HelperFunctions.showToast(getApplicationContext(), "current loc null");
+                }
             }//onClick
         });//onClickListener
 
@@ -266,8 +264,8 @@ public class CompareActivity extends AppCompatActivity {
             Log.d(TAG, "kickOffAccuWeather - currentUrl = null");
             showAccuWeatherError();
         } else {
-            NetworkCallsUtils.AccuWeatherQueryTask accuWeatherQueryTask = new
-                    NetworkCallsUtils.AccuWeatherQueryTask(new NetworkCallsUtils.AccuWeatherQueryTask.AsyncResponse() {
+            NetworkCallsUtils.AccuWeatherCurrentTask accuWeatherQueryTask = new
+                    NetworkCallsUtils.AccuWeatherCurrentTask(new NetworkCallsUtils.AccuWeatherCurrentTask.AsyncResponse() {
                 @Override
                 public void processFinish(Weather output) {
                     //if it is 2 (meaning all tasks are finished), remove, otherwise increment
@@ -308,8 +306,8 @@ public class CompareActivity extends AppCompatActivity {
             Log.d(TAG, "kickOffOpenWeather - currentUrl = null");
             showOpenWeatherError();
         } else {
-            NetworkCallsUtils.OpenWeatherQueryTask openWeatherQueryTask = new
-                    NetworkCallsUtils.OpenWeatherQueryTask(new NetworkCallsUtils.OpenWeatherQueryTask.AsyncResponse() {
+            NetworkCallsUtils.OpenWeatherCurrentTask openWeatherQueryTask = new
+                    NetworkCallsUtils.OpenWeatherCurrentTask(new NetworkCallsUtils.OpenWeatherCurrentTask.AsyncResponse() {
                 @Override
                 public void processFinish(Weather output) {
                     //if it is 2 (meaning all tasks are finished), remove, otherwise increment
