@@ -75,7 +75,7 @@ public class CompareActivity extends AppCompatActivity {
                 Loc loc = SaveLoadList.getLocFromDb(this, id);
                 if (loc != null) {
                     currentLoc = loc;
-                    textCityName.setText(loc.getId());
+                    textCityName.setText(loc.getName());
                 }//null-loc
             }//empty string
         }//has extra
@@ -99,7 +99,7 @@ public class CompareActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (currentLoc != null) {
                     Intent forecastIntetn = new Intent(getApplicationContext(), AccuWeatherForecast.class);
-                    forecastIntetn.putExtra(INTENT_EXTRA_AC_LOC, currentLoc.getId());
+                    forecastIntetn.putExtra(INTENT_EXTRA_AC_LOC, currentLoc.getName());
                     startActivity(forecastIntetn);
                 } else {
                     Log.d(TAG, "Forecast Intent - AW : current loc null");
@@ -138,7 +138,7 @@ public class CompareActivity extends AppCompatActivity {
         int i = 0;
         menuIdList = new ArrayList<>();
         for (Loc loc : locArrayList) {
-            menu.add(0, i, i + 1, loc.getId());
+            menu.add(0, i, i + 1, loc.getName());
             //add id to list
             menuIdList.add(i);
             i++;
@@ -194,7 +194,7 @@ public class CompareActivity extends AppCompatActivity {
         }//null loc
 
         //set the name
-        textCityName.setText(currentLoc.getId());
+        textCityName.setText(currentLoc.getName());
 
         //make the progress bar visible
         progressBar.setVisibility(View.VISIBLE);

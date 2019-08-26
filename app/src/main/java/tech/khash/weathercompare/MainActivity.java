@@ -341,11 +341,11 @@ public class MainActivity extends AppCompatActivity implements
     public void onListItemClick(int clickedItemIndex) {
         //get the corresponding fence object
         Loc loc = locArrayList.get(clickedItemIndex);
-//        HelperFunctions.showToast(this, "\"" + loc.getId() + "\"" + " clicked");
+//        HelperFunctions.showToast(this, "\"" + loc.getName() + "\"" + " clicked");
 
         //start compare activity, passing in the loc object
         Intent compareIntent = new Intent(MainActivity.this, CompareActivity.class);
-        String id = loc.getId();
+        String id = loc.getName();
         compareIntent.putExtra(Constant.INTENT_EXTRA_LOC_NAME, id);
         startActivity(compareIntent);
 
@@ -465,7 +465,7 @@ public class MainActivity extends AppCompatActivity implements
             String locationCodeAW = loc.getKeyAW();
 
 
-            Log.d(TAG, "LogList\n" + counter + ": " + "\nName: " + loc.getId() + "\nLatLng: " + loc.getLatLng().toString()
+            Log.d(TAG, "LogList\n" + counter + ": " + "\nName: " + loc.getName() + "\nLatLng: " + loc.getLatLng().toString()
                     + "\nhasLocationCodeUrlAW : " + hasLocationCodeUrlAW + "\n" +
                     "hasCurrentUrlAW : " + hasCurrentUrlAW + "\n" +
                     "hasCurrentUrlOW : " + hasCurrentUrlOW + "\n" +
@@ -482,7 +482,7 @@ public class MainActivity extends AppCompatActivity implements
         Collections.sort(locArrayList, new Comparator<Loc>() {
             @Override
             public int compare(Loc o1, Loc o2) {
-                return o1.getId().compareTo(o2.getId());
+                return o1.getName().compareTo(o2.getName());
             }
         });
         //notify the adapter that the data has changed, and it should update
@@ -494,7 +494,7 @@ public class MainActivity extends AppCompatActivity implements
         Collections.sort(locArrayList, new Comparator<Loc>() {
             @Override
             public int compare(Loc o1, Loc o2) {
-                return o2.getId().compareTo(o1.getId());
+                return o2.getName().compareTo(o1.getName());
             }
         });
         //notify the adapter that the data has changed, and it should update

@@ -80,7 +80,7 @@ public class LocListAdapter extends RecyclerView.Adapter<LocListAdapter.LocViewH
         }
 
         //set name
-        holder.idTextView.setText(loc.getId());
+        holder.idTextView.setText(loc.getName());
 
         //code
         String code = loc.getKeyAW();

@@ -51,7 +51,7 @@ public class AccuWeatherForecast extends AppCompatActivity implements
                 Loc loc = SaveLoadList.getLocFromDb(this, id);
                 if (loc != null) {
                     currentLoc = loc;
-                    textCityName.setText(loc.getId());
+                    textCityName.setText(loc.getName());
                     getWeather();
                 }//null-loc
             }//empty string

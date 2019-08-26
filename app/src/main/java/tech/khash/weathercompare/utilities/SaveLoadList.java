@@ -126,7 +126,7 @@ public class SaveLoadList {
         //search for the object
         Loc loc = null;
         for (Loc l : currentList) {
-            String locName = l.getId();
+            String locName = l.getName();
             if (locName.equalsIgnoreCase(name)) {
                 loc = l;
             }//if
@@ -169,13 +169,13 @@ public class SaveLoadList {
      * @return : index of the object. returns -1 if no such Loc exists
      */
     private static int getLocIndex (Context context, Loc loc) {
-        String id = loc.getId();
+        String id = loc.getName();
         ArrayList<Loc> locArrayList = loadLocList(context);
 
         int index = -1;
         int i = 0;
         for (Loc l : locArrayList) {
-            if (l.getId().equalsIgnoreCase(id)) {
+            if (l.getName().equalsIgnoreCase(id)) {
                 index = i;
                 return index;
             }//if

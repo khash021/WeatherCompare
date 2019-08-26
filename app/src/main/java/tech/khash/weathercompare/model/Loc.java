@@ -68,7 +68,7 @@ public class Loc {
 
     //Variable
     private LatLng latLng;
-    private String id;
+    private String name;
 
     private String keyAW; //used only for AccuWeather
     private URL locationCodeUrlAW;
@@ -83,9 +83,9 @@ public class Loc {
     //default constructor
     public Loc(){}
 
-    public Loc(String id, LatLng latLng) {
+    public Loc(String name, LatLng latLng) {
         this.latLng = latLng;
-        this.id = id;
+        this.name = name;
     }
 
 
@@ -95,9 +95,9 @@ public class Loc {
 
     //NOTE: These getter methods could return null, check when implementing
 
-    public String getId() {
-        return id;
-    }//getId
+    public String getName() {
+        return name;
+    }//getName
 
     public LatLng getLatLng() {
         return latLng;
@@ -118,7 +118,7 @@ public class Loc {
 
         URL url = createLocationCodeUrlAW(latLng);
         if (url == null) {
-            Log.d(TAG, "getLocationCodeUrlAW - URL null......Name: " + id);
+            Log.d(TAG, "getLocationCodeUrlAW - URL null......Name: " + name);
             return null;
         } else {
             locationCodeUrlAW = url;
@@ -135,7 +135,7 @@ public class Loc {
             //it already has a keyAW
             URL url = createCurrentUrlAW(keyAW);
             if (url == null) {
-                Log.d(TAG, "getCurrentUrlAW - URL null......Name: " + id);
+                Log.d(TAG, "getCurrentUrlAW - URL null......Name: " + name);
                 return null;
             } else {
                 currentUrlAW = url;
@@ -145,7 +145,7 @@ public class Loc {
             //we need keyAW
             //TODO:
             //get keyAW
-            Log.d(TAG, "getCurrentUrlAW - no keyAW......Name: " + id);
+            Log.d(TAG, "getCurrentUrlAW - no keyAW......Name: " + name);
             return null;
         }//if-else keyAW
     }//getCurrentUrlAW
@@ -158,7 +158,7 @@ public class Loc {
         if (hasKeyAW()) {
             URL url = createForecastUrlAW(keyAW);
             if (url == null) {
-                Log.d(TAG, "getForecastUrlAW - URL null......Name: " + id);
+                Log.d(TAG, "getForecastUrlAW - URL null......Name: " + name);
                 return null;
             } else {
                 forecastUrlAW = url;
@@ -168,7 +168,7 @@ public class Loc {
             //we need keyAW
             //TODO:
             //get keyAW
-            Log.d(TAG, "getForecastUrlAW - no keyAW......Name: " + id);
+            Log.d(TAG, "getForecastUrlAW - no keyAW......Name: " + name);
             return null;
         }//if-else keyAW
     }//getForecastUrlAW
@@ -180,7 +180,7 @@ public class Loc {
 
         URL url = createCurrentUrlOW(latLng);
         if (url == null) {
-            Log.d(TAG, "getCcurrentUrlOW - URL null......Name: " + id);
+            Log.d(TAG, "getCcurrentUrlOW - URL null......Name: " + name);
             return null;
         } else {
             currentUrlOW = url;
@@ -195,7 +195,7 @@ public class Loc {
 
         URL url = createCurrentUrlDS(latLng);
         if (url == null) {
-            Log.d(TAG, "getCurrentUrlDS - URL null......Name: " + id);
+            Log.d(TAG, "getCurrentUrlDS - URL null......Name: " + name);
             return null;
         } else {
             currentUrlDS = url;
@@ -213,9 +213,9 @@ public class Loc {
         this.keyAW = keyAW;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }//setId
+    public void setName(String name) {
+        this.name = name;
+    }//setName
 
     public void setLatLng(LatLng latLng) {
         this.latLng = latLng;
