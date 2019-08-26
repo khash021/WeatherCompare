@@ -267,6 +267,53 @@ public class NetworkCallsUtils {
 
     }//DarkSkyQueryTask
 
+
+    /**
+     * Gets the DS forecast response from web.
+     * It does not parse data here, it is done in the parent activity
+     */
+    public static class DarkSkyForecastTask extends AsyncTask<URL, Void, String> {
+
+        private static final String TAG = DarkSkyForecastTask.class.getSimpleName();
+
+        public interface AsyncResponse {
+            void processFinish(String jsonResponse);
+        }//interface
+
+        private AsyncResponse delegate = null;
+
+        //constructor
+        public DarkSkyForecastTask (AsyncResponse delegate) {
+            this.delegate = delegate;
+        }//constructor
+
+        @Override
+        protected String doInBackground(URL... urls) {
+            //make the request
+            try {
+                //get the response using the class, passing in our url
+                String httpResponse = NetworkCallsUtils.getResponseFromHttpUrl(urls[0]);
+                Log.d(TAG, "DarkSkyForecastTask - JSON response: " + httpResponse);
+                return httpResponse;
+            } catch (IOException e) {
+                Log.e(TAG, "Error establishing connection - DarkSkyForecastTask ", e);
+                return null;
+            }
+        }//doInBackground
+
+        @Override
+        protected void onPostExecute(String s) {
+            if (TextUtils.isEmpty(s)) {
+                Log.e(TAG, "DarkSkyForecastTask - postExecute - response = null");
+                return;
+            }
+            Log.d(TAG, "DarkSkyForecastTask response : " + s);
+            delegate.processFinish(s);
+        }//onPostExecute
+    }//DarkSkyForecastTask
+
+
+
     /*
         ----------------------------- OW --------------------------------------
      */
@@ -317,5 +364,45 @@ public class NetworkCallsUtils {
             }//try-catch
         }//onPostExecute
     }//OpenWeatherCurrentTask
+
+    public static class OpenWeatherForecastTask extends AsyncTask<URL, Void, String> {
+
+        private static final String TAG = OpenWeatherForecastTask.class.getSimpleName();
+
+        public interface AsyncResponse {
+            void processFinish(String jsonResponse);
+        }//interface
+
+        private AsyncResponse delegate = null;
+
+        //constructor
+        public OpenWeatherForecastTask (AsyncResponse delegate) {
+            this.delegate = delegate;
+        }//constructor
+
+        @Override
+        protected String doInBackground(URL... urls) {
+            //make the request
+            try {
+                //get the response using the class, passing in our url
+                String httpResponse = NetworkCallsUtils.getResponseFromHttpUrl(urls[0]);
+                Log.d(TAG, "OpenWeatherForecastTask - JSON response: " + httpResponse);
+                return httpResponse;
+            } catch (IOException e) {
+                Log.e(TAG, "Error establishing connection - OpenWeatherForecastTask ", e);
+                return null;
+            }
+        }//doInBackground
+
+        @Override
+        protected void onPostExecute(String s) {
+            if (TextUtils.isEmpty(s)) {
+                Log.e(TAG, "OpenWeatherForecastTask - postExecute - response = null");
+                return;
+            }
+            Log.d(TAG, "OpenWeatherForecastTask response : " + s);
+            delegate.processFinish(s);
+        }//onPostExecute
+    }//OpenWeatherForecastTask
 
 }//NetworkCallsUtils - class

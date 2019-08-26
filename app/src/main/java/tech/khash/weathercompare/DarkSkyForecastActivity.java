@@ -15,37 +15,35 @@ import org.json.JSONException;
 import java.net.URL;
 import java.util.ArrayList;
 
-import tech.khash.weathercompare.adapter.WeatherListAdapter;
+import tech.khash.weathercompare.adapter.WeatherListAdapterDS;
+import tech.khash.weathercompare.model.Constant;
 import tech.khash.weathercompare.model.Loc;
 import tech.khash.weathercompare.model.Weather;
 import tech.khash.weathercompare.utilities.NetworkCallsUtils;
 import tech.khash.weathercompare.utilities.ParseJSON;
 import tech.khash.weathercompare.utilities.SaveLoadList;
 
-public class AccuWeatherForecast extends AppCompatActivity implements
-        WeatherListAdapter.ListItemClickListener {
+public class DarkSkyForecastActivity extends AppCompatActivity implements
+        WeatherListAdapterDS.ListItemClickListener {
 
-    private static final String TAG = AccuWeatherForecast.class.getSimpleName();
+    private static final String TAG = DarkSkyForecastActivity.class.getSimpleName();
 
     private Loc currentLoc;
     private ArrayList<Weather> weatherArrayList;
     private RecyclerView recyclerView;
-    private WeatherListAdapter adapter;
-    //TODO: add progress bar
-    //TODO: send currentLoc data back when you do finish()
+    private WeatherListAdapterDS adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d(TAG, "onCreate Called");
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_accu_weather_forecast);
+        setContentView(R.layout.activity_weather_forecast);
 
         TextView textCityName = findViewById(R.id.text_city_name);
         recyclerView = findViewById(R.id.recycler_view);
 
         //get the loc id from intent extra
-        if (getIntent().hasExtra(CompareActivity.INTENT_EXTRA_AC_LOC)) {
-            String id = getIntent().getStringExtra(CompareActivity.INTENT_EXTRA_AC_LOC);
+        if (getIntent().hasExtra(Constant.INTENT_EXTRA_LOC_NAME)) {
+            String id = getIntent().getStringExtra(Constant.INTENT_EXTRA_LOC_NAME);
             if (!TextUtils.isEmpty(id)) {
                 //get the corresponding loc
                 Loc loc = SaveLoadList.getLocFromDb(this, id);
@@ -57,12 +55,7 @@ public class AccuWeatherForecast extends AppCompatActivity implements
             }//empty string
         }//has extra
 
-
-
-
     }//onCreate
-
-
 
     /*------------------------------------------------------------------------------------------
                     ---------------    HELPER METHODS    ---------------
@@ -75,15 +68,15 @@ public class AccuWeatherForecast extends AppCompatActivity implements
             return;
         }
 
-        URL forecastUrl = currentLoc.getForecastUrlAW();
+        URL forecastUrl = currentLoc.getForecastUrlDS();
         if (forecastUrl == null) {
             Log.d(TAG, "getWeather - forecastUrl = null");
             return;
         }
 
         //get the response
-        NetworkCallsUtils.AccuWeatherForecastTask forecastTask = new
-                NetworkCallsUtils.AccuWeatherForecastTask(new NetworkCallsUtils.AccuWeatherForecastTask.AsyncResponse() {
+        NetworkCallsUtils.DarkSkyForecastTask forecastTask = new
+                NetworkCallsUtils.DarkSkyForecastTask(new NetworkCallsUtils.DarkSkyForecastTask.AsyncResponse() {
             @Override
             public void processFinish(String jsonResponse) {
                 if (TextUtils.isEmpty(jsonResponse)) {
@@ -93,6 +86,7 @@ public class AccuWeatherForecast extends AppCompatActivity implements
 
                 //send the data to be parsed
                 createWeatherArrayList(jsonResponse);
+
             }
         });
         forecastTask.execute(forecastUrl);
@@ -103,7 +97,7 @@ public class AccuWeatherForecast extends AppCompatActivity implements
     private void createWeatherArrayList (String jsonResponse) {
         weatherArrayList = new ArrayList<>();
         try {
-            weatherArrayList = ParseJSON.parseAccuWeatherForecast(jsonResponse);
+            weatherArrayList = ParseJSON.parseDarkSkyForecast(jsonResponse);
             Log.d(TAG, "createWeatherArrayList - size: " + weatherArrayList.size());
             //start the adapter
             updateAdapter(weatherArrayList);
@@ -120,7 +114,7 @@ public class AccuWeatherForecast extends AppCompatActivity implements
         // Get a handle to the RecyclerView.
         recyclerView = findViewById(R.id.recycler_view);
         // Create an adapter and supply the data to be displayed.
-        adapter = new WeatherListAdapter(this, weatherArrayList, this);
+        adapter = new WeatherListAdapterDS(this, weatherArrayList, this);
         // Connect the adapter with the RecyclerView.
         recyclerView.setAdapter(adapter);
         // Give the RecyclerView a horizontal layout manager.
@@ -136,4 +130,5 @@ public class AccuWeatherForecast extends AppCompatActivity implements
     public void onListItemClick(int clickedItemIndex) {
 
     }//onListItemClick
-}//OpenWeatherForecast
+
+}//DarkSkyForecastActivity

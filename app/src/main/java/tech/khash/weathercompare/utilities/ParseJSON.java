@@ -98,6 +98,13 @@ public class ParseJSON {
     private static final String POP_DS = "precipProbability";
     private static final String PRECIP_TYPE_DS = "precipType";
 
+    //forecast
+    private static final String DAILY_DS = "daily";
+    private static final String DATA_DS = "data";
+    private static final String TIME_DS = "time";
+    private static final String TEMP_MIN_DS = "temperatureMin";
+    private static final String TEMP_MAX_DS = "temperatureMax";
+
 
 
 
@@ -128,6 +135,10 @@ public class ParseJSON {
     private static final String CHANCE_OF = " chance of ";
 
     private final static String LINE_BREAK = "\n";
+
+        /*
+    -------------------------------- Open Weather ----------------------------------------
+     */
 
 
     /**
@@ -192,6 +203,43 @@ public class ParseJSON {
 
         return weather;
     }//parseOpenWeatherCurrent
+
+    /**
+     *      This methods goes through the forecast data and create 3 Weather objects for next 3
+     *      days and return the list
+     * @param jsonString : response
+     * @return : ArrayList<Weather> for the next 3 days
+     * @throws JSONException
+     */
+    public static ArrayList<Weather> parseOpenWeatherForecast (String jsonString) throws JSONException {
+        if (TextUtils.isEmpty(jsonString)) {
+            return null;
+        }
+
+        String date, tempMin, tempMax, summaryDay, popDay, cloudDay, summaryNight, popNight, cloudNight;
+        ArrayList<Weather> weatherArrayList = new ArrayList<>();
+        Weather weather;
+        //for formatting date
+        SimpleDateFormat formatter = new SimpleDateFormat("EEE, MMM.dd", Locale.getDefault());
+
+        JSONObject rootObject = new JSONObject(jsonString);
+
+        JSONArray mainArray = rootObject.optJSONArray("list");
+        //TODO: need to figure out min/max data and how to interpret data (comes every 3 hour)
+
+
+        /*we want data for the next three days (first object is for today, which we ignore for now
+        So we get index 1, 2, and 3
+         */
+        for (int i = 1; i < 4; i++) {
+
+        }//for
+        return weatherArrayList;
+    }//parseOpenWeatherForecast
+
+    /*
+    -------------------------------- Acce Weather ----------------------------------------
+     */
 
     /**
      *  It extracts AccuWeather's location code from the JSON response
@@ -395,6 +443,10 @@ public class ParseJSON {
         return weatherArrayList;
     }//parseAccuWeatherForecast
 
+    /*
+    -------------------------------- Dark Sky -----------------------------------------
+     */
+
     /**
      * This method is for parsing the current weather from DarkSky
      * @param jsonString : raw JSON response from the server
@@ -473,6 +525,117 @@ public class ParseJSON {
 
         return weather;
     }//parseDarkSkyCurrent
+
+    public static ArrayList<Weather> parseDarkSkyForecast (String jsonString) throws JSONException {
+        if (TextUtils.isEmpty(jsonString)) {
+            return null;
+        }
+
+        String date, tempMin, tempMax, summary, pressure, dewPoint, humidity, windSpeed, windGust,
+                windDirection, cloudCoverage, pop, precipType, visibility;
+        ArrayList<Weather> weatherArrayList = new ArrayList<>();
+        Weather weather;
+        //for formatting date
+        SimpleDateFormat formatter = new SimpleDateFormat("EEE, MMM.dd", Locale.getDefault());
+
+        JSONObject rootObject = new JSONObject(jsonString);
+        JSONObject dailyObject = rootObject.optJSONObject(DAILY_DS);
+        JSONArray dataArray = dailyObject.optJSONArray(DATA_DS);
+
+        /*we want data for the next three days (first object is for today, which we ignore for now
+        So we get index 1, 2, and 3
+         */
+
+
+        for (int i = 1; i < 4; i++) {
+            weather = new Weather();
+            JSONObject mainObject = dataArray.getJSONObject(i);
+
+            //date
+            long epoch = (long) mainObject.optInt(TIME_DS, -1);
+            //check for -1
+            if (epoch != -1) {
+                //convert to milli sec
+                epoch *= 1000;
+                //create a date
+                Date dateObject = new Date(epoch);
+                date = formatter.format(dateObject);
+            } else {
+                date = "";
+            }
+            weather.setDate(date);
+
+            //summary
+            summary = mainObject.optString(SUMMARY_DS);
+            weather.setSummary(summary);
+
+            //temps
+            long tempMinLong = mainObject.optLong(TEMP_MIN_DS);
+            tempMin = Conversions.farToCel(tempMinLong);
+            weather.setTempMin(tempMin);
+
+            long tempMaxLong = mainObject.optLong(TEMP_MAX_DS);
+            tempMax = Conversions.farToCel(tempMaxLong);
+            weather.setTempMax(tempMax);
+
+            //dew point
+            double dewDouble = mainObject.optDouble(DEW_POINT_DS);
+            dewPoint = Conversions.farToCel(dewDouble);
+            weather.setDewPoint(dewPoint);
+
+            //humidity
+            double humidDouble = mainObject.optDouble(HUMIDITY_DS);
+            humidity = Conversions.decimalToPercentage(humidDouble);
+            weather.setHumidity(humidity);
+
+            //pressure
+            double pressDouble = mainObject.optDouble(PRESSURE_DS);
+            pressure = Conversions.removeDecimal(pressDouble);
+            weather.setPressure(pressure);
+
+            //wind speed
+            double windSpeedDouble = mainObject.optDouble(WIND_SPEED_DS);
+            windSpeed = Conversions.mileToKm(windSpeedDouble);
+            weather.setWindSpeed(windSpeed);
+
+            //wind gust
+            double windGustDouble = mainObject.optDouble(WIND_GUST_DS);
+            windGust = Conversions.mileToKm(windGustDouble);
+            weather.setWindGust(windGust);
+
+            //wind direction
+            double windDirDouble = mainObject.optDouble(WIND_DIRECTION_DS);
+            windDirection = Conversions.degreeToDirection(windDirDouble);
+            weather.setWindDirection(windDirection);
+
+            //cloud cover
+            double cloudCoverDouble = mainObject.optDouble(CLOUD_COVER_DS);
+            cloudCoverage = Conversions.decimalToPercentage(cloudCoverDouble);
+            weather.setCloudCoverage(cloudCoverage);
+
+            //visibility
+            double visDouble = mainObject.optDouble(VISIBILITY_DS);
+            visibility = Conversions.mileToKm(visDouble);
+            weather.setVisibility(visibility);
+
+            //POP
+            double popDouble = mainObject.optDouble(POP_DS);
+            pop = Conversions.decimalToPercentage(popDouble);
+            weather.setPop(pop);
+
+            precipType = mainObject.optString(PRECIP_TYPE_DS);
+            if (!TextUtils.isEmpty(precipType)) {
+                precipType = Conversions.capitalizeFirst(precipType);
+                weather.setPopType(precipType);
+            }
+
+            weatherArrayList.add(weather);
+
+        }//for
+        return weatherArrayList;
+    }//parseDarkSkyForecast
+
+
 
 
 }//class

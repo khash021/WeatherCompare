@@ -20,7 +20,7 @@ import tech.khash.weathercompare.model.Weather;
  * Main adapter class for Weather to be used with RecyclerView in showing weather data
  */
 
-public class WeatherListAdapter extends RecyclerView.Adapter<WeatherListAdapter.WeatherViewHolder> {
+public class WeatherListAdapterAW extends RecyclerView.Adapter<WeatherListAdapterAW.WeatherViewHolder> {
 
     //list of data
     private final ArrayList<Weather> weatherArrayList;
@@ -40,13 +40,14 @@ public class WeatherListAdapter extends RecyclerView.Adapter<WeatherListAdapter.
     }//ListItemLongClickListener
 
     /**
-     *      Public constructor
-     * @param context  :context of parent activity
+     * Public constructor
+     *
+     * @param context          :context of parent activity
      * @param weatherArrayList : ArrayList<Weather> containing data
-     * @param listener : listener
+     * @param listener         : listener
      */
-    public WeatherListAdapter (Context context, ArrayList<Weather> weatherArrayList,
-                               ListItemClickListener listener) {
+    public WeatherListAdapterAW(Context context, ArrayList<Weather> weatherArrayList,
+                                ListItemClickListener listener) {
         this.context = context;
         inflater = LayoutInflater.from(context);
         this.weatherArrayList = weatherArrayList;
@@ -56,8 +57,8 @@ public class WeatherListAdapter extends RecyclerView.Adapter<WeatherListAdapter.
     //It inflates the item layout, and returns a ViewHolder with the layout and the adapter.
     @NonNull
     @Override
-    public WeatherListAdapter.WeatherViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int i) {
-        View itemView = inflater.inflate(R.layout.list_item_weather, parent, false);
+    public WeatherListAdapterAW.WeatherViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int i) {
+        View itemView = inflater.inflate(R.layout.list_item_weather_aw, parent, false);
         return new WeatherViewHolder(itemView, this);
     }//onCreateViewHolder
 
@@ -68,37 +69,55 @@ public class WeatherListAdapter extends RecyclerView.Adapter<WeatherListAdapter.
      * @param position : index of the item in the list
      */
     @Override
-    public void onBindViewHolder(@NonNull WeatherListAdapter.WeatherViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull WeatherListAdapterAW.WeatherViewHolder holder, int position) {
         //TODO: if position is zero: load the descriptions (name, temp, etc). Then make sure to subtract
         //1 when getting the object from arraylist
-        //Get the weather object
-        Weather weather = weatherArrayList.get(position);
+        //TODO: testing
+        if (position == 0) {
+            //load the header
+            //set the views
+            holder.textDay.setText("Day");
+            holder.textTempMin.setText("Min Temp");
+            holder.textTempMax.setText("Max Temp");
+            holder.textSummaryDay.setText("Day summary");
+            holder.textPopDay.setText("Day POP");
+            holder.textCloudDay.setText("Day Cloud");
+            holder.textSummaryNight.setText("Night summary");
+            holder.textPopNight.setText("Night POP");
+            holder.textCloudNight.setText("Night Cloud");
 
-        //check for null Weather
-        if (weather == null) {
-            return;
+        } else {
+
+
+            //Get the weather object
+            Weather weather = weatherArrayList.get(position - 1);
+
+            //check for null Weather
+            if (weather == null) {
+                return;
+            }
+
+            //set the views
+            holder.textDay.setText(weather.getDate());
+            holder.textTempMin.setText(weather.getTempMin());
+            holder.textTempMax.setText(weather.getTempMax());
+            holder.textSummaryDay.setText(weather.getSummaryDay());
+            holder.textPopDay.setText(weather.getPopDay());
+            holder.textCloudDay.setText(weather.getCloudDay());
+            holder.textSummaryNight.setText(weather.getSummaryNight());
+            holder.textPopNight.setText(weather.getPopNight());
+            holder.textCloudNight.setText(weather.getCloudNight());
+
         }
-
-        //set the views
-        holder.textDay.setText(weather.getDate());
-        holder.textTempMin.setText(weather.getTempMin());
-        holder.textTempMax.setText(weather.getTempMax());
-        holder.textSummaryDay.setText(weather.getSummaryDay());
-        holder.textPopDay.setText(weather.getPopDay());
-        holder.textCloudDay.setText(weather.getCloudDay());
-        holder.textSummaryNight.setText(weather.getSummaryNight());
-        holder.textPopNight.setText(weather.getPopNight());
-        holder.textCloudNight.setText(weather.getCloudNight());
-
-
     }//onBindViewHolder
 
     @Override
     public int getItemCount() {
-        if (weatherArrayList ==null) {
+        if (weatherArrayList == null) {
             return 0;
         } else {
-            return weatherArrayList.size();
+            //because the first element is header, we add one
+            return (weatherArrayList.size() + 1);
         }
     }//getItemCount
 
@@ -106,12 +125,12 @@ public class WeatherListAdapter extends RecyclerView.Adapter<WeatherListAdapter.
     //Inner class for the view holder
     class WeatherViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         //views
-        final WeatherListAdapter weatherListAdapter;
+        final WeatherListAdapterAW weatherListAdapter;
         final TextView textDay, textTempMin, textTempMax, textSummaryDay, textPopDay, textCloudDay,
-        textSummaryNight, textPopNight, textCloudNight;
+                textSummaryNight, textPopNight, textCloudNight;
 
         //constructor
-        private WeatherViewHolder (View itemView, WeatherListAdapter weatherListAdapter) {
+        private WeatherViewHolder(View itemView, WeatherListAdapterAW weatherListAdapter) {
             super(itemView);
 
             //find views

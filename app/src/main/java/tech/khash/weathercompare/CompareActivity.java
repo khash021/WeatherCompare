@@ -1,5 +1,6 @@
 package tech.khash.weathercompare;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -12,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.net.URL;
@@ -42,7 +44,8 @@ public class CompareActivity extends AppCompatActivity {
     private ImageView mIconImage;
     private ProgressBar progressBar;
 
-    public final static String INTENT_EXTRA_AC_LOC = "intent-extra-aw-loc";
+    //for sending and receiving location from add location activity
+    private static final int FORECAST_REQUEST_CODE = 1;
 
     private Loc currentLoc;
 
@@ -98,9 +101,9 @@ public class CompareActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (currentLoc != null) {
-                    Intent forecastIntetn = new Intent(getApplicationContext(), AccuWeatherForecast.class);
-                    forecastIntetn.putExtra(INTENT_EXTRA_AC_LOC, currentLoc.getName());
-                    startActivity(forecastIntetn);
+                    Intent awIntent = new Intent(getApplicationContext(), AccuWeatherForecastActivity.class);
+                    awIntent.putExtra(Constant.INTENT_EXTRA_LOC_NAME, currentLoc.getName());
+                    startActivityForResult(awIntent, FORECAST_REQUEST_CODE);
                 } else {
                     Log.d(TAG, "Forecast Intent - AW : current loc null");
                     HelperFunctions.showToast(getApplicationContext(), "current loc null");
@@ -113,8 +116,14 @@ public class CompareActivity extends AppCompatActivity {
         buttonDarkSky.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO: forecast
-//                kickOffDarkSky();
+                if (currentLoc != null) {
+                    Intent dsIntent = new Intent(getApplicationContext(), DarkSkyForecastActivity.class);
+                    dsIntent.putExtra(Constant.INTENT_EXTRA_LOC_NAME, currentLoc.getName());
+                    startActivityForResult(dsIntent, FORECAST_REQUEST_CODE);
+                } else {
+                    Log.d(TAG, "Forecast Intent - DS : current loc null");
+                    HelperFunctions.showToast(getApplicationContext(), "current loc null");
+                }
             }//onClick
         });//onClickListener
 
@@ -122,6 +131,34 @@ public class CompareActivity extends AppCompatActivity {
 
 
     }//onCreate
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        Log.d(TAG, "onActivityResult called");
+        //check to make sure it is the right one
+        if (requestCode == FORECAST_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            //get the name of the loc
+            String nameLoc = data.getStringExtra(Constant.INTENT_EXTRA_LOC_NAME);
+            if (nameLoc == null || nameLoc.isEmpty()) {
+                Log.d(TAG, "onActivityResult - Loc Name = null/empty");
+                return;
+            }//null name
+            //get the corresponding Loc object
+            Loc loc = SaveLoadList.getLocFromDb(this, nameLoc);
+            //set the current loc only if it is not null
+            if (loc == null) {
+                Log.d(TAG, "onActivityResult - Loc =null ; name: " + nameLoc);
+                return;
+            }//loc-null
+            //we set the current loc, set the name, and get the weather again
+            currentLoc = loc;
+            textCityName.setText(loc.getName());
+            locArrayList = SaveLoadList.loadLocList(this);
+            getAllWeather();
+        }//if result OK
+        super.onActivityResult(requestCode, resultCode, data);
+    }//onActivityResult
+
 
     /**
      * Gets called every time the user presses the menu button.

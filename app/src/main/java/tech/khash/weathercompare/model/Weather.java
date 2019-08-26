@@ -14,8 +14,11 @@ public class Weather {
 
     private String summary, temperature, humidity, dewPoint, pressure, windSpeed, windDirection,
             windGust, visibility, cloudCoverage, pop, popType, iconUrl;
+
     //for forecast (AW now)
     private String date, tempMin, TempMax, summaryDay, popDay, cloudDay, summaryNight, popNight, cloudNight;
+
+    //for forecast (DS)
 
     private Uri iconUri;
 
