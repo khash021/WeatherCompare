@@ -25,72 +25,86 @@ public class ParseJSON {
 
     private static final String TAG = ParseJSON.class.getSimpleName();
 
-    //constants for OpenWeather json
-    private static final String JSON_MAIN = "main";
-    private static final String JSON_TEMP = "temp";
-    private static final String JSON_PRESSURE = "pressure";
-    private static final String JSON_HUMIDITY = "humidity";
-    private static final String JSON_WIND = "wind";
-    private static final String JSON_WIND_SPEED = "speed";
-    private static final String JSON_WIND_DIRECTION = "deg";
-    private static final String JSON_WEATHER = "weather";
-    private static final String JSON_WEATHER_MAIN = "main";
-    private static final String JSON_CLOUD = "clouds";
-    private static final String JSON_CLOUDS_ALL = "all";
-    private static final String JSON_ICON = "icon";
-
-    //constants for AccuWeather json
-    private static final String JSON_AW_DESCRIPTION = "WeatherText";
-    private static final String JSON_AW_TEMPERATURE = "Temperature";
-    private static final String JSON_AW_METRIC = "Metric";
-    private static final String JSON_AW_METRIC_VALUE = "Value";
-    private static final String JSON_AW_HUMIDITY = "RelativeHumidity";
-    private static final String JSON_AW_DEW_POINT = "DewPoint";
-    private static final String JSON_AW_WIND = "Wind";
-    private static final String JSON_AW_DIRECTION = "Direction";
-    private static final String JSON_AW_WIND_DIRECTION_ENGLISH = "English";
-    private static final String JSON_AW_SPEED = "Speed";
-    private static final String JSON_AW_WIND_GUST = "WindGust";
-    private static final String JSON_AW_VISIBILITY = "Visibility";
-    private static final String JSON_AW_CLOUD_COVER = "CloudCover";
-    private static final String JSON_AW_PRESSURE = "Pressure";
-    private static final String JSON_AW_LOCATION_KEY = "Key";
-    private static final String JSON_AW_ICON = "WeatherIcon";
-
-    //forecast AW
-    private static final String JSON_AW_DAILY_FORECASTS = "DailyForecasts";
-    private static final String JSON_AW_FORECAST_EPOCH = "EpochDate";
-    private static final String JSON_AW_FORECAST_MIN = "Minimum";
-    private static final String JSON_AW_FORECAST_MAX = "Maximum";
-    private static final String JSON_AW_FORECAST_DAY = "Day";
-    private static final String JSON_AW_FORECAST_NIGHT = "Night";
-    private static final String JSON_AW_FORECAST_SUMMARY = "ShortPhrase";
-    private static final String JSON_AW_FORECAST_POP = "PrecipitationProbability";
-
-
-    //constants for DarkSky
-    private static final String JSON_DS_CURRENTLY = "currently";
-    private static final String JSON_DS_SUMMARY = "summary";
-    private static final String JSON_DS_ICON = "icon";
-    private static final String JSON_DS_TEMPERATURE = "temperature";
-    private static final String JSON_DS_DEW_POINT = "dewPoint";
-    private static final String JSON_DS_HUMIDITY = "humidity";
-    private static final String JSON_DS_PRESSURE = "pressure";
-    private static final String JSON_DS_WIND_SPEED = "windSpeed";
-    private static final String JSON_DS_WIND_GUST = "windGust";
-    private static final String JSON_DS_WIND_DIRECTION = "windBearing";
-    private static final String JSON_DS_CLOUD_COVER = "cloudCover";
-    private static final String JSON_DS_VISIBILITY = "visibility";
-    private static final String JSON_DS_POP = "precipProbability";
-    private static final String JSON_DS_PRECIP_TYPE = "precipType";
+    /*
+        --------------------------- Open Weather -----------------------------------
+     */
+    private static final String MAIN_OW = "main";
+    private static final String TEMP_OW = "temp";
+    private static final String PRESSURE_OW = "pressure";
+    private static final String HUMIDITY_OW = "humidity";
+    private static final String WIND_OW = "wind";
+    private static final String WIND_SPEED_OW = "speed";
+    private static final String WIND_DIRECTION_OW = "deg";
+    private static final String WEATHER_OW = "weather";
+    private static final String WEATHER_MAIN_OW = "main";
+    private static final String CLOUD_OW = "clouds";
+    private static final String CLOUDS_ALL_OW = "all";
+    private static final String ICON_OW = "icon";
 
     //pictures
     private static final String OPENWEATHER_ICON_BASE_URL = "http://openweathermap.org/img/w/";
     private static final String OPENWEATHER_ICON_EXTENSION = ".png";
-    private static final String ACCUWEATHER_ICON_BASE_URL = "https://developer.accuweather.com/sites/default/files/";
-    private static final String ACCUWEATHER_ICON_EXTENSION = "-s.png";
 
-    //some constants for results
+    /*
+        --------------------------- Accu Weather -----------------------------------
+     */
+    private static final String DESCRIPTION_AW = "WeatherText";
+    private static final String TEMPERATURE_AW = "Temperature";
+    private static final String METRIC_AW = "Metric";
+    private static final String METRIC_VALUE_AW = "Value";
+    private static final String HUMIDITY_AW = "RelativeHumidity";
+    private static final String DEW_POINT_AW = "DewPoint";
+    private static final String WIND_AW = "Wind";
+    private static final String DIRECTION_AW = "Direction";
+    private static final String WIND_DIRECTION_ENGLISH_AW = "English";
+    private static final String SPEED_AW = "Speed";
+    private static final String WIND_GUST_AW = "WindGust";
+    private static final String VISIBILITY_AW = "Visibility";
+    private static final String CLOUD_COVER_AW = "CloudCover";
+    private static final String PRESSURE_AW = "Pressure";
+    private static final String LOCATION_KEY_AW = "Key";
+    private static final String ICON_AW = "WeatherIcon";
+
+    //forecast AW
+    private static final String DAILY_FORECASTS_AW = "DailyForecasts";
+    private static final String FORECAST_EPOCH_AW = "EpochDate";
+    private static final String FORECAST_MIN_AW = "Minimum";
+    private static final String FORECAST_MAX_AW = "Maximum";
+    private static final String FORECAST_DAY_AW = "Day";
+    private static final String FORECAST_NIGHT_AW = "Night";
+    private static final String FORECAST_SUMMARY_AW = "ShortPhrase";
+    private static final String FORECAST_POP_AW = "PrecipitationProbability";
+
+    //pictures
+    private static final String ICON_BASE_URL_AW = "https://developer.accuweather.com/sites/default/files/";
+    private static final String ICON_EXTENSION_AW = "-s.png";
+
+
+    /*
+        --------------------------- Dark Sky -----------------------------------
+     */
+    private static final String CURRENTLY_DS = "currently";
+    private static final String SUMMARY_DS = "summary";
+    private static final String ICON_DS = "icon";
+    private static final String TEMPERATURE_DS = "temperature";
+    private static final String DEW_POINT_DS = "dewPoint";
+    private static final String HUMIDITY_DS = "humidity";
+    private static final String PRESSURE_DS = "pressure";
+    private static final String WIND_SPEED_DS = "windSpeed";
+    private static final String WIND_GUST_DS = "windGust";
+    private static final String WIND_DIRECTION_DS = "windBearing";
+    private static final String CLOUD_COVER_DS = "cloudCover";
+    private static final String VISIBILITY_DS = "visibility";
+    private static final String POP_DS = "precipProbability";
+    private static final String PRECIP_TYPE_DS = "precipType";
+
+
+
+
+
+    /*
+        --------------------------- Some constants for results ---------------------------------
+     */
     private static final String TEMPERATURE = "Temperature: ";
     private static final String TEMPERATURE_UNIT_METRIC = " °C";
 
@@ -137,28 +151,28 @@ public class ParseJSON {
         //create an object from the string
         JSONObject forecastJson = new JSONObject(jsonString);
         //get a reference to the main
-        JSONObject mainObject = forecastJson.getJSONObject(JSON_MAIN);
+        JSONObject mainObject = forecastJson.getJSONObject(MAIN_OW);
 
         //weather description
-        JSONArray weatherArray = forecastJson.getJSONArray(JSON_WEATHER);
+        JSONArray weatherArray = forecastJson.getJSONArray(WEATHER_OW);
         JSONObject weatherObject = weatherArray.getJSONObject(0);
-        summary = weatherObject.optString(JSON_WEATHER_MAIN);
+        summary = weatherObject.optString(WEATHER_MAIN_OW);
         weather.setSummary(summary);
 
         //this return the temp value, if no such thing exists, it returns an empty string
-        temp = mainObject.optString(JSON_TEMP);
+        temp = mainObject.optString(TEMP_OW);
         weather.setTemperature(temp);
-        pressure = mainObject.optString(JSON_PRESSURE);
+        pressure = mainObject.optString(PRESSURE_OW);
         weather.setPressure(pressure);
-        humidity = mainObject.getString(JSON_HUMIDITY);
+        humidity = mainObject.getString(HUMIDITY_OW);
         weather.setHumidity(humidity);
 
         //get a reference to the wind
-        JSONObject windObject = forecastJson.getJSONObject(JSON_WIND);
+        JSONObject windObject = forecastJson.getJSONObject(WIND_OW);
 
         //get the values
-        double windSpeedDouble = windObject.optDouble(JSON_WIND_SPEED);
-        double windDirectionDouble = windObject.optDouble(JSON_WIND_DIRECTION);
+        double windSpeedDouble = windObject.optDouble(WIND_SPEED_OW);
+        double windDirectionDouble = windObject.optDouble(WIND_DIRECTION_OW);
 
         //convert the values
         windDirection = Conversions.degreeToDirection(windDirectionDouble);
@@ -167,12 +181,12 @@ public class ParseJSON {
         weather.setWindSpeed(windSpeed);
 
         //cloud cover
-        JSONObject cloudObject = forecastJson.getJSONObject(JSON_CLOUD);
-        cloudCoverage = cloudObject.optString(JSON_CLOUDS_ALL);
+        JSONObject cloudObject = forecastJson.getJSONObject(CLOUD_OW);
+        cloudCoverage = cloudObject.optString(CLOUDS_ALL_OW);
         weather.setCloudCoverage(cloudCoverage);
 
         //icon
-        icon = weatherObject.optString(JSON_ICON);
+        icon = weatherObject.optString(ICON_OW);
         icon = OPENWEATHER_ICON_BASE_URL + icon + OPENWEATHER_ICON_EXTENSION;
         weather.setIconUrl(icon);
 
@@ -193,7 +207,7 @@ public class ParseJSON {
         JSONObject responseObject = new JSONObject(jsonString);
 
         //by using optString, if such string does not exists, it returns an empty string.
-        locationCode = responseObject.optString(JSON_AW_LOCATION_KEY);
+        locationCode = responseObject.optString(LOCATION_KEY_AW);
 
         Log.d(TAG, "location code: " + locationCode);
 
@@ -226,73 +240,73 @@ public class ParseJSON {
         JSONObject forecastObject = forecastArray.getJSONObject(0);
 
         //summary
-        summary = forecastObject.optString(JSON_AW_DESCRIPTION);
+        summary = forecastObject.optString(DESCRIPTION_AW);
         weather.setSummary(summary);
 
         //temp
-        JSONObject tempObject  = forecastObject.getJSONObject(JSON_AW_TEMPERATURE);
-        JSONObject tempMetricObject = tempObject.getJSONObject(JSON_AW_METRIC);
-        double tempDouble = tempMetricObject.optDouble(JSON_AW_METRIC_VALUE);
+        JSONObject tempObject  = forecastObject.getJSONObject(TEMPERATURE_AW);
+        JSONObject tempMetricObject = tempObject.getJSONObject(METRIC_AW);
+        double tempDouble = tempMetricObject.optDouble(METRIC_VALUE_AW);
         temp = Conversions.removeDecimal(tempDouble);
         weather.setTemperature(temp);
 
         //dew point
-        JSONObject dewObject  = forecastObject.getJSONObject(JSON_AW_DEW_POINT);
-        JSONObject metricDewObject = dewObject.getJSONObject(JSON_AW_METRIC);
-        double dewDouble = metricDewObject.optDouble(JSON_AW_METRIC_VALUE);
+        JSONObject dewObject  = forecastObject.getJSONObject(DEW_POINT_AW);
+        JSONObject metricDewObject = dewObject.getJSONObject(METRIC_AW);
+        double dewDouble = metricDewObject.optDouble(METRIC_VALUE_AW);
         dewPoint = Conversions.removeDecimal(dewDouble);
         weather.setDewPoint(dewPoint);
 
         //pressure
-        JSONObject pressObject  = forecastObject.getJSONObject(JSON_AW_PRESSURE);
-        JSONObject pressMetricObject = pressObject.getJSONObject(JSON_AW_METRIC);
-        double pressDouble = pressMetricObject.optDouble(JSON_AW_METRIC_VALUE);
+        JSONObject pressObject  = forecastObject.getJSONObject(PRESSURE_AW);
+        JSONObject pressMetricObject = pressObject.getJSONObject(METRIC_AW);
+        double pressDouble = pressMetricObject.optDouble(METRIC_VALUE_AW);
         pressure = Conversions.removeDecimal(pressDouble);
         weather.setPressure(pressure);
 
         //humidity
-        humidity = forecastObject.optString(JSON_AW_HUMIDITY);
+        humidity = forecastObject.optString(HUMIDITY_AW);
         weather.setHumidity(humidity);
 
         //wind
-        JSONObject windObject = forecastObject.getJSONObject(JSON_AW_WIND);
-        JSONObject windSpeedObject = windObject.getJSONObject(JSON_AW_SPEED);
-        JSONObject windSpeedMetricObject = windSpeedObject.getJSONObject(JSON_AW_METRIC);
-        double windDouble = windSpeedMetricObject.optDouble(JSON_AW_METRIC_VALUE);
+        JSONObject windObject = forecastObject.getJSONObject(WIND_AW);
+        JSONObject windSpeedObject = windObject.getJSONObject(SPEED_AW);
+        JSONObject windSpeedMetricObject = windSpeedObject.getJSONObject(METRIC_AW);
+        double windDouble = windSpeedMetricObject.optDouble(METRIC_VALUE_AW);
         windSpeed = Conversions.removeDecimal(windDouble);
         weather.setWindSpeed(windSpeed);
 
-        JSONObject windDirectionObject = windObject.getJSONObject(JSON_AW_DIRECTION);
-        windDirection = windDirectionObject.optString(JSON_AW_WIND_DIRECTION_ENGLISH);
+        JSONObject windDirectionObject = windObject.getJSONObject(DIRECTION_AW);
+        windDirection = windDirectionObject.optString(WIND_DIRECTION_ENGLISH_AW);
         weather.setWindDirection(windDirection);
 
         //windGust
-        JSONObject gustObject = forecastObject.getJSONObject(JSON_AW_WIND_GUST);
-        JSONObject gustSpeedObject = gustObject.getJSONObject(JSON_AW_SPEED);
-        JSONObject gustSpeedMetricObject = gustSpeedObject.getJSONObject(JSON_AW_METRIC);
-        double gustDouble = gustSpeedMetricObject.optDouble(JSON_AW_METRIC_VALUE);
+        JSONObject gustObject = forecastObject.getJSONObject(WIND_GUST_AW);
+        JSONObject gustSpeedObject = gustObject.getJSONObject(SPEED_AW);
+        JSONObject gustSpeedMetricObject = gustSpeedObject.getJSONObject(METRIC_AW);
+        double gustDouble = gustSpeedMetricObject.optDouble(METRIC_VALUE_AW);
         windGust = Conversions.removeDecimal(gustDouble);
         weather.setWindGust(windGust);
 
         //visibility
-        JSONObject visibilityObject = forecastObject.getJSONObject(JSON_AW_VISIBILITY);
-        JSONObject visibilityMetricObject = visibilityObject.getJSONObject(JSON_AW_METRIC);
-        double visibilityDouble = visibilityMetricObject.optDouble(JSON_AW_METRIC_VALUE);
+        JSONObject visibilityObject = forecastObject.getJSONObject(VISIBILITY_AW);
+        JSONObject visibilityMetricObject = visibilityObject.getJSONObject(METRIC_AW);
+        double visibilityDouble = visibilityMetricObject.optDouble(METRIC_VALUE_AW);
         visibility = Conversions.removeDecimal(visibilityDouble);
         weather.setVisibility(visibility);
 
-        cloudCoverage = forecastObject.optString(JSON_AW_CLOUD_COVER);
+        cloudCoverage = forecastObject.optString(CLOUD_COVER_AW);
         weather.setCloudCoverage(cloudCoverage);
 
 
         //icon
-        int iconId = forecastObject.optInt(JSON_AW_ICON);
+        int iconId = forecastObject.optInt(ICON_AW);
         if (iconId < 10) {
             icon = "0" + iconId;
         } else {
             icon = String.valueOf(iconId);
         }
-        icon = ACCUWEATHER_ICON_BASE_URL + icon + ACCUWEATHER_ICON_EXTENSION;
+        icon = ICON_BASE_URL_AW + icon + ICON_EXTENSION_AW;
         weather.setIconUrl(icon);
 
         return weather;
@@ -317,7 +331,7 @@ public class ParseJSON {
         SimpleDateFormat formatter = new SimpleDateFormat("EEE, MMM.dd", Locale.getDefault());
 
         JSONObject rootObject = new JSONObject(jsonString);
-        JSONArray forecastArray = rootObject.getJSONArray(JSON_AW_DAILY_FORECASTS);
+        JSONArray forecastArray = rootObject.getJSONArray(DAILY_FORECASTS_AW);
 
         /*we want data for the next three days (first object is for today, which we ignore for now
         So we get index 1, 2, and 3
@@ -327,7 +341,7 @@ public class ParseJSON {
             JSONObject mainObject = forecastArray.getJSONObject(i);
 
             //date
-            long epoch = (long) mainObject.optInt(JSON_AW_FORECAST_EPOCH, -1);
+            long epoch = (long) mainObject.optInt(FORECAST_EPOCH_AW, -1);
             //check for -1
             if (epoch != -1) {
                 //convert to milli sec
@@ -341,38 +355,38 @@ public class ParseJSON {
             weather.setDate(date);
 
             //temps
-            JSONObject tempObject = mainObject.optJSONObject(JSON_AW_TEMPERATURE);
+            JSONObject tempObject = mainObject.optJSONObject(TEMPERATURE_AW);
 
-            JSONObject minObject = tempObject.optJSONObject(JSON_AW_FORECAST_MIN);
-            tempMin = String.valueOf(minObject.optLong(JSON_AW_METRIC_VALUE));
+            JSONObject minObject = tempObject.optJSONObject(FORECAST_MIN_AW);
+            tempMin = String.valueOf(minObject.optLong(METRIC_VALUE_AW));
             weather.setTempMin(tempMin);
 
-            JSONObject manObject = tempObject.optJSONObject(JSON_AW_FORECAST_MAX);
-            tempMax = String.valueOf(manObject.optLong(JSON_AW_METRIC_VALUE));
+            JSONObject manObject = tempObject.optJSONObject(FORECAST_MAX_AW);
+            tempMax = String.valueOf(manObject.optLong(METRIC_VALUE_AW));
             weather.setTempMax(tempMax);
 
             //day
-            JSONObject dayObject = mainObject.optJSONObject(JSON_AW_FORECAST_DAY);
+            JSONObject dayObject = mainObject.optJSONObject(FORECAST_DAY_AW);
 
-            summaryDay = dayObject.optString(JSON_AW_FORECAST_SUMMARY);
+            summaryDay = dayObject.optString(FORECAST_SUMMARY_AW);
             weather.setSummaryDay(summaryDay);
 
-            popDay = String.valueOf(dayObject.optInt(JSON_AW_FORECAST_POP));
+            popDay = String.valueOf(dayObject.optInt(FORECAST_POP_AW));
             weather.setPopDay(popDay);
 
-            cloudDay = String.valueOf(dayObject.optInt(JSON_AW_CLOUD_COVER));
+            cloudDay = String.valueOf(dayObject.optInt(CLOUD_COVER_AW));
             weather.setCloudDay(cloudDay);
 
             //night
-            JSONObject nightObject = mainObject.optJSONObject(JSON_AW_FORECAST_NIGHT);
+            JSONObject nightObject = mainObject.optJSONObject(FORECAST_NIGHT_AW);
 
-            summaryNight = nightObject.optString(JSON_AW_FORECAST_SUMMARY);
+            summaryNight = nightObject.optString(FORECAST_SUMMARY_AW);
             weather.setSummaryNight(summaryNight);
 
-            popNight = String.valueOf(nightObject.optInt(JSON_AW_FORECAST_POP));
+            popNight = String.valueOf(nightObject.optInt(FORECAST_POP_AW));
             weather.setPopNight(popNight);
 
-            cloudNight = String.valueOf(nightObject.optInt(JSON_AW_CLOUD_COVER));
+            cloudNight = String.valueOf(nightObject.optInt(CLOUD_COVER_AW));
             weather.setCloudNight(cloudNight);
 
             weatherArrayList.add(weather);
@@ -402,16 +416,16 @@ public class ParseJSON {
         //create the main object
         JSONObject forecastObject = new JSONObject(jsonString);
 
-        JSONObject currentObject = forecastObject.getJSONObject(JSON_DS_CURRENTLY);
+        JSONObject currentObject = forecastObject.getJSONObject(CURRENTLY_DS);
 
-        summary = currentObject.optString(JSON_DS_SUMMARY);
+        summary = currentObject.optString(SUMMARY_DS);
         weather.setSummary(summary);
 
-        double popDouble = currentObject.optDouble(JSON_DS_POP);
+        double popDouble = currentObject.optDouble(POP_DS);
         pop = Conversions.decimalToPercentage(popDouble);
         weather.setPop(pop);
 
-        precipType = currentObject.optString(JSON_DS_PRECIP_TYPE);
+        precipType = currentObject.optString(PRECIP_TYPE_DS);
         if (!(TextUtils.isEmpty(precipType) || precipType.length() < 2)) {
             precipType = Conversions.capitalizeFirst(precipType);
             weather.setPopType(precipType);
@@ -419,43 +433,43 @@ public class ParseJSON {
         }
 
 
-        double tempDouble = currentObject.optDouble(JSON_DS_TEMPERATURE);
+        double tempDouble = currentObject.optDouble(TEMPERATURE_DS);
         temp = Conversions.farToCel(tempDouble);
         weather.setTemperature(temp);
 
-        double dewDouble = currentObject.optDouble(JSON_DS_DEW_POINT);
+        double dewDouble = currentObject.optDouble(DEW_POINT_DS);
         dewPoint = Conversions.farToCel(dewDouble);
         weather.setDewPoint(dewPoint);
 
-        double humidDouble = currentObject.optDouble(JSON_DS_HUMIDITY);
+        double humidDouble = currentObject.optDouble(HUMIDITY_DS);
         humidity = Conversions.decimalToPercentage(humidDouble);
         weather.setHumidity(humidity);
 
-        double pressDouble = currentObject.optDouble(JSON_DS_PRESSURE);
+        double pressDouble = currentObject.optDouble(PRESSURE_DS);
         pressure = Conversions.removeDecimal(pressDouble);
         weather.setPressure(pressure);
 
-        double windSpeedDouble = currentObject.optDouble(JSON_DS_WIND_SPEED);
+        double windSpeedDouble = currentObject.optDouble(WIND_SPEED_DS);
         windSpeed = Conversions.mileToKm(windSpeedDouble);
         weather.setWindSpeed(windSpeed);
 
-        double windGustDouble = currentObject.optDouble(JSON_DS_WIND_GUST);
+        double windGustDouble = currentObject.optDouble(WIND_GUST_DS);
         windGust = Conversions.mileToKm(windGustDouble);
         weather.setWindGust(windGust);
 
-        double windDirDouble = currentObject.optDouble(JSON_DS_WIND_DIRECTION);
+        double windDirDouble = currentObject.optDouble(WIND_DIRECTION_DS);
         windDirection = Conversions.degreeToDirection(windDirDouble);
         weather.setWindDirection(windDirection);
 
-        double cloudCoverDouble = currentObject.optDouble(JSON_DS_CLOUD_COVER);
+        double cloudCoverDouble = currentObject.optDouble(CLOUD_COVER_DS);
         cloudCoverage = Conversions.decimalToPercentage(cloudCoverDouble);
         weather.setCloudCoverage(cloudCoverage);
 
-        double visDouble = currentObject.optDouble(JSON_DS_VISIBILITY);
+        double visDouble = currentObject.optDouble(VISIBILITY_DS);
         visibility = Conversions.mileToKm(visDouble);
         weather.setVisibility(visibility);
 
-        icon = currentObject.optString(JSON_DS_ICON);
+        icon = currentObject.optString(ICON_DS);
 
         return weather;
     }//parseDarkSkyCurrent
