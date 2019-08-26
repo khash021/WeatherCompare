@@ -16,5 +16,8 @@ public final class Constant {
     public final static int LOCATION_PERMISSION_REQUEST_CODE = 1;
     public static final String PREF_KEY_FIRST_TIME_LOCATION = "pref_key_first_time_location";
 
+    //Intents
+    public static final String INTENT_EXTRA_LOC_NAME = "intent-extra-loc-name";
+
 
 }//Constant

@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
+import tech.khash.weathercompare.model.Constant;
 import tech.khash.weathercompare.model.Loc;
 import tech.khash.weathercompare.utilities.HelperFunctions;
 import tech.khash.weathercompare.utilities.SaveLoadList;
@@ -277,7 +278,7 @@ public class AddLocationActivity extends AppCompatActivity implements OnMapReady
         //return to sender
         Intent returnIntent = new Intent();
         //we return the string name of the loc
-        returnIntent.putExtra(MainActivity.INTENT_EXTRA_LOC_NAME, name);
+        returnIntent.putExtra(Constant.INTENT_EXTRA_LOC_NAME, name);
         setResult(Activity.RESULT_OK, returnIntent);
         finish();
     }//saveLocation

@@ -44,6 +44,7 @@ import java.util.Locale;
 import java.util.Objects;
 
 import tech.khash.weathercompare.adapter.LocListAdapter;
+import tech.khash.weathercompare.model.Constant;
 import tech.khash.weathercompare.model.Loc;
 import tech.khash.weathercompare.utilities.HelperFunctions;
 import tech.khash.weathercompare.utilities.NetworkCallsUtils;
@@ -60,8 +61,6 @@ public class MainActivity extends AppCompatActivity implements
 
     //for sending and receiving location from add location activity
     private static final int ADD_LOCATION_REQUEST_CODE = 1;
-    public final static String INTENT_EXTRA_LOC_NAME = "intent--extra-loc_name";
-    public final static String COMPARE_EXTRA_LOC_ID = "compare-extra-loc-id";
 
     //drawer layout used for navigation drawer
     private DrawerLayout drawerLayout;
@@ -191,7 +190,7 @@ public class MainActivity extends AppCompatActivity implements
         //check to make sure it is the right one
         if (requestCode == ADD_LOCATION_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             //get the name of the loc
-            String nameLoc = data.getStringExtra(INTENT_EXTRA_LOC_NAME);
+            String nameLoc = data.getStringExtra(Constant.INTENT_EXTRA_LOC_NAME);
             if (nameLoc == null || nameLoc.isEmpty()) {
                 Log.d(TAG, "onActivityResult - Loc Name = null/empty");
                 return;
@@ -347,7 +346,7 @@ public class MainActivity extends AppCompatActivity implements
         //start compare activity, passing in the loc object
         Intent compareIntent = new Intent(MainActivity.this, CompareActivity.class);
         String id = loc.getId();
-        compareIntent.putExtra(COMPARE_EXTRA_LOC_ID, id);
+        compareIntent.putExtra(Constant.INTENT_EXTRA_LOC_NAME, id);
         startActivity(compareIntent);
 
     }//onListItemClick

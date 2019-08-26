@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.net.URL;
 import java.util.ArrayList;
 
+import tech.khash.weathercompare.model.Constant;
 import tech.khash.weathercompare.model.Loc;
 import tech.khash.weathercompare.model.Weather;
 import tech.khash.weathercompare.utilities.HelperFunctions;
@@ -67,8 +68,8 @@ public class CompareActivity extends AppCompatActivity {
         textCityName = findViewById(R.id.text_city_name);
 
         //get the loc id from intent extra
-        if (getIntent().hasExtra(MainActivity.COMPARE_EXTRA_LOC_ID)) {
-            String id = getIntent().getStringExtra(MainActivity.COMPARE_EXTRA_LOC_ID);
+        if (getIntent().hasExtra(Constant.INTENT_EXTRA_LOC_NAME)) {
+            String id = getIntent().getStringExtra(Constant.INTENT_EXTRA_LOC_NAME);
             if (!TextUtils.isEmpty(id)) {
                 //get the corresponding loc
                 Loc loc = SaveLoadList.getLocFromDb(this, id);
