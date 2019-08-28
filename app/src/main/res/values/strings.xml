@@ -5,7 +5,8 @@
     <string name="title_activity_compare">Compare</string>
     <string name="title_activity_open_weather_forecast">Accu Weather Forecast</string>
     <string name="title_activity_add_location">Add Location</string>
-    <string name="dark_sky_forecast_title">Dark Sky Forecast</string>
+    <string name="title_dark_sky_forecast">Dark Sky Forecast</string>
+    <string name="title_open_weather_forecast">Open Weather Forecast</string>
 
     <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyAHyUo4VnllUXatwyKVvfEjMjhwsEDf5zE</string>
 

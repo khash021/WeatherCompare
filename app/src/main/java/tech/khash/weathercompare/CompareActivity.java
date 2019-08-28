@@ -91,7 +91,16 @@ public class CompareActivity extends AppCompatActivity {
         buttonOpenWeather.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO: forecast
+                //TODO: testing
+//                getForecastOW(currentLoc);
+                if (currentLoc != null) {
+                    Intent owIntent = new Intent(getApplicationContext(), OpenWeatherForecastActivity.class);
+                    owIntent.putExtra(Constant.INTENT_EXTRA_LOC_NAME, currentLoc.getName());
+                    startActivityForResult(owIntent, FORECAST_REQUEST_CODE);
+                } else {
+                    Log.d(TAG, "Forecast Intent - OW : current loc null");
+                    HelperFunctions.showToast(getApplicationContext(), "current loc null");
+                }
             }//onClick
         });//onClickListener
 
@@ -560,6 +569,5 @@ public class CompareActivity extends AppCompatActivity {
         cloud.setText(empty);
         visibility.setText(empty);
     }//showOpenWeatherError
-
 
 }//main-class

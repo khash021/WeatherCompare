@@ -54,10 +54,18 @@
 
         <activity
             android:name=".DarkSkyForecastActivity"
-            android:label="@string/dark_sky_forecast_title">
+            android:label="@string/title_dark_sky_forecast">
         <meta-data
             android:name="android.support.PARENT_ACTIVITY"
             android:value="tech.khash.weathercompare.MainActivity" />
+        </activity>
+
+        <activity
+            android:name=".OpenWeatherForecastActivity"
+            android:label="@string/title_open_weather_forecast">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="tech.khash.weathercompare.MainActivity" />
         </activity>
 
         <meta-data

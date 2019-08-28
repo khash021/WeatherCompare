@@ -1,11 +1,11 @@
 package tech.khash.weathercompare;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -16,7 +16,7 @@ import org.json.JSONException;
 import java.net.URL;
 import java.util.ArrayList;
 
-import tech.khash.weathercompare.adapter.WeatherListAdapterAW;
+import tech.khash.weathercompare.adapter.WeatherListAdapterOW;
 import tech.khash.weathercompare.model.Constant;
 import tech.khash.weathercompare.model.Loc;
 import tech.khash.weathercompare.model.Weather;
@@ -24,21 +24,19 @@ import tech.khash.weathercompare.utilities.NetworkCallsUtils;
 import tech.khash.weathercompare.utilities.ParseJSON;
 import tech.khash.weathercompare.utilities.SaveLoadList;
 
-public class AccuWeatherForecastActivity extends AppCompatActivity implements
-        WeatherListAdapterAW.ListItemClickListener {
+public class OpenWeatherForecastActivity extends AppCompatActivity implements
+        WeatherListAdapterOW.ListItemClickListener {
 
-    private static final String TAG = AccuWeatherForecastActivity.class.getSimpleName();
+    private static final String TAG = OpenWeatherForecastActivity.class.getCanonicalName();
 
     private Loc currentLoc;
     private ArrayList<Weather> weatherArrayList;
     private RecyclerView recyclerView;
-    private WeatherListAdapterAW adapter;
-    //TODO: add progress bar
-    //TODO: send currentLoc data back when you do finish()
+    private WeatherListAdapterOW adapter;
+
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        Log.d(TAG, "onCreate Called");
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather_forecast);
 
@@ -58,22 +56,7 @@ public class AccuWeatherForecastActivity extends AppCompatActivity implements
                 }//null-loc
             }//empty string
         }//has extra
-
-
-
-
     }//onCreate
-
-    //TODO: this does not work, for now I change the parent activity to Main.
-    //TODO: we need to make an app bar, then do this when android up is clicked (like the way we show nav drawer in main activity
-    //Here wen send the current Loc name back to CompareActivity
-    @Override
-    public void onBackPressed() {
-        Intent backIntent = new Intent(this, CompareActivity.class);
-        backIntent.putExtra(Constant.INTENT_EXTRA_LOC_NAME, currentLoc.getName());
-        setResult(RESULT_OK, backIntent);
-        finish();
-    }//onBackPressed
 
 
 
@@ -88,22 +71,21 @@ public class AccuWeatherForecastActivity extends AppCompatActivity implements
             return;
         }
 
-        URL forecastUrl = currentLoc.getForecastUrlAW();
+        URL forecastUrl = currentLoc.getForecastUrlOW();
         if (forecastUrl == null) {
             Log.d(TAG, "getWeather - forecastUrl = null");
             return;
         }
 
         //get the response
-        NetworkCallsUtils.AccuWeatherForecastTask forecastTask = new
-                NetworkCallsUtils.AccuWeatherForecastTask(new NetworkCallsUtils.AccuWeatherForecastTask.AsyncResponse() {
+        NetworkCallsUtils.OpenWeatherForecastTask forecastTask = new
+                NetworkCallsUtils.OpenWeatherForecastTask(new NetworkCallsUtils.OpenWeatherForecastTask.AsyncResponse() {
             @Override
             public void processFinish(String jsonResponse) {
                 if (TextUtils.isEmpty(jsonResponse)) {
                     Log.d(TAG, "getWeather - processFinish callback - response : null/empty");
                     return;
                 }
-
                 //send the data to be parsed
                 createWeatherArrayList(jsonResponse);
             }
@@ -112,17 +94,20 @@ public class AccuWeatherForecastActivity extends AppCompatActivity implements
 
     }//getWeather
 
-    //this methods parse the json response, and populates the Weather ArrayList
-    private void createWeatherArrayList (String jsonResponse) {
-        weatherArrayList = new ArrayList<>();
+
+    private void createWeatherArrayList(String jsonResponse) {
+        if (jsonResponse == null) {
+            Log.d(TAG, "getForecastOW - response = null");
+            return;
+        }
+
         try {
-            weatherArrayList = ParseJSON.parseAccuWeatherForecast(jsonResponse);
-            Log.d(TAG, "createWeatherArrayList - size: " + weatherArrayList.size());
-            //start the adapter
+            weatherArrayList = ParseJSON.parseOpenWeatherForecast(jsonResponse);
             updateAdapter(weatherArrayList);
         } catch (JSONException e) {
-            Log.e(TAG, "Error getting arraylist from ParseJSON.parseAccuWeatherForecast", e);
+            Log.v(TAG, "createWeatherArrayList - error parsing", e);
         }
+
     }//createWeatherArrayList
 
     private void updateAdapter(ArrayList<Weather> weatherArrayList) {
@@ -133,7 +118,7 @@ public class AccuWeatherForecastActivity extends AppCompatActivity implements
         // Get a handle to the RecyclerView.
         recyclerView = findViewById(R.id.recycler_view);
         // Create an adapter and supply the data to be displayed.
-        adapter = new WeatherListAdapterAW(this, weatherArrayList, this);
+        adapter = new WeatherListAdapterOW(this, weatherArrayList, this);
         // Connect the adapter with the RecyclerView.
         recyclerView.setAdapter(adapter);
         // Give the RecyclerView a horizontal layout manager.
@@ -142,6 +127,7 @@ public class AccuWeatherForecastActivity extends AppCompatActivity implements
         DividerItemDecoration decoration = new DividerItemDecoration(recyclerView.getContext(),
                 DividerItemDecoration.HORIZONTAL);
         recyclerView.addItemDecoration(decoration);
+
     }//updateAdapter
 
 
@@ -149,4 +135,4 @@ public class AccuWeatherForecastActivity extends AppCompatActivity implements
     public void onListItemClick(int clickedItemIndex) {
 
     }//onListItemClick
-}//OpenWeatherForecast
+}//OpenWeatherForecastActivity

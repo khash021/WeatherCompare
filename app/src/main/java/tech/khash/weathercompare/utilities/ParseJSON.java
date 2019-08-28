@@ -9,7 +9,10 @@ import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Locale;
 
 import tech.khash.weathercompare.model.Weather;
@@ -40,6 +43,12 @@ public class ParseJSON {
     private static final String CLOUD_OW = "clouds";
     private static final String CLOUDS_ALL_OW = "all";
     private static final String ICON_OW = "icon";
+
+    //forecast
+    private static final String LIST_OW = "list";
+    private static final String DATA_OW = "dt";
+
+
 
     //pictures
     private static final String OPENWEATHER_ICON_BASE_URL = "http://openweathermap.org/img/w/";
@@ -207,35 +216,127 @@ public class ParseJSON {
     /**
      *      This methods goes through the forecast data and create 3 Weather objects for next 3
      *      days and return the list
-     * @param jsonString : response
+     * @param jsonResponse : response
      * @return : ArrayList<Weather> for the next 3 days
      * @throws JSONException
      */
-    public static ArrayList<Weather> parseOpenWeatherForecast (String jsonString) throws JSONException {
-        if (TextUtils.isEmpty(jsonString)) {
+    public static ArrayList<Weather> parseOpenWeatherForecast (String jsonResponse) throws JSONException {
+        if (TextUtils.isEmpty(jsonResponse)) {
             return null;
         }
 
-        String date, tempMin, tempMax, summaryDay, popDay, cloudDay, summaryNight, popNight, cloudNight;
+        final long DAY_MILLI =86400000;
         ArrayList<Weather> weatherArrayList = new ArrayList<>();
-        Weather weather;
-        //for formatting date
-        SimpleDateFormat formatter = new SimpleDateFormat("EEE, MMM.dd", Locale.getDefault());
 
-        JSONObject rootObject = new JSONObject(jsonString);
+        //create calender using default timezone and locale for this moment
+        Calendar calendar = new GregorianCalendar();
+        // reset hour, minutes, seconds and millis
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        //next day
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
 
-        JSONArray mainArray = rootObject.optJSONArray("list");
-        //TODO: need to figure out min/max data and how to interpret data (comes every 3 hour)
+        //start of next 4 days
+        long day1StartMilli = calendar.getTimeInMillis();
+        long day2StartMilli = day1StartMilli + DAY_MILLI;
+        long day3StartMilli = day2StartMilli + DAY_MILLI;
+        long day4StartMilli = day3StartMilli + DAY_MILLI;
 
+        try {
+            JSONObject rootObject = new JSONObject(jsonResponse);
+            JSONArray listArray = rootObject.optJSONArray(LIST_OW);
+            ArrayList<Weather> day1Array = getWeatherDayOW(day1StartMilli, day2StartMilli, listArray);
+            ArrayList<Weather> day2Array = getWeatherDayOW(day2StartMilli, day3StartMilli, listArray);
+            ArrayList<Weather> day3Array = getWeatherDayOW(day3StartMilli, day4StartMilli, listArray);
 
-        /*we want data for the next three days (first object is for today, which we ignore for now
-        So we get index 1, 2, and 3
-         */
-        for (int i = 1; i < 4; i++) {
+            //add to list
+            if (day1Array == null || day1Array.size() <1) {
+                Log.d(TAG, "OW WEATHER LIST = null/empty");
+            } else {
+                Weather weather1 = calculateMinMax(day1Array);
+                weatherArrayList.add(weather1);
+            }//if/else null/empty
 
-        }//for
+            if (day2Array == null || day2Array.size() <1) {
+                Log.d(TAG, "OW WEATHER LIST = null/empty");
+            } else {
+                Weather weather2 = calculateMinMax(day2Array);
+                weatherArrayList.add(weather2);
+            }//if/else null/empty
+
+            if (day3Array == null || day3Array.size() <1) {
+                Log.d(TAG, "OW WEATHER LIST = null/empty");
+            } else {
+                Weather weather3 = calculateMinMax(day3Array);
+                weatherArrayList.add(weather3);
+            }//if/else null/empty
+        } catch (JSONException e) {
+            Log.e(TAG, "getForecastOW - error parsing json", e);
+        }
         return weatherArrayList;
     }//parseOpenWeatherForecast
+
+    private static ArrayList<Weather> getWeatherDayOW(long start, long end, JSONArray jsonArray) {
+        long epoch;
+        String temp;
+        ArrayList<Weather> outputList = new ArrayList<>();
+        Weather weather;
+        for (int i = 0; i < jsonArray.length(); i++) {
+            weather = new Weather();
+            try {
+                JSONObject rootObject = (JSONObject) jsonArray.get(i);
+                epoch = rootObject.optLong(DATA_OW);
+                epoch *= 1000;
+                //check for dates
+                if (!(epoch > start && epoch < end))
+                    continue;
+                weather.setEpoch(epoch);
+
+                JSONObject mainObject = rootObject.optJSONObject(MAIN_OW);
+                temp = mainObject.optString(TEMP_OW);
+                weather.setTemperature(temp);
+                outputList.add(weather);
+            } catch (JSONException e) {
+                Log.e(TAG, "getWeatherDayOW - array error", e);
+            }
+
+        }//for
+        return outputList;
+    }//getWeatherDayOW
+
+    private static Weather calculateMinMax(ArrayList<Weather> weatherArrayList) {
+        SimpleDateFormat formatter = new SimpleDateFormat("EEE, MMM.dd", Locale.getDefault());
+        int min, max;
+        String date;
+        long epoch;
+        Weather weather = new Weather();
+
+        //epoch
+        epoch = (weatherArrayList.get(0)).getEpoch();
+        weather.setEpoch(epoch);
+
+        //date
+        Date d = new Date(epoch);
+        date = formatter.format(d);
+        weather.setDate(date);
+
+        ArrayList<Integer> tempArrayList = new ArrayList<>();
+        for (Weather w : weatherArrayList) {
+            int temp = Integer.valueOf(w.getTemperature());
+            tempArrayList.add(temp);
+        }
+
+        min = Collections.min(tempArrayList);
+        max = Collections.max(tempArrayList);
+
+        weather.setTempMin(String.valueOf(min));
+        weather.setTempMax(String.valueOf(max));
+
+        return weather;
+
+    }//calculateMinMax
 
     /*
     -------------------------------- Acce Weather ----------------------------------------
@@ -446,6 +547,7 @@ public class ParseJSON {
     /*
     -------------------------------- Dark Sky -----------------------------------------
      */
+    //TODO: use the new url to get metric and then remove all this conversions
 
     /**
      * This method is for parsing the current weather from DarkSky

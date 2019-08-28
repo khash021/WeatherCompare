@@ -37,9 +37,11 @@ import org.joda.time.format.DateTimeFormatter;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -133,6 +135,28 @@ public class MainActivity extends AppCompatActivity implements
 
 
         Log.d(TAG, "EPOCH formatted 1: " + output + "\nJoda : " + output2);
+
+        //create calender using default timezone and locale for this moment
+        Calendar calendar = new GregorianCalendar();
+        // reset hour, minutes, seconds and millis
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+
+        //next day
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+
+        Date tomorrowDate = calendar.getTime();
+        long tomorrowMilli = calendar.getTimeInMillis();
+
+        long dayAfterMilli = tomorrowMilli + (24 * 60 * 60 * 1000);
+        long afterThatMilli = dayAfterMilli + (24 * 60 * 60 * 1000);
+
+        Log.d(TAG, "\n\nTomorrow milli:" + tomorrowMilli + "\nDay After milli: " + dayAfterMilli +
+                "\nAfter that milli: " + afterThatMilli);
+
+
     }//onCreate
 
     @Override

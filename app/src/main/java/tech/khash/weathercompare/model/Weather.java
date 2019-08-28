@@ -17,6 +17,7 @@ public class Weather {
 
     //for forecast (AW now)
     private String date, tempMin, TempMax, summaryDay, popDay, cloudDay, summaryNight, popNight, cloudNight;
+    private long epoch;
 
     //for forecast (DS)
 
@@ -91,6 +92,10 @@ public class Weather {
     public void setIconUrl(String iconUrl) {
         this.iconUrl = iconUrl;
     }//setIconUrl
+
+    public void setEpoch(long epoch) {
+        this.epoch = epoch;
+    }//setEpoch
 
     /**
      * Getter methods
@@ -201,6 +206,10 @@ public class Weather {
             return null;
         }
     }//getIconUri
+
+    public long getEpoch() {
+        return epoch;
+    }//getEpoch
 
 
 /*
