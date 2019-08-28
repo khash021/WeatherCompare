@@ -14,7 +14,7 @@ public class Conversions {
     //TODO: change the decimal so it actually rounds up or down depending on the value
 
     //TODO: use enum for this
-    public static String degreeToDirection (double degree ) {
+    public static String degreeToDirection(double degree) {
         Log.d(TAG, "Degree is: " + degree);
 
         if (degree >= 348.75 || degree <= 11.25) {
@@ -53,7 +53,7 @@ public class Conversions {
 
     }//degreeToDirection
 
-    public static String meterToKmh (double meter) {
+    public static String meterToKmh(double meter) {
         Log.d(TAG, "m/s is: " + meter);
         double kmh = meter * 3.6;
         //TODO: use locale
@@ -61,7 +61,7 @@ public class Conversions {
         return output;
     }//meterToKmh
 
-    public static String farToCel (double far) {
+    public static String farToCel(double far) {
         double cel = (far - 32) * 5 / 9;
         String output = String.format("%.0f", cel);
         return output;
@@ -73,28 +73,38 @@ public class Conversions {
         return output;
     }//decimalToPercentage
 
-    public static String capitalizeFirst (String s) {
+    public static String capitalizeFirst(String s) {
         //check to makes sure it is not empty
         if (s == null || TextUtils.isEmpty(s)) {
             return "";
         }
-        String output = s.substring(0,1).toUpperCase() + s.substring(1);
+        String output = s.substring(0, 1).toUpperCase() + s.substring(1);
         return output;
     }//capitalizeFirst
 
-    public static String mileToKm (double mile) {
+    public static String mileToKm(double mile) {
         double km = mile * 1.60934;
         String output = String.format("%.0f", km);
         return output;
     }//mileToKm
 
-    public static String removeDecimal (double d) {
-        String output = String.format("%.0f", d);
+    public static String removeDemicalFloat(float f) {
+        String output = String.format("%.0f", f);
         return output;
     }//removeDecimal
 
+    public static String roundDecimal(String s) {
+        if (!s.contains(".")) {
+            return s;
+        }
+        float f = Float.valueOf(s);
+        int rounded = Math.round(f);
+        String output = String.valueOf(rounded);
+        return output;
+    }//roundDecimal
 
-    public static String getDayEpoch (long epoch) {
+
+    public static String getDayEpoch(long epoch) {
         DateTime dateTime = new DateTime(epoch);
         String day = dateTime.dayOfWeek().getAsText(Locale.getDefault());
         return day;

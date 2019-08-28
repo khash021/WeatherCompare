@@ -420,11 +420,8 @@ public class Loc {
         String latLngString = String.format(LOCATION_DS, latLng.latitude, latLng.longitude);
 
         String urlString = BASE_URL_DS + API_KEY_DS + "/" + latLngString + "?" +
-                EXCLUDE_DS + EXCLUDE_BLOCK_CURRENT_DS;
-        //TODO: now we are getting imperial and convert when parsing, change it to get metric
-//        String urlString = BASE_URL_DS + API_KEY_DS + "/" + latLngString + "?" +
-//                EXCLUDE_DS + EXCLUDE_BLOCK_FORECAST_DS + "&" + UNITS_DS +
-//                UNITS_METRIC_DS;
+                EXCLUDE_DS + EXCLUDE_BLOCK_CURRENT_DS + "&" + UNITS_DS +
+                UNITS_METRIC_DS;
         Log.d(TAG, "Current URL string - DS: " + urlString);
 
         URL url = null;
@@ -441,11 +438,8 @@ public class Loc {
         String latLngString = String.format(LOCATION_DS, latLng.latitude, latLng.longitude);
 
         String urlString = BASE_URL_DS + API_KEY_DS + "/" + latLngString + "?" +
-                EXCLUDE_DS + EXCLUDE_BLOCK_FORECAST_DS ;
-        //TODO: now we are getting imperial and convert when parsing, change it to get metric
-//        String urlString = BASE_URL_DS + API_KEY_DS + "/" + latLngString + "?" +
-//                EXCLUDE_DS + EXCLUDE_BLOCK_FORECAST_DS + "&" + UNITS_DS +
-//                UNITS_METRIC_DS;
+                EXCLUDE_DS + EXCLUDE_BLOCK_FORECAST_DS + "&" + UNITS_DS +
+                UNITS_METRIC_DS;
 
         Log.d(TAG, "Forecast URL string - DS: " + urlString);
 

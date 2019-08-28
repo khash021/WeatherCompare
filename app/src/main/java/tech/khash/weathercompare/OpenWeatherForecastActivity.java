@@ -11,8 +11,6 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import org.json.JSONException;
-
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -101,12 +99,9 @@ public class OpenWeatherForecastActivity extends AppCompatActivity implements
             return;
         }
 
-        try {
-            weatherArrayList = ParseJSON.parseOpenWeatherForecast(jsonResponse);
-            updateAdapter(weatherArrayList);
-        } catch (JSONException e) {
-            Log.v(TAG, "createWeatherArrayList - error parsing", e);
-        }
+
+        weatherArrayList = ParseJSON.parseOpenWeatherForecast(jsonResponse);
+        updateAdapter(weatherArrayList);
 
     }//createWeatherArrayList
 

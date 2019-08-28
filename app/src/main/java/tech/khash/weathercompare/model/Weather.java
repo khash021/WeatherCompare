@@ -16,7 +16,7 @@ public class Weather {
             windGust, visibility, cloudCoverage, pop, popType, iconUrl;
 
     //for forecast (AW now)
-    private String date, tempMin, TempMax, summaryDay, popDay, cloudDay, summaryNight, popNight, cloudNight;
+    private String date, tempMin, tempMax, summaryDay, popDay, cloudDay, summaryNight, popNight, cloudNight;
     private long epoch;
 
     //for forecast (DS)
@@ -111,14 +111,6 @@ public class Weather {
         if (temperature == null) {
             return "";
         }
-        //Open weather data is a float, here we convert to float, and then return the rounded version
-        if (temperature.contains(".")) {
-            float tempFloat = Float.valueOf(temperature);
-            int rounded = Math.round(tempFloat);
-            String output = String.valueOf(rounded);
-            return output;
-        }
-
         return temperature;
     }//getTemperature
 
@@ -224,19 +216,25 @@ public class Weather {
     }
 
     public String getTempMin() {
+        if (tempMin == null) {
+            return "";
+        }
         return tempMin;
-    }
+    }//getTempMin
 
     public void setTempMin(String tempMin) {
         this.tempMin = tempMin;
     }
 
     public String getTempMax() {
-        return TempMax;
-    }
+        if (tempMax == null) {
+            return "";
+        }
+        return tempMax;
+    }//getTempMax
 
     public void setTempMax(String tempMax) {
-        TempMax = tempMax;
+        this.tempMax = tempMax;
     }
 
     public String getSummaryDay() {
