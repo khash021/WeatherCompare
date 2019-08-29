@@ -14,6 +14,12 @@ import java.util.ArrayList;
 import tech.khash.weathercompare.R;
 import tech.khash.weathercompare.model.Weather;
 
+/**
+ * Created by Khashayar "Khash" Mortazavi
+ * <p>
+ * Main adapter class for Dark Sky Weather to be used with RecyclerView in showing weather data
+ */
+
 public class WeatherListAdapterDS extends RecyclerView.Adapter<WeatherListAdapterDS.WeatherViewHolder> {
 
     //list of data

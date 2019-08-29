@@ -17,7 +17,7 @@ import tech.khash.weathercompare.model.Weather;
 /**
  * Created by Khashayar "Khash" Mortazavi
  * <p>
- * Main adapter class for Weather to be used with RecyclerView in showing weather data
+ * Main adapter class for Accu Weather to be used with RecyclerView in showing weather data
  */
 
 public class WeatherListAdapterAW extends RecyclerView.Adapter<WeatherListAdapterAW.WeatherViewHolder> {

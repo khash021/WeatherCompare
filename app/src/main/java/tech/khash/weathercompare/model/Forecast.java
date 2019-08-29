@@ -4,7 +4,7 @@ package tech.khash.weathercompare.model;
  * Object representing each forecast to be used for showing the list of forecasts
  */
 
-//TODO: add some sunrise, sunset, maybe even pressure, and wind stuff
+//TODO: could delete this?
 
 public class Forecast {
 

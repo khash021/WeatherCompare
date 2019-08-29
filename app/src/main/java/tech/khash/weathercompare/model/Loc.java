@@ -22,6 +22,7 @@ import java.net.URL;
  */
 
 //TODO: add methods for creating OW, AW, and DS URLs
+//TODO: getCurrentUrlAW, if no key, try to get it here?
 
 public class Loc {
 
@@ -70,19 +71,22 @@ public class Loc {
     private LatLng latLng;
     private String name;
 
+    //for AW only
     private String keyAW; //used only for AccuWeather
     private URL locationCodeUrlAW;
 
+    //current
     private URL currentUrlAW;
     private URL currentUrlOW;
     private URL currentUrlDS;
 
+    //forecast
     private URL forecastUrlAW;
     private URL forecastUrlOW;
     private URL forecastUrlDS;
 
 
-    //default constructor
+    //constructors
     public Loc() {
     }
 
@@ -114,6 +118,7 @@ public class Loc {
         }
     }//getKeyAW
 
+    //AW location code
     public URL getLocationCodeUrlAW() {
         if (locationCodeUrlAW != null) {
             return locationCodeUrlAW;
@@ -129,6 +134,7 @@ public class Loc {
         }//if-else
     }//getLocationCodeUrlAW
 
+    // -----------------------------  AW ----------------
     public URL getCurrentUrlAW() {
         if (currentUrlAW != null) {
             return currentUrlAW;
@@ -176,6 +182,7 @@ public class Loc {
         }//if-else keyAW
     }//getForecastUrlAW
 
+    // -----------------------------  OW ----------------
     public URL getCurrentUrlOW() {
         if (currentUrlOW != null) {
             return currentUrlOW;
@@ -204,9 +211,9 @@ public class Loc {
             forecastUrlOW = url;
             return forecastUrlOW;
         }//url null
-
     }//getForecastUrlOW
 
+    // -----------------------------  DS ----------------
     public URL getCurrentUrlDS() {
         if (currentUrlDS != null) {
             return currentUrlDS;
@@ -235,10 +242,7 @@ public class Loc {
             forecastUrlDS = url;
             return forecastUrlDS;
         }//url null
-
     }//getForecastUrlOW
-
-
 
     /*
         ------------------------ SETTER METHODS -----------------------------------------
@@ -256,6 +260,7 @@ public class Loc {
         this.latLng = latLng;
     }//setLatLng
 
+    //this creates all URLs if they are null
     public void setAllUrls() {
         //code
         if (!hasLocationCodeUrlAW()) {
@@ -266,11 +271,9 @@ public class Loc {
         if (!hasCurrentUrlAW()) {
             getCurrentUrlAW();
         }
-
         if (!hasCurrentUrlOW()) {
             getCurrentUrlOW();
         }
-
         if (!hasCurrentUrlDS()) {
             getCurrentUrlDS();
         }
@@ -279,7 +282,12 @@ public class Loc {
         if (!hasForecastUrlAW()) {
             getForecastUrlAW();
         }
-
+        if (!hasForecastUrlOW()) {
+            getForecastUrlOW();
+        }
+        if (!hasForecastUrlDS()) {
+            getForecastUrlDS();
+        }
     }//setAllUrls
 
 
@@ -295,6 +303,7 @@ public class Loc {
         return locationCodeUrlAW != null;
     }//hasLocationCodeUrlAW
 
+    //Methods for checking URLs
     public boolean hasCurrentUrlAW() {
         return currentUrlAW != null;
     }//hasCurrentUrlAW
@@ -311,8 +320,16 @@ public class Loc {
         return forecastUrlAW != null;
     }//hasForecastUrlAW
 
+    public boolean hasForecastUrlOW() {
+        return forecastUrlOW != null;
+    }//hasForecastUrlOW
+
+    public boolean hasForecastUrlDS() {
+        return forecastUrlDS != null;
+    }//hasForecastUrlDS
+
     /**
-     * This creates a URL for getting location code from LatLng
+     * This creates a URL for getting location code from LatLng - AW
      *
      * @param latLng : LatLng of the location
      * @return : URL for getting the location code
@@ -334,7 +351,7 @@ public class Loc {
     }//createLocationCodeUrl
 
     /**
-     * This creates the URL for current weather using city ID
+     * This creates the URL for current weather using city ID - AW
      *
      * @param locCode : city's code
      * @return : URL
@@ -354,6 +371,12 @@ public class Loc {
         return url;
     }//createCurrentWeatherUrlId
 
+    /**
+     * This creates the URL for forecast weather using city ID - AW
+     *
+     * @param locCode : city's code
+     * @return : URL
+     */
     private static URL createForecastUrlAW(String locCode) {
         String urlString = BASE_URL_FORECAST_AW + locCode + API_ID_AW +
                 API_KEY_AW + DETAILS_TRUE_AW + METRIC_TRUE_AW;
@@ -369,25 +392,8 @@ public class Loc {
         return url;
     }//createForecastUrlAW
 
-    private static URL createForecastUrlOW(LatLng latLng) {
-        String latLngString = String.format(LAT_LNG_OW, latLng.latitude, latLng.longitude);
-
-        String urlString = FORECAST_BASE_URL_OW + latLngString + UNIT_OW +
-                METRIC_OW + API_ID_OW + API_KEY_OW;
-        Log.d(TAG, "Forecast URL string - OW: " + urlString);
-
-        URL url = null;
-        try {
-            url = new URL(urlString);
-            Log.d(TAG, "generated forecast url - OW: " + url.toString());
-        } catch (MalformedURLException e) {
-            Log.e(TAG, "Error creating current weather URL from string", e);
-        }
-        return url;
-    }//createForecastUrlOW
-
     /**
-     * This creates the URL for current weather using LatLng
+     * This creates the URL for current weather using LatLng - OW
      *
      * @param latLng : latlng
      * @return : URL
@@ -411,7 +417,30 @@ public class Loc {
     }//createCurrentWeatherUrlId
 
     /**
-     * This creates the URL for current weather (notice exclude parameters) using LatLng
+     * This creates the URL for forecast weather using LatLng - OW
+     *
+     * @param latLng : latlng
+     * @return : URL
+     */
+    private static URL createForecastUrlOW(LatLng latLng) {
+        String latLngString = String.format(LAT_LNG_OW, latLng.latitude, latLng.longitude);
+
+        String urlString = FORECAST_BASE_URL_OW + latLngString + UNIT_OW +
+                METRIC_OW + API_ID_OW + API_KEY_OW;
+        Log.d(TAG, "Forecast URL string - OW: " + urlString);
+
+        URL url = null;
+        try {
+            url = new URL(urlString);
+            Log.d(TAG, "generated forecast url - OW: " + url.toString());
+        } catch (MalformedURLException e) {
+            Log.e(TAG, "Error creating current weather URL from string", e);
+        }
+        return url;
+    }//createForecastUrlOW
+
+    /**
+     * This creates the URL for current weather (notice exclude parameters) using LatLng - DS
      *
      * @param latLng : LatLng
      * @return : URL
@@ -434,6 +463,12 @@ public class Loc {
         return url;
     }//createCurrentWeatherUrlId
 
+    /**
+     * This creates the URL for forecast weather (notice exclude parameters) using LatLng - DS
+     *
+     * @param latLng : LatLng
+     * @return : URL
+     */
     private static URL createForecastUrlDS(LatLng latLng) {
         String latLngString = String.format(LOCATION_DS, latLng.latitude, latLng.longitude);
 

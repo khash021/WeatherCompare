@@ -4,8 +4,17 @@ import android.net.Uri;
 
 /**
  * Class for weather object.
- *
- * This will be used for current weather conditions
+ * <p>
+ * This is the main Weather object corresponding to a specific time/place.
+ * <p>
+ * It stores all the data for weather.
+ * <p>
+ * Epoch : millis Epoch corresponding to the time that the weather forecast/current is representing
+ * Date : the human readable version of the epoch. it usually just stores day, and date
+ * TempMin and TempMax are used for forecast only
+ * //TODO: finish all the variables
+ * <p>
+ * The Weather object is created using the JSON response from weather providers in the ParsJSON class
  */
 
 public class Weather {
@@ -19,28 +28,25 @@ public class Weather {
     private String date, tempMin, tempMax, summaryDay, popDay, cloudDay, summaryNight, popNight, cloudNight;
     private long epoch;
 
-    //for forecast (DS)
-
     private Uri iconUri;
 
     //default public constructor
     public Weather() {
     }//Weather
 
-    /**
-     * Helper method to see if there is any icon associated with the weather object
-     */
-    public boolean hasIcon() {
-        if (iconUrl == null) {
-            return false;
-        } else {
-            return true;
-        }
-    }//hasIcon
 
-    /**
-     * Setter methods
+    /*
+        ------------------------ SETTER METHODS -----------------------------------------
      */
+
+    public void setEpoch(long epoch) {
+        this.epoch = epoch;
+    }//setEpoch
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
     public void setSummary(String summary) {
         this.summary = summary;
     }//setSummary
@@ -48,6 +54,14 @@ public class Weather {
     public void setTemperature(String temperature) {
         this.temperature = temperature;
     }//setTemperature
+
+    public void setTempMin(String tempMin) {
+        this.tempMin = tempMin;
+    }//setTempMin
+
+    public void setTempMax(String tempMax) {
+        this.tempMax = tempMax;
+    }//setTempMax
 
     public void setDewPoint(String dewPoint) {
         this.dewPoint = dewPoint;
@@ -93,13 +107,42 @@ public class Weather {
         this.iconUrl = iconUrl;
     }//setIconUrl
 
-    public void setEpoch(long epoch) {
-        this.epoch = epoch;
-    }//setEpoch
+    public void setPopDay(String popDay) {
+        this.popDay = popDay;
+    }
 
-    /**
-     * Getter methods
+    public void setSummaryDay(String summaryDay) {
+        this.summaryDay = summaryDay;
+    }
+
+    public void setCloudDay(String cloudDay) {
+        this.cloudDay = cloudDay;
+    }
+
+    public void setSummaryNight(String summaryNight) {
+        this.summaryNight = summaryNight;
+    }
+
+    public void setCloudNight(String cloudNight) {
+        this.cloudNight = cloudNight;
+    }
+
+    public void setPopNight(String popNight) {
+        this.popNight = popNight;
+    }
+
+    /*
+        ------------------------ GETTER METHODS -----------------------------------------
      */
+
+    public long getEpoch() {
+        return epoch;
+    }//getEpoch
+
+    public String getDate() {
+        return date;
+    }//getDate
+
     public String getSummary() {
         if (summary == null) {
             return "";
@@ -113,6 +156,20 @@ public class Weather {
         }
         return temperature;
     }//getTemperature
+
+    public String getTempMax() {
+        if (tempMax == null) {
+            return "";
+        }
+        return tempMax;
+    }//getTempMax
+
+    public String getTempMin() {
+        if (tempMin == null) {
+            return "";
+        }
+        return tempMin;
+    }//getTempMin
 
     public String getDewPoint() {
         if (dewPoint == null) {
@@ -184,6 +241,30 @@ public class Weather {
         return popType;
     }//getPopType
 
+    public String getSummaryDay() {
+        return summaryDay;
+    }
+
+    public String getPopDay() {
+        return popDay;
+    }
+
+    public String getCloudDay() {
+        return cloudDay;
+    }
+
+    public String getSummaryNight() {
+        return summaryNight;
+    }
+
+    public String getPopNight() {
+        return popNight;
+    }
+
+    public String getCloudNight() {
+        return cloudNight;
+    }
+
     public String getIconUrl() {
         if (iconUrl == null) {
             return "";
@@ -199,89 +280,14 @@ public class Weather {
         }
     }//getIconUri
 
-    public long getEpoch() {
-        return epoch;
-    }//getEpoch
-
-
-/*
----------------------------------------------- AW FORECAST ---------------------------------------
- */
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
-    }
-
-    public String getTempMin() {
-        if (tempMin == null) {
-            return "";
+    /**
+     * Helper method to see if there is any icon associated with the weather object
+     */
+    public boolean hasIcon() {
+        if (iconUrl == null) {
+            return false;
+        } else {
+            return true;
         }
-        return tempMin;
-    }//getTempMin
-
-    public void setTempMin(String tempMin) {
-        this.tempMin = tempMin;
-    }
-
-    public String getTempMax() {
-        if (tempMax == null) {
-            return "";
-        }
-        return tempMax;
-    }//getTempMax
-
-    public void setTempMax(String tempMax) {
-        this.tempMax = tempMax;
-    }
-
-    public String getSummaryDay() {
-        return summaryDay;
-    }
-
-    public void setSummaryDay(String summaryDay) {
-        this.summaryDay = summaryDay;
-    }
-
-    public String getPopDay() {
-        return popDay;
-    }
-
-    public void setPopDay(String popDay) {
-        this.popDay = popDay;
-    }
-
-    public String getCloudDay() {
-        return cloudDay;
-    }
-
-    public void setCloudDay(String cloudDay) {
-        this.cloudDay = cloudDay;
-    }
-
-    public String getSummaryNight() {
-        return summaryNight;
-    }
-
-    public void setSummaryNight(String summaryNight) {
-        this.summaryNight = summaryNight;
-    }
-
-    public String getPopNight() {
-        return popNight;
-    }
-
-    public void setPopNight(String popNight) {
-        this.popNight = popNight;
-    }
-
-    public String getCloudNight() {
-        return cloudNight;
-    }
-
-    public void setCloudNight(String cloudNight) {
-        this.cloudNight = cloudNight;
-    }
-}
+    }//hasIcon
+}//Weather
