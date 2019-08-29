@@ -26,7 +26,6 @@ public class NetworkCallsUtils {
 
     private static final String TAG = NetworkCallsUtils.class.getSimpleName();
 
-
     /**
      * This method returns the entire result from the HTTP response.
      *
@@ -65,6 +64,21 @@ public class NetworkCallsUtils {
         }
     }//getResponseFromHttpUrl
 
+    /**
+     * In all of these AsyncTasks, we create an interface called AsyncResponse which has the
+     * function processFinishe which has an input parameter of String. This is our result (i.e.
+     * JSON response).
+     *
+     * We use this interface to send results back to the host activity, so we can do what we want
+     * in the host activity, rather thatn passing in context and running into problems here.
+     *
+     * Then once we get the results in onPostExecute, we pass that to the interface.
+     *
+     * In our host activities (current, forecast), we implement theis interface and override its
+     * processFinish method. Whenever the background task finishes, we get the results in that
+     * method in the host activity and we can process results and update db and UI from there.
+     */
+
 
     /*
         ----------------------------- AW --------------------------------------
@@ -82,7 +96,6 @@ public class NetworkCallsUtils {
         }//AsyncResponse
 
         private AsyncResponse delegate = null;
-
 
         public NetworkCallAccuWeatherCode(AsyncResponse delegate) {
             this.delegate = delegate;
@@ -318,6 +331,10 @@ public class NetworkCallsUtils {
         ----------------------------- OW --------------------------------------
      */
 
+    /**
+     * Gets the OW current response from web.
+     * It does not parse data here, it is done in the parent activity
+     */
     public static class OpenWeatherCurrentTask extends AsyncTask<URL, Void, String> {
 
         private final String TAG = OpenWeatherCurrentTask.class.getSimpleName();
@@ -365,6 +382,11 @@ public class NetworkCallsUtils {
         }//onPostExecute
     }//OpenWeatherCurrentTask
 
+
+    /**
+     * Gets the OW forecast response from web.
+     * It does not parse data here, it is done in the parent activity
+     */
     public static class OpenWeatherForecastTask extends AsyncTask<URL, Void, String> {
 
         private static final String TAG = OpenWeatherForecastTask.class.getSimpleName();

@@ -25,6 +25,7 @@ public class ParseJSON {
 
     //TODO: add rain, sunrise and sunset, icons
     //TODO: feels like attribute
+    //TODO: clean up go through it
 
     private static final String TAG = ParseJSON.class.getSimpleName();
 
