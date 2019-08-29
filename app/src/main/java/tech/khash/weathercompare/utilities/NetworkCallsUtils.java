@@ -343,10 +343,10 @@ public class NetworkCallsUtils {
             void processFinish(Weather output);
         }
 
-        private AsyncResponse deletegate = null;
+        private AsyncResponse delegate = null;
 
         public OpenWeatherCurrentTask(AsyncResponse deletegate) {
-            this.deletegate = deletegate;
+            this.delegate = deletegate;
         }
 
         @Override
@@ -374,10 +374,10 @@ public class NetworkCallsUtils {
             try {
                 current = ParseJSON.parseOpenWeatherCurrent(s);
                 //pass data to interface
-                deletegate.processFinish(current);
+                delegate.processFinish(current);
             } catch (JSONException e) {
                 Log.e(TAG, "OpenWeatherQueryTask - postExecute - error parsing response");
-                deletegate.processFinish(null);
+                delegate.processFinish(null);
             }//try-catch
         }//onPostExecute
     }//OpenWeatherCurrentTask
@@ -426,5 +426,104 @@ public class NetworkCallsUtils {
             delegate.processFinish(s);
         }//onPostExecute
     }//OpenWeatherForecastTask
+
+    /*
+        ----------------------------- WB --------------------------------------
+     */
+
+    /**
+     * Gets the WB current response from web.
+     * It does not parse data here, it is done in the parent activity
+     */
+    public static class WeatherBitCurrentTask extends AsyncTask<URL, Void, String> {
+
+        private final String TAG = WeatherBitCurrentTask.class.getSimpleName();
+
+        public interface AsyncResponse {
+            void processFinish(Weather output);
+        }
+
+        private AsyncResponse delegate = null;
+
+        public WeatherBitCurrentTask(AsyncResponse deletegate) {
+            this.delegate = deletegate;
+        }
+
+        @Override
+        protected String doInBackground(URL... urls) {
+            //Make the request
+            try {
+                //get the response using the class, passing in our url
+                String httpResponse = NetworkCallsUtils.getResponseFromHttpUrl(urls[0]);
+                Log.d(TAG, "WeatherBitCurrentTask - JSON response: " + httpResponse);
+                return httpResponse;
+            } catch (IOException e) {
+                Log.e(TAG, "Error establishing connection - WeatherBitCurrentTask ", e);
+                return null;
+            }
+        }//doInBackground
+
+        @Override
+        protected void onPostExecute(String s) {
+            if (TextUtils.isEmpty(s)) {
+                Log.e(TAG, "WeatherBitCurrentTask - postExecute - response = null");
+            }
+            //parse response and get the code
+            Weather current = null;
+
+            try {
+                current = ParseJSON.parseWeatherBitCurrent(s);
+                //pass data to interface
+                delegate.processFinish(current);
+            } catch (JSONException e) {
+                Log.e(TAG, "WeatherBitCurrentTask - postExecute - error parsing response");
+                delegate.processFinish(null);
+            }//try-catch
+        }//onPostExecute
+    }//WeatherBitCurrentTask
+
+    /**
+     * Gets the DS forecast response from web.
+     * It does not parse data here, it is done in the parent activity
+     */
+    public static class WeatherBitForecastTask extends AsyncTask<URL, Void, String> {
+
+        private static final String TAG = WeatherBitForecastTask.class.getSimpleName();
+
+        public interface AsyncResponse {
+            void processFinish(String jsonResponse);
+        }//interface
+
+        private AsyncResponse delegate = null;
+
+        //constructor
+        public WeatherBitForecastTask (AsyncResponse delegate) {
+            this.delegate = delegate;
+        }//constructor
+
+        @Override
+        protected String doInBackground(URL... urls) {
+            //make the request
+            try {
+                //get the response using the class, passing in our url
+                String httpResponse = NetworkCallsUtils.getResponseFromHttpUrl(urls[0]);
+                Log.d(TAG, "WeatherBitForecastTask - JSON response: " + httpResponse);
+                return httpResponse;
+            } catch (IOException e) {
+                Log.e(TAG, "Error establishing connection - WeatherBitForecastTask ", e);
+                return null;
+            }
+        }//doInBackground
+
+        @Override
+        protected void onPostExecute(String s) {
+            if (TextUtils.isEmpty(s)) {
+                Log.e(TAG, "WeatherBitForecastTask - postExecute - response = null");
+                return;
+            }
+            Log.d(TAG, "WeatherBitForecastTask response : " + s);
+            delegate.processFinish(s);
+        }//onPostExecute
+    }//WeatherBitForecastTask
 
 }//NetworkCallsUtils - class

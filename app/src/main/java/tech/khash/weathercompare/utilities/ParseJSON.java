@@ -24,8 +24,8 @@ import tech.khash.weathercompare.model.Weather;
 public class ParseJSON {
 
     //TODO: add rain, sunrise and sunset, icons
-    //TODO: feels like attribute
     //TODO: clean up go through it
+    //TODO: double check all the results to be same unit (C, pressure, percentage, kmh, km, etc)
 
     private static final String TAG = ParseJSON.class.getSimpleName();
 
@@ -113,6 +113,27 @@ public class ParseJSON {
     private static final String TIME_DS = "time";
     private static final String TEMP_MIN_DS = "temperatureMin";
     private static final String TEMP_MAX_DS = "temperatureMax";
+
+    /*
+        --------------------------- Weather Bit -----------------------------------
+     */
+
+    private static final String DATA_WB = "data";
+    private static final String TEMP_WB = "temp";
+    private static final String WEATHER_WB = "weather";
+    private static final String DESCRIPTION_WB = "description";
+    private static final String ICON_WB = "icon";
+    private static final String HUMIDITY_WB = "rh";
+    private static final String PRESSURE_WB = "pres";
+    private static final String CLOUD_WB = "clouds";
+    private static final String VISIBILITY_WB = "vis";
+    private static final String DEW_WB = "dewpt";
+    private static final String WIND_SPEED_WB = "wind_spd";
+    private static final String WIND_DIRECTION_WB = "wind_dir";
+    private static final String EPOCH_WB = "ts";
+    private static final String TEMP_MIN_WB = "min_temp";
+    private static final String TEMP_MAX_WB = "max_temp";
+    private static final String POP_WB = "pop";
 
 
     /*
@@ -662,8 +683,7 @@ public class ParseJSON {
         SimpleDateFormat formatter = new SimpleDateFormat("EEE, MMM.dd", Locale.getDefault());
 
         JSONObject rootObject = new JSONObject(jsonString);
-        JSONObject dailyObject = rootObject.optJSONObject(DAILY_DS);
-        JSONArray dataArray = dailyObject.optJSONArray(DATA_DS);
+        JSONArray dataArray = rootObject.optJSONArray(DATA_WB);
 
         /*we want data for the next three days (first object is for today, which we ignore for now
         So we get index 1, 2, and 3
@@ -760,5 +780,205 @@ public class ParseJSON {
         return weatherArrayList;
     }//parseDarkSkyForecast
 
+
+
+
+
+
+    /*
+    -------------------------------- Weather Bit -----------------------------------------
+     */
+
+    /**
+     * This method is for parsing the current weather from Weather Bit
+     *
+     * @param jsonString : raw JSON response from the server
+     * @return : Weather object
+     * @throws JSONException
+     */
+    public static Weather parseWeatherBitCurrent(String jsonString) throws JSONException {
+
+        //dummy check for empty or null input
+        if (jsonString == null || TextUtils.isEmpty(jsonString)) {
+            return null;
+        }//if
+
+        String summary, temp, pressure, humidity, windSpeed, windDirection, cloudCoverage, icon,
+        dewPoint, visibility;
+
+        //create a Weather object
+        Weather weather = new Weather();
+
+        //create an object from the string
+        JSONObject rootObject = new JSONObject(jsonString);
+        //get a reference to the data array
+        JSONArray dataArray = rootObject.getJSONArray(DATA_WB);
+        //get the first element of the array for current data
+        try {
+            JSONObject mainObject = dataArray.getJSONObject(0);
+
+            //summary and icon are both in weather object
+            JSONObject weatherObject = mainObject.optJSONObject(WEATHER_WB);
+            summary = weatherObject.optString(DESCRIPTION_WB);
+            weather.setSummary(summary);
+            icon = weatherObject.optString(ICON_WB);
+
+            //temp
+            temp = mainObject.optString(TEMP_WB);
+            //round if it contains a decimal point
+            temp = Conversions.roundDecimal(temp);
+            weather.setTemperature(temp);
+
+            //dew
+            dewPoint = mainObject.optString(DEW_WB);
+            dewPoint = Conversions.roundDecimal(dewPoint);
+            weather.setDewPoint(dewPoint);
+
+            //pressure
+            pressure = mainObject.optString(PRESSURE_WB);
+            pressure = Conversions.roundDecimal(pressure);
+            weather.setPressure(pressure);
+
+            //humidity
+            humidity = mainObject.getString(HUMIDITY_WB);
+            weather.setHumidity(humidity);
+
+            //wind
+            windSpeed = mainObject.optString(WIND_SPEED_WB);
+            windSpeed = Conversions.roundDecimal(windSpeed);
+            weather.setWindSpeed(windSpeed);
+
+
+            double windDirectionDouble = mainObject.optDouble(WIND_DIRECTION_WB);
+            windDirection = Conversions.degreeToDirection(windDirectionDouble);
+            weather.setWindDirection(windDirection);
+
+            //cloud cover
+            cloudCoverage = mainObject.optString(CLOUD_WB);
+            cloudCoverage = Conversions.roundDecimal(cloudCoverage);
+            weather.setCloudCoverage(cloudCoverage);
+
+            //visibility
+            visibility = mainObject.optString(VISIBILITY_WB);
+            visibility = Conversions.roundDecimal(visibility);
+            weather.setVisibility(visibility);
+
+
+            return weather;
+        } catch (NullPointerException e) {
+            //this happens when for some reason the main data array is empty
+            Log.e("parseWeatherBitCurrent", "parseWeatherBitCurrent - data array is null", e);
+            return null;
+        }
+    }//parseWeatherBitCurrent
+
+
+
+
+
+
+    public static ArrayList<Weather> parseWeatherBitForecast(String jsonString) throws JSONException {
+        if (TextUtils.isEmpty(jsonString)) {
+            return null;
+        }
+
+        String date, summary, tempMin, tempMax, dewPoint, pressure, humidity, windSpeed, windGust,
+                windDirection, cloudCoverage, pop, visibility;
+        ArrayList<Weather> weatherArrayList = new ArrayList<>();
+        Weather weather;
+        //for formatting date
+        SimpleDateFormat formatter = new SimpleDateFormat("EEE, MMM.dd", Locale.getDefault());
+
+        JSONObject rootObject = new JSONObject(jsonString);
+        JSONArray dataArray = rootObject.optJSONArray(DATA_WB);
+
+        /*we want data for the next three days (first object is for today, which we ignore for now
+        So we get index 1, 2, and 3
+         */
+
+
+        for (int i = 1; i < 4; i++) {
+            weather = new Weather();
+            JSONObject mainObject = dataArray.getJSONObject(i);
+
+            //date
+            long epoch = mainObject.optLong(EPOCH_WB, -1);
+            //check for -1
+            if (epoch != -1) {
+                //convert to milli sec
+                epoch *= 1000;
+                //create a date
+                Date dateObject = new Date(epoch);
+                date = formatter.format(dateObject);
+            } else {
+                date = "";
+            }
+            weather.setEpoch(epoch);
+            weather.setDate(date);
+
+            //summary
+            JSONObject weatherObject = mainObject.optJSONObject(WEATHER_WB);
+            summary = weatherObject.optString(DESCRIPTION_WB);
+            weather.setSummary(summary);
+
+            //temps
+            tempMin = mainObject.optString(TEMP_MIN_WB);
+            tempMin = Conversions.roundDecimal(tempMin);
+
+            tempMax = mainObject.optString(TEMP_MAX_WB);
+            tempMax = Conversions.roundDecimal(tempMax);
+            weather.setTempMin(tempMin);
+            weather.setTempMax(tempMax);
+
+            //dew point
+            dewPoint = mainObject.optString(DEW_WB);
+            dewPoint = Conversions.roundDecimal(dewPoint);
+            weather.setDewPoint(dewPoint);
+
+            //humidity
+            humidity = mainObject.optString(HUMIDITY_WB);
+            humidity = Conversions.roundDecimal(humidity);
+            weather.setHumidity(humidity);
+
+            //pressure
+            pressure = mainObject.optString(PRESSURE_WB);
+            pressure = Conversions.roundDecimal(pressure);
+            weather.setPressure(pressure);
+
+            //wind speed
+            windSpeed = mainObject.optString(WIND_SPEED_WB);
+            windSpeed = Conversions.roundDecimal(windSpeed);
+            weather.setWindSpeed(windSpeed);
+
+            //wind gust
+            windGust = mainObject.optString(WIND_GUST_DS);
+            windGust = Conversions.roundDecimal(windGust);
+            weather.setWindGust(windGust);
+
+            //wind direction
+            double windDirDouble = mainObject.optDouble(WIND_DIRECTION_WB);
+            windDirection = Conversions.degreeToDirection(windDirDouble);
+            weather.setWindDirection(windDirection);
+
+            //cloud cover
+            cloudCoverage = mainObject.optString(CLOUD_WB);
+            weather.setCloudCoverage(cloudCoverage);
+
+            //visibility
+            visibility = mainObject.optString(VISIBILITY_WB);
+            visibility = Conversions.roundDecimal(visibility);
+            weather.setVisibility(visibility);
+
+            //POP
+            pop = mainObject.optString(POP_WB);
+            pop = Conversions.roundDecimal(pop);
+            weather.setPop(pop);
+
+
+            weatherArrayList.add(weather);
+
+        }//for
+        return weatherArrayList;
+    }//parseWeatherBitForecast
 
 }//class

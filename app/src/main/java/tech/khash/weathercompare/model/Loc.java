@@ -66,6 +66,17 @@ public class Loc {
     private static final String UNIT_OW = "&units=";
     private static final String METRIC_OW = "metric";
 
+    //----------------------   Weather Bit   -----------------------------------------------
+    //current
+    private static final String BASE_URL_CURRENT_WB = "http://api.weatherbit.io/v2.0/current?";
+    private static final String LOCATION_WB = "lat=%s&lon=%s";
+    private static final String API_WB = "key=";
+    private static final String API_KEY_WB = "03cd1fbb3bb34f9f9048596b05226e29";
+    private static final String UNITS_WB = "units=";
+    private static final String UNITS_METRIC_WB = "M";
+    //forecast
+    private static final String BASE_URL_FORECAST_WB = "http://api.weatherbit.io/v2.0/forecast/daily?";
+
 
     //Variable
     private LatLng latLng;
@@ -79,12 +90,13 @@ public class Loc {
     private URL currentUrlAW;
     private URL currentUrlOW;
     private URL currentUrlDS;
+    private URL currentUrlWB;
 
     //forecast
     private URL forecastUrlAW;
     private URL forecastUrlOW;
     private URL forecastUrlDS;
-
+    private URL forecastUrlWB;
 
     //constructors
     public Loc() {
@@ -244,6 +256,37 @@ public class Loc {
         }//url null
     }//getForecastUrlOW
 
+    // -----------------------------  WB ----------------
+    public URL getCurrentUrlWB() {
+        if (currentUrlWB != null) {
+            return currentUrlWB;
+        }
+
+        URL url = createCurrentUrlWB(latLng);
+        if (url == null) {
+            Log.d(TAG, "getCurrentUrlDS - URL null......Name: " + name);
+            return null;
+        } else {
+            currentUrlWB = url;
+            return currentUrlWB;
+        }//if-else
+    }//getCurrentUrlWB
+
+    public URL getForecastUrlWB() {
+        if (forecastUrlWB != null) {
+            return forecastUrlWB;
+        }
+
+        URL url = createForecastUrlWB(latLng);
+        if (url == null) {
+            Log.d(TAG, "getForecastUrlDS - URL null......Name: " + name);
+            return null;
+        } else {
+            forecastUrlWB = url;
+            return forecastUrlWB;
+        }//url null
+    }//getForecastUrlWB
+
     /*
         ------------------------ SETTER METHODS -----------------------------------------
      */
@@ -277,6 +320,9 @@ public class Loc {
         if (!hasCurrentUrlDS()) {
             getCurrentUrlDS();
         }
+        if (!hasCurrentUrlWB()) {
+            getCurrentUrlWB();
+        }
 
         //forecast
         if (!hasForecastUrlAW()) {
@@ -287,6 +333,9 @@ public class Loc {
         }
         if (!hasForecastUrlDS()) {
             getForecastUrlDS();
+        }
+        if (!hasForecastUrlWB()) {
+            getForecastUrlWB();
         }
     }//setAllUrls
 
@@ -316,6 +365,10 @@ public class Loc {
         return currentUrlDS != null;
     }//hasCurrentUrlDS
 
+    public boolean hasCurrentUrlWB() {
+        return currentUrlWB != null;
+    }//hasCurrentUrlWB
+
     public boolean hasForecastUrlAW() {
         return forecastUrlAW != null;
     }//hasForecastUrlAW
@@ -327,6 +380,12 @@ public class Loc {
     public boolean hasForecastUrlDS() {
         return forecastUrlDS != null;
     }//hasForecastUrlDS
+
+    public boolean hasForecastUrlWB() {
+        return forecastUrlWB != null;
+    }//hasForecastUrlWB
+
+    // -----------------------------  AW ----------------
 
     /**
      * This creates a URL for getting location code from LatLng - AW
@@ -392,6 +451,8 @@ public class Loc {
         return url;
     }//createForecastUrlAW
 
+    // -----------------------------  OW ----------------
+
     /**
      * This creates the URL for current weather using LatLng - OW
      *
@@ -439,6 +500,8 @@ public class Loc {
         return url;
     }//createForecastUrlOW
 
+    // -----------------------------  DS ----------------
+
     /**
      * This creates the URL for current weather (notice exclude parameters) using LatLng - DS
      *
@@ -456,6 +519,7 @@ public class Loc {
         URL url = null;
         try {
             url = new URL(urlString);
+            Log.d(TAG, "generated current url - DS: " + url.toString());
         } catch (MalformedURLException e) {
 
             Log.e(TAG, "Error creating URL from string", e);
@@ -487,5 +551,56 @@ public class Loc {
         }
         return url;
     }//createForecastUrlOW
+
+    // -----------------------------  WB ----------------
+
+    /**
+     * This creates the URL for current weather (notice exclude parameters) using LatLng - WB
+     *
+     * @param latLng : LatLng
+     * @return : URL
+     */
+    private static URL createCurrentUrlWB(LatLng latLng) {
+        String latLngString = String.format(LOCATION_WB, latLng.latitude, latLng.longitude);
+
+        String urlString = BASE_URL_CURRENT_WB + latLngString + "&" + UNITS_WB + UNITS_METRIC_WB +
+                "&" + API_WB + API_KEY_WB;
+        Log.d(TAG, "Current URL string - WB: " + urlString);
+
+        URL url = null;
+        try {
+            url = new URL(urlString);
+            Log.d(TAG, "generated current url - WB: " + url.toString());
+        } catch (MalformedURLException e) {
+
+            Log.e(TAG, "Error creating URL from string", e);
+        }
+        return url;
+    }//createCurrentUrlWB
+
+    /**
+     * This creates the URL for forecast weather (notice exclude parameters) using LatLng - WB
+     *
+     * @param latLng : LatLng
+     * @return : URL
+     */
+    private static URL createForecastUrlWB(LatLng latLng) {
+        String latLngString = String.format(LOCATION_WB, latLng.latitude, latLng.longitude);
+
+        String urlString = BASE_URL_FORECAST_WB + latLngString + "&" + UNITS_WB + UNITS_METRIC_WB +
+                "&" + API_WB + API_KEY_WB;
+        Log.d(TAG, "Current URL string - WB: " + urlString);
+
+
+        URL url = null;
+        try {
+            url = new URL(urlString);
+            Log.d(TAG, "generated forecast url - WB: " + url.toString());
+        } catch (MalformedURLException e) {
+            Log.e(TAG, "Error creating current weather URL from string", e);
+        }
+        return url;
+
+    }//createForecastUrlWB
 
 }//Loc

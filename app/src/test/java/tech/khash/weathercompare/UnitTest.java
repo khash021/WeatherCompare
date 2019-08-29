@@ -34,19 +34,28 @@ public class UnitTest {
 //        assertEquals(template, result);
 //    }//stringFormat
 
+//    @Test
+//    public void roundFloat() {
+//        float f1 = 25.5f;
+//        float f2 = 23.3f;
+//        float f3 = 23.8f;
+//
+//        int i1 = Math.round(f1);
+//        int i2 = Math.round(f2);
+//        int i3 = Math.round(f3);
+//
+////        assertEquals(26, i1);
+////        assertEquals(23, i2);
+//        assertEquals(24, i3);
+//    }
+
     @Test
-    public void roundFloat() {
-        float f1 = 25.5f;
-        float f2 = 23.3f;
-        float f3 = 23.8f;
-
-        int i1 = Math.round(f1);
-        int i2 = Math.round(f2);
-        int i3 = Math.round(f3);
-
-//        assertEquals(26, i1);
-//        assertEquals(23, i2);
-        assertEquals(24, i3);
+    public void stringFormat() {
+        String lat = "23.6";
+        String lng = "-123.5";
+        String LOCATION_WB = "lat=%s&lon=%s";
+        String latLngString = String.format(LOCATION_WB, lat, lng);
+        assertEquals(latLngString, "lat=23.6&lon=-123.5");
     }
 
 //    @Test

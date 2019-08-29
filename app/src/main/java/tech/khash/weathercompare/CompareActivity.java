@@ -136,6 +136,22 @@ public class CompareActivity extends AppCompatActivity {
             }//onClick
         });//onClickListener
 
+        //Getting Weather Bit
+        Button buttonWeatherBit = findViewById(R.id.button_weather_bit);
+        buttonWeatherBit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (currentLoc != null) {
+                    Intent dsIntent = new Intent(getApplicationContext(), WeatherBitForecastActivity.class);
+                    dsIntent.putExtra(Constant.INTENT_EXTRA_LOC_NAME, currentLoc.getName());
+                    startActivityForResult(dsIntent, FORECAST_REQUEST_CODE);
+                } else {
+                    Log.d(TAG, "Forecast Intent - WB : current loc null");
+                    HelperFunctions.showToast(getApplicationContext(), "current loc null");
+                }
+            }
+        });
+
         getAllWeather();
 
 
@@ -248,6 +264,7 @@ public class CompareActivity extends AppCompatActivity {
         kickOffAccuWeather();
         kickOffDarkSky();
         kickOffOpenWeather();
+        kickOffWeatherBit();
     }//getAllWeather
 
     private void kickOffDarkSky() {
@@ -268,8 +285,8 @@ public class CompareActivity extends AppCompatActivity {
                     NetworkCallsUtils.DarkSkyQueryTask(new NetworkCallsUtils.DarkSkyQueryTask.AsyncResponse() {
                 @Override
                 public void processFinish(Weather output) {
-                    //if it is 2 (meaning all tasks are finished), remove, otherwise increment
-                    if (tracker == 2) {
+                    //if it is 3 (meaning all tasks are finished), remove, otherwise increment
+                    if (tracker == 3) {
                         //remove progress bar and reset the tracker
                         progressBar.setVisibility(View.INVISIBLE);
                         tracker = 0;
@@ -291,6 +308,51 @@ public class CompareActivity extends AppCompatActivity {
             darkSkyQueryTask.execute(currentUrlDS);
         }////if-else URL
     }//kickOffDarkSky
+
+    private void kickOffWeatherBit() {
+        //check for null loc
+        if (currentLoc == null) {
+            Log.d(TAG, "kickOffWeatherBit - currentLoc = null");
+            return;
+        }
+
+        //get the location code
+        URL currentUrlWB = currentLoc.getCurrentUrlWB();
+
+        if (currentUrlWB == null) {
+            Log.d(TAG, "kickOffWeatherBit - currentUrl = null");
+            showWeatherBitError();
+        } else {
+            NetworkCallsUtils.WeatherBitCurrentTask weatherBitCurrentTask = new
+                    NetworkCallsUtils.WeatherBitCurrentTask(new NetworkCallsUtils.WeatherBitCurrentTask.AsyncResponse() {
+                @Override
+                public void processFinish(Weather output) {
+                    //if it is 3 (meaning all tasks are finished), remove, otherwise increment
+                    if (tracker == 3) {
+                        //remove progress bar and reset the tracker
+                        progressBar.setVisibility(View.INVISIBLE);
+                        tracker = 0;
+                    } else {
+                        //this means this is part the group load and just increment
+                        tracker++;
+                    }
+
+                    //if the call fails, it returns null, so check that first
+                    if (output == null) {
+                        Log.v(TAG, "kickOffWeatherBit - processFinish - Weather = null");
+                        showDarkSkyError();
+                    } else {
+                        showWeatherBitResults(output);
+                    }
+
+                }//processFinish
+            });
+            weatherBitCurrentTask.execute(currentUrlWB);
+        }////if-else URL
+
+
+
+    }//kickOffWeatherBit
 
     private void kickOffAccuWeather() {
         //check for null loc
@@ -315,8 +377,8 @@ public class CompareActivity extends AppCompatActivity {
                     NetworkCallsUtils.AccuWeatherCurrentTask(new NetworkCallsUtils.AccuWeatherCurrentTask.AsyncResponse() {
                 @Override
                 public void processFinish(Weather output) {
-                    //if it is 2 (meaning all tasks are finished), remove, otherwise increment
-                    if (tracker == 2) {
+                    //if it is 3 (meaning all tasks are finished), remove, otherwise increment
+                    if (tracker == 3) {
                         //remove progress bar and reset the tracker
                         progressBar.setVisibility(View.INVISIBLE);
                         tracker = 0;
@@ -357,8 +419,8 @@ public class CompareActivity extends AppCompatActivity {
                     NetworkCallsUtils.OpenWeatherCurrentTask(new NetworkCallsUtils.OpenWeatherCurrentTask.AsyncResponse() {
                 @Override
                 public void processFinish(Weather output) {
-                    //if it is 2 (meaning all tasks are finished), remove, otherwise increment
-                    if (tracker == 2) {
+                    //if it is 3 (meaning all tasks are finished), remove, otherwise increment
+                    if (tracker == 3) {
                         //remove progress bar and reset the tracker
                         progressBar.setVisibility(View.INVISIBLE);
                         tracker = 0;
@@ -569,5 +631,65 @@ public class CompareActivity extends AppCompatActivity {
         cloud.setText(empty);
         visibility.setText(empty);
     }//showOpenWeatherError
+
+    private void showWeatherBitResults(Weather weather) {
+
+        //TODO: icons
+        if (weather == null) {
+            showWeatherBitError();
+            return;
+        }
+        //find views
+        TextView summary, temp, dew, press, humidity, wind, gust, cloud, visibility;
+
+        summary = findViewById(R.id.text_summary_wb);
+        temp = findViewById(R.id.text_temp_wb);
+        dew = findViewById(R.id.text_dew_wb);
+        press = findViewById(R.id.text_press_wb);
+        humidity = findViewById(R.id.text_humidity_wb);
+        wind = findViewById(R.id.text_wind_wb);
+        gust = findViewById(R.id.text_gust_wb);
+        cloud = findViewById(R.id.text_cloud_wb);
+        visibility = findViewById(R.id.text_visibility_wb);
+
+        //set values
+        summary.setText(weather.getSummary());
+        temp.setText(weather.getTemperature());
+        dew.setText(weather.getDewPoint());
+        press.setText(weather.getPressure());
+        humidity.setText(weather.getHumidity());
+        wind.setText(weather.getWindSpeed() + " " + weather.getWindDirection());
+        gust.setText(weather.getWindGust());
+        cloud.setText(weather.getCloudCoverage());
+        visibility.setText(weather.getVisibility());
+    }//showWeatherBitResults
+
+    private void showWeatherBitError() {
+
+        TextView summary, temp, dew, press, humidity, wind, gust, cloud, visibility;
+
+        summary = findViewById(R.id.text_summary_wb);
+        temp = findViewById(R.id.text_temp_wb);
+        dew = findViewById(R.id.text_dew_wb);
+        press = findViewById(R.id.text_press_wb);
+        humidity = findViewById(R.id.text_humidity_wb);
+        wind = findViewById(R.id.text_wind_wb);
+        gust = findViewById(R.id.text_gust_wb);
+        cloud = findViewById(R.id.text_cloud_wb);
+        visibility = findViewById(R.id.text_visibility_wb);
+
+        String error = "Error";
+        String empty = "";
+        //set values
+        summary.setText(error);
+        temp.setText(empty);
+        dew.setText(empty);
+        press.setText(empty);
+        humidity.setText(empty);
+        wind.setText(empty);
+        gust.setText(empty);
+        cloud.setText(empty);
+        visibility.setText(empty);
+    }//showWeatherBitError
 
 }//main-class
