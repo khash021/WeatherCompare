@@ -30,6 +30,12 @@ public class Weather {
 
     private Uri iconUri;
 
+    private int provider;
+    public static final int PROVIDER_OW = 1; //Open Weather
+    public static final int PROVIDER_DS = 2; //Dark Sky
+    public static final int PROVIDER_WB = 3; //Weather Bit
+    public static final int PROVIDER_AC = 4; //Accu Weather
+
     //default public constructor
     public Weather() {
     }//Weather
@@ -42,6 +48,10 @@ public class Weather {
     public void setEpoch(long epoch) {
         this.epoch = epoch;
     }//setEpoch
+
+    public void setProvider (int provider) {
+        this.provider = provider;
+    }//setProvider
 
     public void setDate(String date) {
         this.date = date;
@@ -138,6 +148,10 @@ public class Weather {
     public long getEpoch() {
         return epoch;
     }//getEpoch
+
+    public int getProvider() {
+        return provider;
+    }//getProvider
 
     public String getDate() {
         return date;

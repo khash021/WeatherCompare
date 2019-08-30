@@ -189,6 +189,9 @@ public class ParseJSON {
         //create a Weather object
         Weather weather = new Weather();
 
+        //set the provider
+        weather.setProvider(Weather.PROVIDER_OW);
+
         //create an object from the string
         JSONObject forecastJson = new JSONObject(jsonString);
         //get a reference to the main
@@ -324,6 +327,8 @@ public class ParseJSON {
                 //check for dates
                 if (!(epoch > start && epoch < end))
                     continue;
+                //set the provider
+                weather.setProvider(Weather.PROVIDER_OW);
                 weather.setEpoch(epoch);
 
                 JSONObject mainObject = rootObject.optJSONObject(MAIN_OW);
@@ -427,6 +432,9 @@ public class ParseJSON {
 
         //get the first element of the array containing all the current weather data
         JSONObject forecastObject = forecastArray.getJSONObject(0);
+
+        //set the provider
+        weather.setProvider(Weather.PROVIDER_AC);
 
         //summary
         summary = forecastObject.optString(DESCRIPTION_AW);
@@ -544,6 +552,9 @@ public class ParseJSON {
             }
             weather.setDate(date);
 
+            //set the provider
+            weather.setProvider(Weather.PROVIDER_AC);
+
             //temps
             JSONObject tempObject = mainObject.optJSONObject(TEMPERATURE_AW);
 
@@ -610,6 +621,9 @@ public class ParseJSON {
                 cloudCoverage, icon, pop, precipType, visibility;
 
         Weather weather = new Weather();
+
+        //set the provider
+        weather.setProvider(Weather.PROVIDER_DS);
 
         //create the main object
         JSONObject forecastObject = new JSONObject(jsonString);
@@ -695,6 +709,9 @@ public class ParseJSON {
 
         for (int i = 1; i < 4; i++) {
             weather = new Weather();
+            //set the provider
+            weather.setProvider(Weather.PROVIDER_DS);
+
             JSONObject mainObject = dataArray.getJSONObject(i);
 
             //date
@@ -812,6 +829,9 @@ public class ParseJSON {
         //create a Weather object
         Weather weather = new Weather();
 
+        //set the provider
+        weather.setProvider(Weather.PROVIDER_WB);
+
         //create an object from the string
         JSONObject rootObject = new JSONObject(jsonString);
         //get a reference to the data array
@@ -902,6 +922,9 @@ public class ParseJSON {
 
         for (int i = 1; i < 4; i++) {
             weather = new Weather();
+            //set the provider
+            weather.setProvider(Weather.PROVIDER_WB);
+            
             JSONObject mainObject = dataArray.getJSONObject(i);
 
             //date
