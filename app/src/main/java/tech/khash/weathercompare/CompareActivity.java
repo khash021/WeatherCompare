@@ -154,6 +154,9 @@ public class CompareActivity extends AppCompatActivity {
 
         getAllWeather();
 
+        //TODO: testing
+        Log.d(TAG, "URLS:" + currentLoc.getForecastUrlDS());
+
 
     }//onCreate
 

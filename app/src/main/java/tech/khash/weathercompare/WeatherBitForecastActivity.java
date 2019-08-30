@@ -123,7 +123,7 @@ public class WeatherBitForecastActivity extends AppCompatActivity implements
         DividerItemDecoration decoration = new DividerItemDecoration(recyclerView.getContext(),
                 DividerItemDecoration.HORIZONTAL);
         recyclerView.addItemDecoration(decoration);
-    }
+    }//updateAdapter
 
 
     @Override

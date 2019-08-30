@@ -26,6 +26,7 @@ public class ParseJSON {
     //TODO: add rain, sunrise and sunset, icons
     //TODO: clean up go through it
     //TODO: double check all the results to be same unit (C, pressure, percentage, kmh, km, etc)
+    //TODO: add try catch for null pointer for all array stuff
 
     private static final String TAG = ParseJSON.class.getSimpleName();
 
@@ -663,6 +664,7 @@ public class ParseJSON {
         weather.setCloudCoverage(cloudCoverage);
 
         visibility = currentObject.optString(VISIBILITY_DS);
+        visibility = Conversions.roundDecimal(visibility);
         weather.setVisibility(visibility);
 
         icon = currentObject.optString(ICON_DS);
@@ -683,7 +685,8 @@ public class ParseJSON {
         SimpleDateFormat formatter = new SimpleDateFormat("EEE, MMM.dd", Locale.getDefault());
 
         JSONObject rootObject = new JSONObject(jsonString);
-        JSONArray dataArray = rootObject.optJSONArray(DATA_WB);
+        JSONObject dailyObject = rootObject.optJSONObject(DAILY_DS);
+        JSONArray dataArray = dailyObject.optJSONArray(DATA_WB);
 
         /*we want data for the next three days (first object is for today, which we ignore for now
         So we get index 1, 2, and 3
