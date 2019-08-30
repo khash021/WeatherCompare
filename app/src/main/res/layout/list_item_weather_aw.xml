@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="wrap_content"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal">
 
     <TextView
         android:id="@+id/text_day"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
+        android:layout_height="0dp"
+        android:layout_weight="2"
         android:padding="6dp"
         android:textStyle="bold"
         android:textSize="14sp" />
@@ -20,40 +21,40 @@
     <TextView
         android:id="@+id/text_temp_min"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
+        android:layout_height="0dp"
+        android:layout_weight="2"
         android:padding="6dp"
         android:textSize="12sp" />
 
     <TextView
         android:id="@+id/text_temp_max"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
+        android:layout_height="0dp"
+        android:layout_weight="2"
         android:padding="6dp"
         android:textSize="12sp" />
 
     <TextView
         android:id="@+id/text_summary_day"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
+        android:layout_height="0dp"
+        android:layout_weight="3"
         android:padding="6dp"
         android:textSize="12sp" />
 
     <TextView
         android:id="@+id/text_pop_day"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
+        android:layout_height="0dp"
+        android:layout_weight="2"
         android:padding="6dp"
         android:textSize="12sp" />
 
     <TextView
         android:id="@+id/text_cloud_day"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
+        android:layout_height="0dp"
+        android:layout_weight="2"
         android:padding="6dp"
         android:textSize="12sp" />
 
@@ -62,24 +63,24 @@
     <TextView
         android:id="@+id/text_summary_night"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
+        android:layout_height="0dp"
+        android:layout_weight="3"
         android:padding="6dp"
         android:textSize="12sp" />
 
     <TextView
         android:id="@+id/text_pop_night"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
+        android:layout_height="0dp"
+        android:layout_weight="2"
         android:padding="6dp"
         android:textSize="12sp" />
 
     <TextView
         android:id="@+id/text_cloud_night"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
+        android:layout_height="0dp"
+        android:layout_weight="2"
         android:padding="6dp"
         android:textSize="12sp" />
 

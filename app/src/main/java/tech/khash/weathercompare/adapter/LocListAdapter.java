@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -33,11 +34,19 @@ public class LocListAdapter extends RecyclerView.Adapter<LocListAdapter.LocViewH
     //This is our listener implemented as an interface, to be used in the Activity
     private ListItemClickListener itemClickListener;
 
+    //constants for our button clicks
+    public static final int CURRENT_BUTTON = 1;
+    public static final int FORECAST_BUTTON = 2;
+
     /**
      * The interface that receives onClick messages.
+     * //TODO: testing
+     * we pass the index of the list (to find the corresponding Loc object from the list.
+     * We also pass a second int for which button was clicked (1 = current, 2 = forecast, -1 = no
+     * button, just the main item was clicked
      */
     public interface ListItemClickListener {
-        void onListItemClick(int clickedItemIndex);
+        void onListItemClick(int clickedItemIndex, int buttonClick);
     }//ListItemLongClickListener
 
     /**
@@ -102,6 +111,7 @@ public class LocListAdapter extends RecyclerView.Adapter<LocListAdapter.LocViewH
     class LocViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         //our views
         final TextView idTextView, codeTextView;
+        final Button buttonCurrent, buttonForecast;
         final LocListAdapter locListAdapter;
         private Context context;
 
@@ -112,6 +122,11 @@ public class LocListAdapter extends RecyclerView.Adapter<LocListAdapter.LocViewH
             //find view
             idTextView = itemView.findViewById(R.id.list_text_id);
             codeTextView = itemView.findViewById(R.id.list_text_location_code);
+
+            buttonCurrent = itemView.findViewById(R.id.button_current);
+            buttonForecast = itemView.findViewById(R.id.button_forecast);
+            buttonForecast.setOnClickListener(this);
+            buttonCurrent.setOnClickListener(this);
             //adapter
             this.locListAdapter = adapter;
             //for click listener
@@ -120,9 +135,17 @@ public class LocListAdapter extends RecyclerView.Adapter<LocListAdapter.LocViewH
 
         @Override
         public void onClick(View v) {
+            int id = v.getId();
             //get the index of the item
             int position = getLayoutPosition();
-            itemClickListener.onListItemClick(position);
+            //we capture whether the buttons were clicked or not
+            if (id == R.id.button_current) {
+                itemClickListener.onListItemClick(position, CURRENT_BUTTON);
+            } else if (id == R.id.button_forecast) {
+                itemClickListener.onListItemClick(position, FORECAST_BUTTON);
+            } else {
+                itemClickListener.onListItemClick(position, -1);
+            }
         }//onClick
     }//LocViewHolder
 

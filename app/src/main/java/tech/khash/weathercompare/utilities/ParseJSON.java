@@ -924,7 +924,7 @@ public class ParseJSON {
             weather = new Weather();
             //set the provider
             weather.setProvider(Weather.PROVIDER_WB);
-            
+
             JSONObject mainObject = dataArray.getJSONObject(i);
 
             //date

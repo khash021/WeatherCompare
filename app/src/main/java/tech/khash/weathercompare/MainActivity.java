@@ -30,19 +30,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Locale;
 import java.util.Objects;
 
 import tech.khash.weathercompare.adapter.LocListAdapter;
@@ -118,44 +109,6 @@ public class MainActivity extends AppCompatActivity implements
                 openAddLocation();
             }
         });
-
-
-        //TODO: testing
-        String epoch = "1566817200";
-        long epochLong = Long.valueOf(epoch);
-        epochLong *= 1000;//AW gives seconds epoch, we need to convert to milliseconds
-        Date date = new Date(epochLong);
-
-        SimpleDateFormat formatter = new SimpleDateFormat("EEE, MMM.dd", Locale.getDefault());
-        String output = formatter.format(date);
-
-        DateTimeFormatter jodaFormatter = DateTimeFormat.forPattern("EEE, MMM.dd");
-        DateTime dateTime = new DateTime(epochLong);
-        String output2 = jodaFormatter.withLocale(Locale.getDefault()).print(dateTime);
-
-
-        Log.d(TAG, "EPOCH formatted 1: " + output + "\nJoda : " + output2);
-
-        //create calender using default timezone and locale for this moment
-        Calendar calendar = new GregorianCalendar();
-        // reset hour, minutes, seconds and millis
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-
-        //next day
-        calendar.add(Calendar.DAY_OF_MONTH, 1);
-
-        Date tomorrowDate = calendar.getTime();
-        long tomorrowMilli = calendar.getTimeInMillis();
-
-        long dayAfterMilli = tomorrowMilli + (24 * 60 * 60 * 1000);
-        long afterThatMilli = dayAfterMilli + (24 * 60 * 60 * 1000);
-
-        Log.d(TAG, "\n\nTomorrow milli:" + tomorrowMilli + "\nDay After milli: " + dayAfterMilli +
-                "\nAfter that milli: " + afterThatMilli);
-
 
     }//onCreate
 
@@ -362,17 +315,29 @@ public class MainActivity extends AppCompatActivity implements
     }//onNavigationItemSelected
 
     @Override
-    public void onListItemClick(int clickedItemIndex) {
+    public void onListItemClick(int clickedItemIndex, int buttonClick) {
         //get the corresponding fence object
         Loc loc = locArrayList.get(clickedItemIndex);
-//        HelperFunctions.showToast(this, "\"" + loc.getName() + "\"" + " clicked");
 
-        //start compare activity, passing in the loc object
-        Intent compareIntent = new Intent(MainActivity.this, CompareActivity.class);
-        String id = loc.getName();
-        compareIntent.putExtra(Constant.INTENT_EXTRA_LOC_NAME, id);
-        startActivity(compareIntent);
+        //if it is a click on the view, we show the old original current, otherwise we send them to
+        //newer current/forecast classes
+        switch (buttonClick) {
+            case -1:
+                //start compare activity, passing in the loc object
+                Intent compareIntent = new Intent(MainActivity.this, CompareActivity.class);
+                String id = loc.getName();
+                compareIntent.putExtra(Constant.INTENT_EXTRA_LOC_NAME, id);
+                startActivity(compareIntent);
+                break;
+            case LocListAdapter.CURRENT_BUTTON:
+                //TODO:
+                break;
 
+            case LocListAdapter.FORECAST_BUTTON:
+                //TODO:
+                break;
+
+        }//switch
     }//onListItemClick
 
     /*------------------------------------------------------------------------------------------
@@ -551,5 +516,6 @@ public class MainActivity extends AppCompatActivity implements
         AlertDialog dialog = builder.create();
         dialog.show();
     }//showUnsavedChangesDialog
+
 
 }//MainActivity

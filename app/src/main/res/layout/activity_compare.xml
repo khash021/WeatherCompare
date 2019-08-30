@@ -112,7 +112,7 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:padding="6dp"
-                android:text="@string/dark_sky"
+                android:text="@string/accu_weather"
                 android:textSize="12sp"
                 android:textStyle="bold" />
 

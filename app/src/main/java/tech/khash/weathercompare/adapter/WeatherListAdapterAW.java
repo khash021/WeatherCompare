@@ -63,7 +63,7 @@ public class WeatherListAdapterAW extends RecyclerView.Adapter<WeatherListAdapte
         //TODO: testing
         //We want to make all these 4 views to be the same width
         ViewGroup.LayoutParams layoutParams = itemView.getLayoutParams();
-        layoutParams.width = (int) (parent.getWidth() *0.25);
+        layoutParams.width = (int) (parent.getWidth() *0.247);
         itemView.setLayoutParams(layoutParams);
 
         return new WeatherViewHolder(itemView, this);
