@@ -3,6 +3,8 @@ package tech.khash.weathercompare;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -31,6 +33,8 @@ public class OpenWeatherForecastActivity extends AppCompatActivity implements
     private ArrayList<Weather> weatherArrayList;
     private RecyclerView recyclerView;
     private WeatherListAdapterOW adapter;
+    private ProgressBar progressBar;
+
 
 
     @Override
@@ -40,6 +44,8 @@ public class OpenWeatherForecastActivity extends AppCompatActivity implements
 
         TextView textCityName = findViewById(R.id.text_city_name);
         recyclerView = findViewById(R.id.recycler_view);
+
+        progressBar = findViewById(R.id.progress_bar);
 
         //get the loc id from intent extra
         if (getIntent().hasExtra(Constant.INTENT_EXTRA_LOC_NAME)) {
@@ -88,6 +94,8 @@ public class OpenWeatherForecastActivity extends AppCompatActivity implements
                 createWeatherArrayList(jsonResponse);
             }
         });
+        //set the progress bar
+        progressBar.setVisibility(View.VISIBLE);
         forecastTask.execute(forecastUrl);
 
     }//getWeather
@@ -106,6 +114,9 @@ public class OpenWeatherForecastActivity extends AppCompatActivity implements
     }//createWeatherArrayList
 
     private void updateAdapter(ArrayList<Weather> weatherArrayList) {
+        //remove progress bar
+        progressBar.setVisibility(View.GONE);
+        //TODO: add some error message to let the user know something went wrong
         if (weatherArrayList == null || weatherArrayList.size() < 1) {
             Log.d(TAG, "updateAdapter - null or empty");
             return;
