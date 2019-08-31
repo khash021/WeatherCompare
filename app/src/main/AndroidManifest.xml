@@ -76,6 +76,14 @@
                 android:value="tech.khash.weathercompare.MainActivity" />
         </activity>
 
+        <activity
+            android:name=".WeatherUnlockedForecastActivity"
+            android:label="@string/title_weather_unlocked_forecast">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="tech.khash.weathercompare.MainActivity" />
+        </activity>
+
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />

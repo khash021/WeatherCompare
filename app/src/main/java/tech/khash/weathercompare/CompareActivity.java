@@ -87,7 +87,6 @@ public class CompareActivity extends AppCompatActivity {
 
         setClickListeners();
 
-
         getAllWeather();
     }//onCreate
 
@@ -481,9 +480,9 @@ public class CompareActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (currentLoc != null) {
-                    Intent dsIntent = new Intent(getApplicationContext(), WeatherBitForecastActivity.class);
-                    dsIntent.putExtra(Constant.INTENT_EXTRA_LOC_NAME, currentLoc.getName());
-                    startActivityForResult(dsIntent, FORECAST_REQUEST_CODE);
+                    Intent wbIntent = new Intent(getApplicationContext(), WeatherBitForecastActivity.class);
+                    wbIntent.putExtra(Constant.INTENT_EXTRA_LOC_NAME, currentLoc.getName());
+                    startActivityForResult(wbIntent, FORECAST_REQUEST_CODE);
                 } else {
                     Log.d(TAG, "Forecast Intent - WB : current loc null");
                     HelperFunctions.showToast(getApplicationContext(), "current loc null");
@@ -495,7 +494,14 @@ public class CompareActivity extends AppCompatActivity {
         ((TextView) findViewById(R.id.text_title_weather_unlocked)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO:
+                if (currentLoc != null) {
+                    Intent wuIntent = new Intent(getApplicationContext(), WeatherUnlockedForecastActivity.class);
+                    wuIntent.putExtra(Constant.INTENT_EXTRA_LOC_NAME, currentLoc.getName());
+                    startActivityForResult(wuIntent, FORECAST_REQUEST_CODE);
+                } else {
+                    Log.d(TAG, "Forecast Intent - WU : current loc null");
+                    HelperFunctions.showToast(getApplicationContext(), "current loc null");
+                }
             }
         });
     }//setClickListeners

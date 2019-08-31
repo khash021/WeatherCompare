@@ -25,7 +25,11 @@ public class Weather {
             windGust, visibility, cloudCoverage, pop, popType, iconUrl;
 
     //for forecast (AW now)
-    private String date, tempMin, tempMax, summaryDay, popDay, cloudDay, summaryNight, popNight, cloudNight;
+    private String date, tempMin, tempMax, summaryDay, popDay, cloudDay, summaryNight, popNight,
+            cloudNight;
+
+    //for WU
+    private String popTotal;
     private long epoch;
 
     private Uri iconUri;
@@ -109,6 +113,10 @@ public class Weather {
     public void setPop(String pop) {
         this.pop = pop;
     }//setPop
+
+    public void setPopTotal (String popTotal) {
+        this.popTotal = popTotal;
+    }//setPopTotal
 
     public void setPopType(String popType) {
         this.popType = popType;
@@ -248,6 +256,14 @@ public class Weather {
         }
         return pop;
     }//getPop
+
+    public String getPopTotal() {
+        if (popTotal == null) {
+            return "";
+        } else {
+            return popTotal;
+        }
+    }//getPopTotal
 
     public String getPopType() {
         if (popType == null) {

@@ -322,15 +322,15 @@ public class MainActivity extends AppCompatActivity implements
         //if it is a click on the view, we show the old original current, otherwise we send them to
         //newer current/forecast classes
         switch (buttonClick) {
+            //TODO: remove one of them
+            //for now, both are doing the same thing,
             case -1:
+            case LocListAdapter.CURRENT_BUTTON:
                 //start compare activity, passing in the loc object
                 Intent compareIntent = new Intent(MainActivity.this, CompareActivity.class);
                 String id = loc.getName();
                 compareIntent.putExtra(Constant.INTENT_EXTRA_LOC_NAME, id);
                 startActivity(compareIntent);
-                break;
-            case LocListAdapter.CURRENT_BUTTON:
-                //TODO:
                 break;
 
             case LocListAdapter.FORECAST_BUTTON:

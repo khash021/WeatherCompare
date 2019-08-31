@@ -15,7 +15,7 @@ import org.json.JSONException;
 import java.net.URL;
 import java.util.ArrayList;
 
-import tech.khash.weathercompare.adapter.WeatherListAdapterWB;
+import tech.khash.weathercompare.adapter.WeatherListAdapterWU;
 import tech.khash.weathercompare.model.Constant;
 import tech.khash.weathercompare.model.Loc;
 import tech.khash.weathercompare.model.Weather;
@@ -23,15 +23,15 @@ import tech.khash.weathercompare.utilities.NetworkCallsUtils;
 import tech.khash.weathercompare.utilities.ParseJSON;
 import tech.khash.weathercompare.utilities.SaveLoadList;
 
-public class WeatherBitForecastActivity extends AppCompatActivity implements
-        WeatherListAdapterWB.ListItemClickListener {
+public class WeatherUnlockedForecastActivity extends AppCompatActivity implements
+        WeatherListAdapterWU.ListItemClickListener{
 
-    private static final String TAG = WeatherBitForecastActivity.class.getSimpleName();
+    private static final String TAG = WeatherUnlockedForecastActivity.class.getSimpleName();
 
     private Loc currentLoc;
     private ArrayList<Weather> weatherArrayList;
     private RecyclerView recyclerView;
-    private WeatherListAdapterWB adapter;
+    private WeatherListAdapterWU adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,25 +68,23 @@ public class WeatherBitForecastActivity extends AppCompatActivity implements
             return;
         }
 
-        URL forecastUrl = currentLoc.getForecastUrlWB();
+        URL forecastUrl = currentLoc.getForecastUrlWU();
         if (forecastUrl == null) {
             Log.d(TAG, "getWeather - forecastUrl = null");
             return;
         }
 
         //get the response
-        NetworkCallsUtils.WeatherBitForecastTask forecastTask = new
-                NetworkCallsUtils.WeatherBitForecastTask(new NetworkCallsUtils.WeatherBitForecastTask.AsyncResponse() {
+        NetworkCallsUtils.WeatherUnlockedForecastTask forecastTask = new
+                NetworkCallsUtils.WeatherUnlockedForecastTask(new NetworkCallsUtils.WeatherUnlockedForecastTask.AsyncResponse() {
             @Override
             public void processFinish(String jsonResponse) {
                 if (TextUtils.isEmpty(jsonResponse)) {
                     Log.d(TAG, "getWeather - processFinish callback - response : null/empty");
                     return;
                 }
-
                 //send the data to be parsed
                 createWeatherArrayList(jsonResponse);
-
             }
         });
         forecastTask.execute(forecastUrl);
@@ -97,7 +95,7 @@ public class WeatherBitForecastActivity extends AppCompatActivity implements
     private void createWeatherArrayList (String jsonResponse) {
         weatherArrayList = new ArrayList<>();
         try {
-            weatherArrayList = ParseJSON.parseWeatherBitForecast(jsonResponse);
+            weatherArrayList = ParseJSON.parseWeatherUnlockedForecast(jsonResponse);
             Log.d(TAG, "createWeatherArrayList - size: " + weatherArrayList.size());
             //start the adapter
             updateAdapter(weatherArrayList);
@@ -114,7 +112,7 @@ public class WeatherBitForecastActivity extends AppCompatActivity implements
         // Get a handle to the RecyclerView.
         recyclerView = findViewById(R.id.recycler_view);
         // Create an adapter and supply the data to be displayed.
-        adapter = new WeatherListAdapterWB(this, weatherArrayList, this);
+        adapter = new WeatherListAdapterWU(this, weatherArrayList, this);
         // Connect the adapter with the RecyclerView.
         recyclerView.setAdapter(adapter);
         // Give the RecyclerView a horizontal layout manager.
@@ -125,10 +123,7 @@ public class WeatherBitForecastActivity extends AppCompatActivity implements
         recyclerView.addItemDecoration(decoration);
     }//updateAdapter
 
-
     @Override
     public void onListItemClick(int clickedItemIndex) {
     }//onListItemClick
-
-
-}//WeatherBitForecastActivity
+}//WeatherUnlockedForecastActivity

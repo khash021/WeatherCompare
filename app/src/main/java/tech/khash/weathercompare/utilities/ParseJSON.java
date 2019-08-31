@@ -7,6 +7,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -1018,10 +1019,6 @@ public class ParseJSON {
 
 
 
-
-
-
-
     /**
      * This method is for parsing the current weather from Weather Unlocked
      *
@@ -1091,5 +1088,99 @@ public class ParseJSON {
 
         return weather;
     }//parseWeatherUnlockedCurrent
+
+    private static final String DAYS_WU = "Days";
+    private static final String DATE_WU = "date";
+    private static final String TEMP_MIN_WU = "temp_min_c";
+    private static final String TEMP_MAX_WU = "temp_max_c";
+    private static final String POP_WU = "prob_precip_pct";
+    private static final String PRECIP_TOTAL_WU = "precip_total_mm";
+    private static final String WIND_WU = "windspd_max_kmh";
+    private static final String GUST_WU = "windgst_max_kmh";
+    private static final String HUMIDITY_MAX_WU = "humid_max_pct";
+    private static final String HUMIDITY_MIN_WU = "humid_min_pct";
+
+    public static ArrayList<Weather> parseWeatherUnlockedForecast(String jsonString) throws JSONException {
+        if (TextUtils.isEmpty(jsonString)) {
+            return null;
+        }
+
+        String date, tempMin, tempMax, humidity, windSpeed, windGust, pop, popTotal;
+        ArrayList<Weather> weatherArrayList = new ArrayList<>();
+        Weather weather;
+        //for formatting date
+        SimpleDateFormat formatter = new SimpleDateFormat("EEE, MMM.dd", Locale.getDefault());
+
+        JSONObject rootObject = new JSONObject(jsonString);
+        JSONArray dataArray = rootObject.optJSONArray(DAYS_WU);
+
+        /*we want data for the next three days (first object is for today, which we ignore for now
+        So we get index 1, 2, and 3
+         */
+
+
+        for (int i = 1; i < 4; i++) {
+            weather = new Weather();
+            //set the provider
+            weather.setProvider(Weather.PROVIDER_WU);
+
+            JSONObject mainObject = dataArray.getJSONObject(i);
+
+            date = mainObject.optString(DATE_WU);
+
+            /*WU does not provide epoch, so we need to create a date (for 0100 hrs) using the string
+            and then we make a formatted date to be consistent with other.
+             */
+            SimpleDateFormat f = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            try {
+                Date d = f.parse(date);
+                long epoch = d.getTime();
+                weather.setEpoch(epoch);
+                date = formatter.format(epoch);
+                weather.setDate(date);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            //temps
+            tempMin = mainObject.optString(TEMP_MIN_WU);
+            tempMin = Conversions.roundDecimal(tempMin);
+
+            tempMax = mainObject.optString(TEMP_MAX_WU);
+            tempMax = Conversions.roundDecimal(tempMax);
+            weather.setTempMin(tempMin);
+            weather.setTempMax(tempMax);
+
+            //humidity
+            double humidityMin = mainObject.optDouble(HUMIDITY_MIN_WU);
+            double humidityMax = mainObject.optDouble(HUMIDITY_MAX_WU);
+            double humidityDouble = (humidityMin + humidityMax)/ 2;
+            humidity = Conversions.roundDecimal(String.valueOf(humidityDouble));
+            weather.setHumidity(humidity);
+
+            //wind speed
+            windSpeed = mainObject.optString(WIND_WU);
+            windSpeed = Conversions.roundDecimal(windSpeed);
+            weather.setWindSpeed(windSpeed);
+
+            //wind gust
+            windGust = mainObject.optString(GUST_WU);
+            windGust = Conversions.roundDecimal(windGust);
+            weather.setWindGust(windGust);
+
+            //POP
+            pop = mainObject.optString(POP_WU);
+            pop = Conversions.roundDecimal(pop);
+            weather.setPop(pop);
+
+            popTotal = mainObject.optString(PRECIP_TOTAL_WU);
+            popTotal = Conversions.roundDecimal(popTotal);
+            weather.setPopTotal(popTotal);
+
+            weatherArrayList.add(weather);
+
+        }//for
+        return weatherArrayList;
+    }//parseWeatherUnlockedForecast
 
 }//class

@@ -70,7 +70,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/text_title_weather_bit"
+                    android:id="@+id/text_title_accu"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -79,9 +79,10 @@
                     android:text="@string/accu_weather"
                     android:textSize="12sp"
                     android:textStyle="bold" />
+                text_title_accu
 
                 <TextView
-                    android:id="@+id/text_title_accu"
+                    android:id="@+id/text_title_weather_bit"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"

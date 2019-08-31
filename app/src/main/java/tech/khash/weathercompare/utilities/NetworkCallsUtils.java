@@ -577,7 +577,7 @@ public class NetworkCallsUtils {
      */
     public static class WeatherUnlockedCurrentTask extends AsyncTask<URL, Void, String> {
 
-        private final String TAG = WeatherBitCurrentTask.class.getSimpleName();
+        private final String TAG = WeatherUnlockedCurrentTask.class.getSimpleName();
 
         public interface AsyncResponse {
             void processFinish(Weather output);
@@ -621,5 +621,48 @@ public class NetworkCallsUtils {
             }//try-catch
         }//onPostExecute
     }//WeatherBitCurrentTask
+
+    /**
+     * Gets the WU forecast response from web.
+     * It does not parse data here, it is done in the parent activity
+     */
+    public static class WeatherUnlockedForecastTask extends AsyncTask<URL, Void, String> {
+
+        private final String TAG = WeatherUnlockedForecastTask.class.getSimpleName();
+
+        public interface AsyncResponse {
+            void processFinish(String jsonResponse);
+        }
+
+        private AsyncResponse delegate = null;
+
+        public WeatherUnlockedForecastTask(AsyncResponse deletegate) {
+            this.delegate = deletegate;
+        }
+
+        @Override
+        protected String doInBackground(URL... urls) {
+            //Make the request
+            try {
+                //get the response using the class, passing in our url
+                String httpResponse = NetworkCallsUtils.getResponseFromHttpUrlWithHeader(urls[0]);
+                Log.d(TAG, "WeatherUnlockedForecastTask - JSON response: " + httpResponse);
+                return httpResponse;
+            } catch (IOException e) {
+                Log.e(TAG, "Error establishing connection - WeatherUnlockedForecastTask ", e);
+                return null;
+            }
+        }//doInBackground
+
+        @Override
+        protected void onPostExecute(String s) {
+            if (TextUtils.isEmpty(s)) {
+                Log.e(TAG, "WeatherUnlockedForecastTask - postExecute - response = null");
+                return;
+            }
+            Log.d(TAG, "WeatherUnlockedForecastTask response : " + s);
+            delegate.processFinish(s);
+        }//onPostExecute
+    }//WeatherUnlockedForecastTask
 
 }//NetworkCallsUtils - class
