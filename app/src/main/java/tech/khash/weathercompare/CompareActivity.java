@@ -8,7 +8,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -86,79 +85,13 @@ public class CompareActivity extends AppCompatActivity {
 
         locArrayList = SaveLoadList.loadLocList(this);
 
-        //Getting Open Weather
-        Button buttonOpenWeather = findViewById(R.id.button_open_weather);
-        buttonOpenWeather.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //TODO: testing
-//                getForecastOW(currentLoc);
-                if (currentLoc != null) {
-                    Intent owIntent = new Intent(getApplicationContext(), OpenWeatherForecastActivity.class);
-                    owIntent.putExtra(Constant.INTENT_EXTRA_LOC_NAME, currentLoc.getName());
-                    startActivityForResult(owIntent, FORECAST_REQUEST_CODE);
-                } else {
-                    Log.d(TAG, "Forecast Intent - OW : current loc null");
-                    HelperFunctions.showToast(getApplicationContext(), "current loc null");
-                }
-            }//onClick
-        });//onClickListener
+        setClickListeners();
 
-        //Getting Accu Weather
-        Button buttonAccuWeather = findViewById(R.id.button_accu_weather);
-        buttonAccuWeather.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (currentLoc != null) {
-                    Intent awIntent = new Intent(getApplicationContext(), AccuWeatherForecastActivity.class);
-                    awIntent.putExtra(Constant.INTENT_EXTRA_LOC_NAME, currentLoc.getName());
-                    startActivityForResult(awIntent, FORECAST_REQUEST_CODE);
-                } else {
-                    Log.d(TAG, "Forecast Intent - AW : current loc null");
-                    HelperFunctions.showToast(getApplicationContext(), "current loc null");
-                }
-            }//onClick
-        });//onClickListener
-
-        //Getting Dark Sky
-        Button buttonDarkSky = findViewById(R.id.button_dark_sky);
-        buttonDarkSky.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (currentLoc != null) {
-                    Intent dsIntent = new Intent(getApplicationContext(), DarkSkyForecastActivity.class);
-                    dsIntent.putExtra(Constant.INTENT_EXTRA_LOC_NAME, currentLoc.getName());
-                    startActivityForResult(dsIntent, FORECAST_REQUEST_CODE);
-                } else {
-                    Log.d(TAG, "Forecast Intent - DS : current loc null");
-                    HelperFunctions.showToast(getApplicationContext(), "current loc null");
-                }
-            }//onClick
-        });//onClickListener
-
-        //Getting Weather Bit
-        Button buttonWeatherBit = findViewById(R.id.button_weather_bit);
-        buttonWeatherBit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (currentLoc != null) {
-                    Intent dsIntent = new Intent(getApplicationContext(), WeatherBitForecastActivity.class);
-                    dsIntent.putExtra(Constant.INTENT_EXTRA_LOC_NAME, currentLoc.getName());
-                    startActivityForResult(dsIntent, FORECAST_REQUEST_CODE);
-                } else {
-                    Log.d(TAG, "Forecast Intent - WB : current loc null");
-                    HelperFunctions.showToast(getApplicationContext(), "current loc null");
-                }
-            }
-        });
 
         getAllWeather();
-
-        //TODO: testing
-        Log.d(TAG, "URLS:" + currentLoc.getForecastUrlDS());
-
-
     }//onCreate
+
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -268,6 +201,7 @@ public class CompareActivity extends AppCompatActivity {
         kickOffDarkSky();
         kickOffOpenWeather();
         kickOffWeatherBit();
+        kickOffWeatherUnlocked();
     }//getAllWeather
 
     private void kickOffDarkSky() {
@@ -289,7 +223,7 @@ public class CompareActivity extends AppCompatActivity {
                 @Override
                 public void processFinish(Weather output) {
                     //if it is 3 (meaning all tasks are finished), remove, otherwise increment
-                    if (tracker == 3) {
+                    if (tracker == 4) {
                         //remove progress bar and reset the tracker
                         progressBar.setVisibility(View.INVISIBLE);
                         tracker = 0;
@@ -331,7 +265,7 @@ public class CompareActivity extends AppCompatActivity {
                 @Override
                 public void processFinish(Weather output) {
                     //if it is 3 (meaning all tasks are finished), remove, otherwise increment
-                    if (tracker == 3) {
+                    if (tracker == 4) {
                         //remove progress bar and reset the tracker
                         progressBar.setVisibility(View.INVISIBLE);
                         tracker = 0;
@@ -381,7 +315,7 @@ public class CompareActivity extends AppCompatActivity {
                 @Override
                 public void processFinish(Weather output) {
                     //if it is 3 (meaning all tasks are finished), remove, otherwise increment
-                    if (tracker == 3) {
+                    if (tracker == 4) {
                         //remove progress bar and reset the tracker
                         progressBar.setVisibility(View.INVISIBLE);
                         tracker = 0;
@@ -423,7 +357,7 @@ public class CompareActivity extends AppCompatActivity {
                 @Override
                 public void processFinish(Weather output) {
                     //if it is 3 (meaning all tasks are finished), remove, otherwise increment
-                    if (tracker == 3) {
+                    if (tracker == 4) {
                         //remove progress bar and reset the tracker
                         progressBar.setVisibility(View.INVISIBLE);
                         tracker = 0;
@@ -445,11 +379,126 @@ public class CompareActivity extends AppCompatActivity {
         }//if-else URL null
     }//kickOffOpenWeather
 
+    private void kickOffWeatherUnlocked() {
+        //check for null loc
+        if (currentLoc == null) {
+            Log.d(TAG, "kickOffWeatherUnlocked - currentLoc = null");
+            return;
+        }
+
+        //get the location code
+        URL currentUrlWU = currentLoc.getCurrentUrlWU();
+
+        if (currentUrlWU == null) {
+            Log.d(TAG, "kickOffWeatherUnlocked - currentUrl = null");
+            showWeatherUnlockedError();
+        } else {
+            NetworkCallsUtils.WeatherUnlockedCurrentTask weatherUnlockedCurrentTask = new
+                    NetworkCallsUtils.WeatherUnlockedCurrentTask(new NetworkCallsUtils.WeatherUnlockedCurrentTask.AsyncResponse() {
+                @Override
+                public void processFinish(Weather output) {
+                    //if it is 3 (meaning all tasks are finished), remove, otherwise increment
+                    if (tracker == 4) {
+                        //remove progress bar and reset the tracker
+                        progressBar.setVisibility(View.INVISIBLE);
+                        tracker = 0;
+                    } else {
+                        //this means this is part the group load and just increment
+                        tracker++;
+                    }
+
+                    //if the call fails, it returns null, so check that first
+                    if (output == null) {
+                        Log.v(TAG, "kickOffWeatherUnlocked - processFinish - Weather = null");
+                        showWeatherUnlockedError();
+                    } else {
+                        showWeatherUnlockedResults(output);
+                    }
+                }
+            });
+            weatherUnlockedCurrentTask.execute(currentUrlWU);
+        }//if-else URL null
+    }//kickOffWeatherUnlocked
+
 
     /*------------------------------------------------------------------------------------------
                     ---------------    HELPER METHODS    ---------------
                     ---------------       UPDATE UI      ---------------
     ------------------------------------------------------------------------------------------*/
+
+    /**
+     * Set all the click listeners for opening the forecast
+     */
+    private void setClickListeners() {
+        //set the click listeners for the title views
+        //OW
+        ((TextView) findViewById(R.id.text_title_open_weather)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (currentLoc != null) {
+                    Intent owIntent = new Intent(getApplicationContext(), OpenWeatherForecastActivity.class);
+                    owIntent.putExtra(Constant.INTENT_EXTRA_LOC_NAME, currentLoc.getName());
+                    startActivityForResult(owIntent, FORECAST_REQUEST_CODE);
+                } else {
+                    Log.d(TAG, "Forecast Intent - OW : current loc null");
+                    HelperFunctions.showToast(getApplicationContext(), "current loc null");
+                }
+            }
+        });
+
+        //AW
+        ((TextView) findViewById(R.id.text_title_accu)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (currentLoc != null) {
+                    Intent awIntent = new Intent(getApplicationContext(), AccuWeatherForecastActivity.class);
+                    awIntent.putExtra(Constant.INTENT_EXTRA_LOC_NAME, currentLoc.getName());
+                    startActivityForResult(awIntent, FORECAST_REQUEST_CODE);
+                } else {
+                    Log.d(TAG, "Forecast Intent - AW : current loc null");
+                    HelperFunctions.showToast(getApplicationContext(), "current loc null");
+                }
+            }
+        });
+
+        //DS
+        ((TextView) findViewById(R.id.text_title_dark_sky)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (currentLoc != null) {
+                    Intent dsIntent = new Intent(getApplicationContext(), DarkSkyForecastActivity.class);
+                    dsIntent.putExtra(Constant.INTENT_EXTRA_LOC_NAME, currentLoc.getName());
+                    startActivityForResult(dsIntent, FORECAST_REQUEST_CODE);
+                } else {
+                    Log.d(TAG, "Forecast Intent - DS : current loc null");
+                    HelperFunctions.showToast(getApplicationContext(), "current loc null");
+                }
+            }
+        });
+
+        //WB
+        ((TextView) findViewById(R.id.text_title_weather_bit)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (currentLoc != null) {
+                    Intent dsIntent = new Intent(getApplicationContext(), WeatherBitForecastActivity.class);
+                    dsIntent.putExtra(Constant.INTENT_EXTRA_LOC_NAME, currentLoc.getName());
+                    startActivityForResult(dsIntent, FORECAST_REQUEST_CODE);
+                } else {
+                    Log.d(TAG, "Forecast Intent - WB : current loc null");
+                    HelperFunctions.showToast(getApplicationContext(), "current loc null");
+                }
+            }
+        });
+
+        //WU
+        ((TextView) findViewById(R.id.text_title_weather_unlocked)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //TODO:
+            }
+        });
+    }//setClickListeners
 
 
     /**
@@ -680,6 +729,66 @@ public class CompareActivity extends AppCompatActivity {
         gust = findViewById(R.id.text_gust_wb);
         cloud = findViewById(R.id.text_cloud_wb);
         visibility = findViewById(R.id.text_visibility_wb);
+
+        String error = "Error";
+        String empty = "";
+        //set values
+        summary.setText(error);
+        temp.setText(empty);
+        dew.setText(empty);
+        press.setText(empty);
+        humidity.setText(empty);
+        wind.setText(empty);
+        gust.setText(empty);
+        cloud.setText(empty);
+        visibility.setText(empty);
+    }//showWeatherBitError
+
+    private void showWeatherUnlockedResults(Weather weather) {
+
+        //TODO: icons
+        if (weather == null) {
+            showWeatherUnlockedError();
+            return;
+        }
+        //find views
+        TextView summary, temp, dew, press, humidity, wind, gust, cloud, visibility;
+
+        summary = findViewById(R.id.text_summary_wu);
+        temp = findViewById(R.id.text_temp_wu);
+        dew = findViewById(R.id.text_dew_wu);
+        press = findViewById(R.id.text_press_wu);
+        humidity = findViewById(R.id.text_humidity_wu);
+        wind = findViewById(R.id.text_wind_wu);
+        gust = findViewById(R.id.text_gust_wu);
+        cloud = findViewById(R.id.text_cloud_wu);
+        visibility = findViewById(R.id.text_visibility_wu);
+
+        //set values
+        summary.setText(weather.getSummary());
+        temp.setText(weather.getTemperature());
+        dew.setText(weather.getDewPoint());
+        press.setText(weather.getPressure());
+        humidity.setText(weather.getHumidity());
+        wind.setText(weather.getWindSpeed() + " " + weather.getWindDirection());
+        gust.setText(weather.getWindGust());
+        cloud.setText(weather.getCloudCoverage());
+        visibility.setText(weather.getVisibility());
+    }//showWeatherBitResults
+
+    private void showWeatherUnlockedError() {
+
+        TextView summary, temp, dew, press, humidity, wind, gust, cloud, visibility;
+
+        summary = findViewById(R.id.text_summary_wu);
+        temp = findViewById(R.id.text_temp_wu);
+        dew = findViewById(R.id.text_dew_wu);
+        press = findViewById(R.id.text_press_wu);
+        humidity = findViewById(R.id.text_humidity_wu);
+        wind = findViewById(R.id.text_wind_wu);
+        gust = findViewById(R.id.text_gust_wu);
+        cloud = findViewById(R.id.text_cloud_wu);
+        visibility = findViewById(R.id.text_visibility_wu);
 
         String error = "Error";
         String empty = "";

@@ -77,6 +77,17 @@ public class Loc {
     //forecast
     private static final String BASE_URL_FORECAST_WB = "http://api.weatherbit.io/v2.0/forecast/daily?";
 
+    //----------------------   Weather Unlocked   -----------------------------------------------
+    //current
+    private static final String BASE_URL_CURRENT_WU = "http://api.weatherunlocked.com/api/current/";
+    private static final String LOCATION_WU = "%s,%s";
+    private static final String APP_ID_WU = "app_id=";
+    private static final String APP_ID_VALUE_WU = "7240fadc";
+    private static final String APP_KEY_WB = "app_key=";
+    private static final String APP_KEY_VALUE_WB = "ab1ded5ea4b842eee12289be9361d2da";
+    //forecast
+    private static final String BASE_URL_FORECAST_WU = "http://api.weatherunlocked.com/api/forecast/";
+
 
     //Variable
     private LatLng latLng;
@@ -91,12 +102,14 @@ public class Loc {
     private URL currentUrlOW;
     private URL currentUrlDS;
     private URL currentUrlWB;
+    private URL currentUrlWU;
 
     //forecast
     private URL forecastUrlAW;
     private URL forecastUrlOW;
     private URL forecastUrlDS;
     private URL forecastUrlWB;
+    private URL forecastUrlWU;
 
     //constructors
     public Loc() {
@@ -287,6 +300,37 @@ public class Loc {
         }//url null
     }//getForecastUrlWB
 
+    // -----------------------------  WU ----------------
+    public URL getCurrentUrlWU() {
+        if (currentUrlWU != null) {
+            return currentUrlWU;
+        }
+
+        URL url = createCurrentUrlWU(latLng);
+        if (url == null) {
+            Log.d(TAG, "getCurrentUrlWU - URL null......Name: " + name);
+            return null;
+        } else {
+            currentUrlWU = url;
+            return currentUrlWU;
+        }//if-else
+    }//getCurrentUrlWU
+
+    public URL getForecastUrlWU() {
+        if (forecastUrlWU != null) {
+            return forecastUrlWU;
+        }
+
+        URL url = createForecastUrlWU(latLng);
+        if (url == null) {
+            Log.d(TAG, "getForecastUrlWU - URL null......Name: " + name);
+            return null;
+        } else {
+            forecastUrlWU = url;
+            return forecastUrlWU;
+        }//url null
+    }//getForecastUrlWU
+
     /*
         ------------------------ SETTER METHODS -----------------------------------------
      */
@@ -323,6 +367,9 @@ public class Loc {
         if (!hasCurrentUrlWB()) {
             getCurrentUrlWB();
         }
+        if(!hasCurrentUrlWU()) {
+            getCurrentUrlWU();
+        }
 
         //forecast
         if (!hasForecastUrlAW()) {
@@ -336,6 +383,9 @@ public class Loc {
         }
         if (!hasForecastUrlWB()) {
             getForecastUrlWB();
+        }
+        if (!hasForecastUrlWU()) {
+            getForecastUrlWU();
         }
     }//setAllUrls
 
@@ -384,6 +434,14 @@ public class Loc {
     public boolean hasForecastUrlWB() {
         return forecastUrlWB != null;
     }//hasForecastUrlWB
+
+    public boolean hasCurrentUrlWU() {
+        return currentUrlWU != null;
+    }//hasCurrentUrlWU
+
+    public boolean hasForecastUrlWU() {
+        return forecastUrlWU != null;
+    }//hasForecastUrlWU
 
     // -----------------------------  AW ----------------
 
@@ -596,6 +654,57 @@ public class Loc {
         try {
             url = new URL(urlString);
             Log.d(TAG, "generated forecast url - WB: " + url.toString());
+        } catch (MalformedURLException e) {
+            Log.e(TAG, "Error creating current weather URL from string", e);
+        }
+        return url;
+
+    }//createForecastUrlWB
+
+    // -----------------------------  WU ----------------
+
+    /**
+     * This creates the URL for current weather (notice exclude parameters) using LatLng - WU
+     *
+     * @param latLng : LatLng
+     * @return : URL
+     */
+    private static URL createCurrentUrlWU(LatLng latLng) {
+        String latLngString = String.format(LOCATION_WU, latLng.latitude, latLng.longitude);
+
+        String urlString = BASE_URL_CURRENT_WU + latLngString + "?" + APP_ID_WU + APP_ID_VALUE_WU +
+                "&" + APP_KEY_WB + APP_KEY_VALUE_WB;
+        Log.d(TAG, "Current URL string - WU: " + urlString);
+
+        URL url = null;
+        try {
+            url = new URL(urlString);
+            Log.d(TAG, "generated current url - WU: " + url.toString());
+        } catch (MalformedURLException e) {
+
+            Log.e(TAG, "Error creating URL from string", e);
+        }
+        return url;
+    }//createCurrentUrlWB
+
+    /**
+     * This creates the URL for forecast weather (notice exclude parameters) using LatLng - WU
+     *
+     * @param latLng : LatLng
+     * @return : URL
+     */
+    private static URL createForecastUrlWU(LatLng latLng) {
+        String latLngString = String.format(LOCATION_WU, latLng.latitude, latLng.longitude);
+
+        String urlString = BASE_URL_FORECAST_WU + latLngString + "?" + APP_ID_WU + APP_ID_VALUE_WU +
+                "&" + APP_KEY_WB + APP_KEY_VALUE_WB;
+        Log.d(TAG, "Current URL string - WU: " + urlString);
+
+
+        URL url = null;
+        try {
+            url = new URL(urlString);
+            Log.d(TAG, "generated forecast url - WU: " + url.toString());
         } catch (MalformedURLException e) {
             Log.e(TAG, "Error creating current weather URL from string", e);
         }

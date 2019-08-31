@@ -516,6 +516,4 @@ public class MainActivity extends AppCompatActivity implements
         AlertDialog dialog = builder.create();
         dialog.show();
     }//showUnsavedChangesDialog
-
-
 }//MainActivity

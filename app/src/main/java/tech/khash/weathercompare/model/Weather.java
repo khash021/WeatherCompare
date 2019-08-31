@@ -35,6 +35,7 @@ public class Weather {
     public static final int PROVIDER_DS = 2; //Dark Sky
     public static final int PROVIDER_WB = 3; //Weather Bit
     public static final int PROVIDER_AC = 4; //Accu Weather
+    public static final int PROVIDER_WU = 5; //Weather Unlocked
 
     //default public constructor
     public Weather() {

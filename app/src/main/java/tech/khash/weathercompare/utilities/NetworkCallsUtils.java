@@ -65,6 +65,47 @@ public class NetworkCallsUtils {
     }//getResponseFromHttpUrl
 
     /**
+     * This method returns the entire result from the HTTP response with specified header
+     * (Used for Weather Unlocked)
+     *
+     * @param url The URL to fetch the HTTP response from.
+     * @return The contents of the HTTP response.
+     * @throws IOException Related to network and stream reading
+     */
+    private static String getResponseFromHttpUrlWithHeader(URL url) throws IOException {
+        //establish the connection
+        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+        //set the header for JSON
+        urlConnection.setRequestProperty("Accept", "application/json");
+        try {
+            //start reading the input
+            InputStream in = urlConnection.getInputStream();
+
+            //pass the inputstream to the scanner
+            Scanner scanner = new Scanner(in);
+
+            //Delimiter \A means next token, read until the next token (refer to GitHub page in the bookmarks of InputStream/Scanner)
+            scanner.useDelimiter("\\A");
+
+            boolean hasInput = scanner.hasNext();
+            if (hasInput) {
+                return scanner.next();
+            } else {
+                //close scanner
+                scanner.close();
+                return null;
+            }
+        } catch (Exception e) {
+            //Log error
+            Log.e(TAG, "Error getting http response", e);
+            return null;
+        } finally {
+            //finally close the url connection
+            urlConnection.disconnect();
+        }
+    }//getResponseFromHttpUrl
+
+    /**
      * In all of these AsyncTasks, we create an interface called AsyncResponse which has the
      * function processFinishe which has an input parameter of String. This is our result (i.e.
      * JSON response).
@@ -525,5 +566,60 @@ public class NetworkCallsUtils {
             delegate.processFinish(s);
         }//onPostExecute
     }//WeatherBitForecastTask
+
+    /*
+        ----------------------------- WU --------------------------------------
+     */
+
+    /**
+     * Gets the WU current response from web.
+     * It does not parse data here, it is done in the parent activity
+     */
+    public static class WeatherUnlockedCurrentTask extends AsyncTask<URL, Void, String> {
+
+        private final String TAG = WeatherBitCurrentTask.class.getSimpleName();
+
+        public interface AsyncResponse {
+            void processFinish(Weather output);
+        }
+
+        private AsyncResponse delegate = null;
+
+        public WeatherUnlockedCurrentTask(AsyncResponse deletegate) {
+            this.delegate = deletegate;
+        }
+
+        @Override
+        protected String doInBackground(URL... urls) {
+            //Make the request
+            try {
+                //get the response using the class, passing in our url
+                String httpResponse = NetworkCallsUtils.getResponseFromHttpUrlWithHeader(urls[0]);
+                Log.d(TAG, "WeatherUnlockedCurrentTask - JSON response: " + httpResponse);
+                return httpResponse;
+            } catch (IOException e) {
+                Log.e(TAG, "Error establishing connection - WeatherUnlockedCurrentTask ", e);
+                return null;
+            }
+        }//doInBackground
+
+        @Override
+        protected void onPostExecute(String s) {
+            if (TextUtils.isEmpty(s)) {
+                Log.e(TAG, "WeatherUnlockedCurrentTask - postExecute - response = null");
+            }
+            //parse response and get the code
+            Weather current = null;
+
+            try {
+                current = ParseJSON.parseWeatherUnlockedCurrent(s);
+                //pass data to interface
+                delegate.processFinish(current);
+            } catch (JSONException e) {
+                Log.e(TAG, "WeatherUnlockedCurrentTask - postExecute - error parsing response");
+                delegate.processFinish(null);
+            }//try-catch
+        }//onPostExecute
+    }//WeatherBitCurrentTask
 
 }//NetworkCallsUtils - class
