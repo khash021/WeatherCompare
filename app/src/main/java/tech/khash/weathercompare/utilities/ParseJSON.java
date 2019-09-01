@@ -763,8 +763,8 @@ public class ParseJSON {
             weather.setDewPoint(dewPoint);
 
             //humidity
-            humidity = mainObject.optString(HUMIDITY_DS);
-            humidity = Conversions.roundDecimal(humidity);
+            double humidDouble = mainObject.optDouble(HUMIDITY_DS);
+            humidity = Conversions.decimalToPercentage(humidDouble);
             weather.setHumidity(humidity);
 
             //pressure

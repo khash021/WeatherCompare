@@ -9,6 +9,7 @@
     <string name="title_open_weather_forecast">Open Weather Forecast</string>
     <string name="title_weather_bit_forecast">Weather Bit Forecast</string>
     <string name="title_weather_unlocked_forecast">Weather Unlocked Forecast</string>
+    <string name="title_activity_forecast">Forecast</string>
 
     <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyAHyUo4VnllUXatwyKVvfEjMjhwsEDf5zE</string>
 

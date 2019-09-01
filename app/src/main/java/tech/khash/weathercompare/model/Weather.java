@@ -40,6 +40,13 @@ public class Weather {
     public static final int PROVIDER_WB = 3; //Weather Bit
     public static final int PROVIDER_AC = 4; //Accu Weather
     public static final int PROVIDER_WU = 5; //Weather Unlocked
+    //TODO: for testing now, think of a better way for future (it just takes too much space right now)
+    private static final String OPEN_WEATHER = "O-Weather";
+    private static final String DARK_SKY = "DarkSky";
+    private static final String WEATHER_BIT = "W-Bit";
+    private static final String ACCU_WEATHER = "A-Weather";
+    private static final String WEATHER_UNLOCKED = "W-Unlocked";
+
 
     //default public constructor
     public Weather() {
@@ -54,7 +61,7 @@ public class Weather {
         this.epoch = epoch;
     }//setEpoch
 
-    public void setProvider (int provider) {
+    public void setProvider(int provider) {
         this.provider = provider;
     }//setProvider
 
@@ -114,7 +121,7 @@ public class Weather {
         this.pop = pop;
     }//setPop
 
-    public void setPopTotal (String popTotal) {
+    public void setPopTotal(String popTotal) {
         this.popTotal = popTotal;
     }//setPopTotal
 
@@ -161,6 +168,23 @@ public class Weather {
     public int getProvider() {
         return provider;
     }//getProvider
+
+    public String getProviderString() {
+        switch (provider) {
+            case PROVIDER_OW:
+                return OPEN_WEATHER;
+            case PROVIDER_DS:
+                return DARK_SKY;
+            case PROVIDER_WB:
+                return WEATHER_BIT;
+            case PROVIDER_AC:
+                return ACCU_WEATHER;
+            case PROVIDER_WU:
+                return WEATHER_UNLOCKED;
+            default:
+                return "";
+        }//switch
+    }//getProviderString
 
     public String getDate() {
         return date;

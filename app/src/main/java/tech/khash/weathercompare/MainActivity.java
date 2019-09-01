@@ -318,6 +318,7 @@ public class MainActivity extends AppCompatActivity implements
     public void onListItemClick(int clickedItemIndex, int buttonClick) {
         //get the corresponding fence object
         Loc loc = locArrayList.get(clickedItemIndex);
+        String id = loc.getName();
 
         //if it is a click on the view, we show the old original current, otherwise we send them to
         //newer current/forecast classes
@@ -328,13 +329,14 @@ public class MainActivity extends AppCompatActivity implements
             case LocListAdapter.CURRENT_BUTTON:
                 //start compare activity, passing in the loc object
                 Intent compareIntent = new Intent(MainActivity.this, CompareActivity.class);
-                String id = loc.getName();
                 compareIntent.putExtra(Constant.INTENT_EXTRA_LOC_NAME, id);
                 startActivity(compareIntent);
                 break;
 
             case LocListAdapter.FORECAST_BUTTON:
-                //TODO:
+                Intent forecastIntent = new Intent(MainActivity.this, ForecastActivity.class);
+                forecastIntent.putExtra(Constant.INTENT_EXTRA_LOC_NAME, id);
+                startActivity(forecastIntent);
                 break;
 
         }//switch
