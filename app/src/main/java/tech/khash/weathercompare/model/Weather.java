@@ -21,7 +21,7 @@ public class Weather {
 
     //TODO: make the variables match the return type from API (float, etc) and then convert on returning
 
-    private String summary, temperature, humidity, dewPoint, pressure, windSpeed, windDirection,
+    private String summary, temperature, tempFeel, humidity, dewPoint, pressure, windSpeed, windDirection,
             windGust, visibility, cloudCoverage, pop, popType, iconUrl;
 
     //for forecast (AW now)
@@ -76,6 +76,10 @@ public class Weather {
     public void setTemperature(String temperature) {
         this.temperature = temperature;
     }//setTemperature
+
+    public void setTempFeel(String tempFeel) {
+        this.tempFeel = tempFeel;
+    }//setTempFeel
 
     public void setTempMin(String tempMin) {
         this.tempMin = tempMin;
@@ -203,6 +207,14 @@ public class Weather {
         }
         return temperature;
     }//getTemperature
+
+    public String getTempFeel() {
+        if (tempFeel == null) {
+            return "";
+        } else {
+            return tempFeel;
+        }
+    }//getTempFeel
 
     public String getTempMax() {
         if (tempMax == null) {

@@ -518,10 +518,11 @@ public class CompareActivity extends AppCompatActivity {
             return;
         }
         //find views
-        TextView summary, temp, dew, press, humidity, wind, gust, cloud, visibility;
+        TextView summary, temp,feelLike, dew, press, humidity, wind, gust, cloud, visibility;
 
         summary = findViewById(R.id.text_summary_open_weather);
         temp = findViewById(R.id.text_temp_open_weather);
+        feelLike = findViewById(R.id.text_temp_feel_open_weather);
         dew = findViewById(R.id.text_dew_open_weather);
         press = findViewById(R.id.text_press_open_weather);
         humidity = findViewById(R.id.text_humidity_open_weather);
@@ -533,6 +534,7 @@ public class CompareActivity extends AppCompatActivity {
         //set values
         summary.setText(weather.getSummary());
         temp.setText(weather.getTemperature());
+        feelLike.setText(weather.getTempFeel());
         dew.setText(weather.getDewPoint());
         press.setText(weather.getPressure());
         humidity.setText(weather.getHumidity());
@@ -544,10 +546,11 @@ public class CompareActivity extends AppCompatActivity {
 
     private void showOpenWeatherError() {
 
-        TextView summary, temp, dew, press, humidity, wind, gust, cloud, visibility;
+        TextView summary, temp,feelLike, dew, press, humidity, wind, gust, cloud, visibility;
 
         summary = findViewById(R.id.text_summary_open_weather);
         temp = findViewById(R.id.text_temp_open_weather);
+        feelLike = findViewById(R.id.text_temp_feel_open_weather);
         dew = findViewById(R.id.text_dew_open_weather);
         press = findViewById(R.id.text_press_open_weather);
         humidity = findViewById(R.id.text_humidity_open_weather);
@@ -561,6 +564,7 @@ public class CompareActivity extends AppCompatActivity {
         //set values
         summary.setText(error);
         temp.setText(empty);
+        feelLike.setText(empty);
         dew.setText(empty);
         press.setText(empty);
         humidity.setText(empty);
@@ -578,10 +582,11 @@ public class CompareActivity extends AppCompatActivity {
             return;
         }
         //find views
-        TextView summary, temp, dew, press, humidity, wind, gust, cloud, visibility;
+        TextView summary, temp, feelLike, dew, press, humidity, wind, gust, cloud, visibility;
 
         summary = findViewById(R.id.text_summary_dark_sky);
         temp = findViewById(R.id.text_temp_dark_sky);
+        feelLike = findViewById(R.id.text_temp_feel_dark_sky);
         dew = findViewById(R.id.text_dew_dark_sky);
         press = findViewById(R.id.text_press_dark_sky);
         humidity = findViewById(R.id.text_humidity_dark_sky);
@@ -594,6 +599,7 @@ public class CompareActivity extends AppCompatActivity {
         summary.setText(weather.getSummary());
         temp.setText(weather.getTemperature());
         dew.setText(weather.getDewPoint());
+        feelLike.setText(weather.getTempFeel());
         press.setText(weather.getPressure());
         humidity.setText(weather.getHumidity());
         wind.setText(weather.getWindSpeed() + " " + weather.getWindDirection());
@@ -604,10 +610,11 @@ public class CompareActivity extends AppCompatActivity {
 
     private void showDarkSkyError() {
 
-        TextView summary, temp, dew, press, humidity, wind, gust, cloud, visibility;
+        TextView summary, temp, feelLike, dew, press, humidity, wind, gust, cloud, visibility;
 
         summary = findViewById(R.id.text_summary_dark_sky);
         temp = findViewById(R.id.text_temp_dark_sky);
+        feelLike = findViewById(R.id.text_temp_feel_dark_sky);
         dew = findViewById(R.id.text_dew_dark_sky);
         press = findViewById(R.id.text_press_dark_sky);
         humidity = findViewById(R.id.text_humidity_dark_sky);
@@ -621,6 +628,7 @@ public class CompareActivity extends AppCompatActivity {
         //set values
         summary.setText(error);
         temp.setText(empty);
+        feelLike.setText(empty);
         dew.setText(empty);
         press.setText(empty);
         humidity.setText(empty);
@@ -638,10 +646,11 @@ public class CompareActivity extends AppCompatActivity {
             return;
         }
         //find views
-        TextView summary, temp, dew, press, humidity, wind, gust, cloud, visibility;
+        TextView summary, temp, feelLike, dew, press, humidity, wind, gust, cloud, visibility;
 
         summary = findViewById(R.id.text_summary_accu);
         temp = findViewById(R.id.text_temp_accu);
+        feelLike = findViewById(R.id.text_temp_feel_accu);
         dew = findViewById(R.id.text_dew_accu);
         press = findViewById(R.id.text_press_accu);
         humidity = findViewById(R.id.text_humidity_accu);
@@ -653,6 +662,7 @@ public class CompareActivity extends AppCompatActivity {
         //set values
         summary.setText(weather.getSummary());
         temp.setText(weather.getTemperature());
+        feelLike.setText(weather.getTempFeel());
         dew.setText(weather.getDewPoint());
         press.setText(weather.getPressure());
         humidity.setText(weather.getHumidity());
@@ -664,10 +674,11 @@ public class CompareActivity extends AppCompatActivity {
 
     private void showAccuWeatherError() {
 
-        TextView summary, temp, dew, press, humidity, wind, gust, cloud, visibility;
+        TextView summary, temp, feelLike, dew, press, humidity, wind, gust, cloud, visibility;
 
         summary = findViewById(R.id.text_summary_accu);
         temp = findViewById(R.id.text_temp_accu);
+        feelLike = findViewById(R.id.text_temp_feel_accu);
         dew = findViewById(R.id.text_dew_accu);
         press = findViewById(R.id.text_press_accu);
         humidity = findViewById(R.id.text_humidity_accu);
@@ -681,6 +692,7 @@ public class CompareActivity extends AppCompatActivity {
         //set values
         summary.setText(error);
         temp.setText(empty);
+        feelLike.setText(empty);
         dew.setText(empty);
         press.setText(empty);
         humidity.setText(empty);
@@ -698,10 +710,11 @@ public class CompareActivity extends AppCompatActivity {
             return;
         }
         //find views
-        TextView summary, temp, dew, press, humidity, wind, gust, cloud, visibility;
+        TextView summary, temp, feelLike, dew, press, humidity, wind, gust, cloud, visibility;
 
         summary = findViewById(R.id.text_summary_wb);
         temp = findViewById(R.id.text_temp_wb);
+        feelLike = findViewById(R.id.text_temp_feel_wb);
         dew = findViewById(R.id.text_dew_wb);
         press = findViewById(R.id.text_press_wb);
         humidity = findViewById(R.id.text_humidity_wb);
@@ -713,6 +726,7 @@ public class CompareActivity extends AppCompatActivity {
         //set values
         summary.setText(weather.getSummary());
         temp.setText(weather.getTemperature());
+        feelLike.setText(weather.getTempFeel());
         dew.setText(weather.getDewPoint());
         press.setText(weather.getPressure());
         humidity.setText(weather.getHumidity());
@@ -724,10 +738,11 @@ public class CompareActivity extends AppCompatActivity {
 
     private void showWeatherBitError() {
 
-        TextView summary, temp, dew, press, humidity, wind, gust, cloud, visibility;
+        TextView summary, temp, feelLike, dew, press, humidity, wind, gust, cloud, visibility;
 
         summary = findViewById(R.id.text_summary_wb);
         temp = findViewById(R.id.text_temp_wb);
+        feelLike = findViewById(R.id.text_temp_feel_wb);
         dew = findViewById(R.id.text_dew_wb);
         press = findViewById(R.id.text_press_wb);
         humidity = findViewById(R.id.text_humidity_wb);
@@ -741,6 +756,7 @@ public class CompareActivity extends AppCompatActivity {
         //set values
         summary.setText(error);
         temp.setText(empty);
+        feelLike.setText(empty);
         dew.setText(empty);
         press.setText(empty);
         humidity.setText(empty);
@@ -758,10 +774,11 @@ public class CompareActivity extends AppCompatActivity {
             return;
         }
         //find views
-        TextView summary, temp, dew, press, humidity, wind, gust, cloud, visibility;
+        TextView summary, temp, feelLike, dew, press, humidity, wind, gust, cloud, visibility;
 
         summary = findViewById(R.id.text_summary_wu);
         temp = findViewById(R.id.text_temp_wu);
+        feelLike = findViewById(R.id.text_temp_feel_wu);
         dew = findViewById(R.id.text_dew_wu);
         press = findViewById(R.id.text_press_wu);
         humidity = findViewById(R.id.text_humidity_wu);
@@ -773,6 +790,7 @@ public class CompareActivity extends AppCompatActivity {
         //set values
         summary.setText(weather.getSummary());
         temp.setText(weather.getTemperature());
+        feelLike.setText(weather.getTempFeel());
         dew.setText(weather.getDewPoint());
         press.setText(weather.getPressure());
         humidity.setText(weather.getHumidity());
@@ -784,10 +802,11 @@ public class CompareActivity extends AppCompatActivity {
 
     private void showWeatherUnlockedError() {
 
-        TextView summary, temp, dew, press, humidity, wind, gust, cloud, visibility;
+        TextView summary, temp, feelLike, dew, press, humidity, wind, gust, cloud, visibility;
 
         summary = findViewById(R.id.text_summary_wu);
         temp = findViewById(R.id.text_temp_wu);
+        feelLike = findViewById(R.id.text_temp_feel_wu);
         dew = findViewById(R.id.text_dew_wu);
         press = findViewById(R.id.text_press_wu);
         humidity = findViewById(R.id.text_humidity_wu);
@@ -801,6 +820,7 @@ public class CompareActivity extends AppCompatActivity {
         //set values
         summary.setText(error);
         temp.setText(empty);
+        feelLike.setText(empty);
         dew.setText(empty);
         press.setText(empty);
         humidity.setText(empty);

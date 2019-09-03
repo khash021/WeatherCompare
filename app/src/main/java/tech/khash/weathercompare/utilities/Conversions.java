@@ -21,10 +21,10 @@ public class Conversions {
     private final static String TAG = Conversions.class.getSimpleName();
 
     /**
-     *  This converts the input string to float, and then if there are any decimal poiints
-     *  it rounds it up or down, and return the result in String again
+     * This converts the input string to float, and then if there are any decimal poiints
+     * it rounds it up or down, and return the result in String again
      */
-    public static String roundDecimal(String s) {
+    public static String roundDecimalString(String s) {
         if (!s.contains(".")) {
             return s;
         }
@@ -32,7 +32,7 @@ public class Conversions {
         int rounded = Math.round(f);
         String output = String.valueOf(rounded);
         return output;
-    }//roundDecimal
+    }//roundDecimalString
 
     public static String decimalToPercentage(double dec) {
         double perc = dec * 100;
@@ -54,11 +54,60 @@ public class Conversions {
         return output;
     }//removeDecimal
 
+    public static String roundDecimalDouble (double d) {
+        d = Math.round(d);
+        return roundDecimalString(String.valueOf(d));
+    }//roundDecimalDouble
+
+    /**
+     * This method calculates the feel like temp, either by Heat Index, or Wind chill factor
+     * depending on the temperature.
+     *
+     * For now, we calculate Heat Index for values above 20 Cel, and Wind Chill for below 10 Cel
+     * @param T : ambient temp in Cel
+     * @param H : relative humidity in %
+     * @param V : wind speed in kmh
+     * @return
+     */
+    public static double calculateFeelsLikeTemp(double T, double H, double V) {
+        //figure out whether we need Heat index, or windchill based on temp
+        if (T <= 10d) {
+            //we do wind chill
+            return windChillCel(T, V);
+        } else if (T >= 20d) {
+            //we do heat index
+            return heatIndexCel(T, H);
+        }
+        //otherwise we just return the same since there is no point
+        return T;
+    }//calculateFeelsLikeTemp
+
+    /**
+     * This methods calculates dew point. All in Cel
+     * @param T : given ambient temperature in Cel
+     * @param H : given relative humidity in % (0-100)
+     * @return : calculated dew point in Cel
+     */
+    public static double calculateDewPointCel (double T, double H) {
+        //change humidity to decimal
+        H = H/100d;
+
+        //constants
+        double c1 = 112d;
+        double c2 = 0.9d;
+        double c3 = 0.1d;
+        double c4 = -112d;
+
+        double dewCel = (Math.pow(H, (1/8d))) * (c1 + (c2 * T)) + (c3 * T) + c4;
+
+        return dewCel;
+    }//calculateDewPointCel
+
     /*
        -------------------------  Unit conversions ---------------------------------------
      */
 
-    public static String meterToKmh(double meter) {
+    public static String meterToKmhString(double meter) {
         Log.d(TAG, "m/s is: " + meter);
         double kmh = meter * 3.6;
         //TODO: use locale
@@ -66,19 +115,19 @@ public class Conversions {
         return output;
     }//meterToKmh
 
-    public static String farToCel(double far) {
+    public static String farToCelString(double far) {
         double cel = (far - 32) * 5 / 9;
         String output = String.format("%.0f", cel);
         return output;
     }//farToCel
 
-    public static String mileToKm(double mile) {
+    public static String mileToKmString(double mile) {
         double km = mile * 1.60934;
         String output = String.format("%.0f", km);
         return output;
     }//mileToKm
 
-    public static String getDayEpoch(long epoch) {
+    public static String getDayEpochString(long epoch) {
         DateTime dateTime = new DateTime(epoch);
         String day = dateTime.dayOfWeek().getAsText(Locale.getDefault());
         return day;
@@ -122,5 +171,61 @@ public class Conversions {
             return "NNW";
         }
     }//degreeToDirection
+
+    public static double celToFarDouble(double cel) {
+        return (cel * (9d / 5d)) + 32d;
+    }//celToFar
+
+    public static double farToCelDouble(double far) {
+        return (far - 32d) * (5d / 9d);
+    }//farToCelDouble
+
+    /**
+     * This method calculates the Heat index in Cel
+     * @param T : given ambient temperature in Cel
+     * @param H : given relative humidity in % (0-100)
+     * @return : calculated heat index in cel
+     */
+    public static double heatIndexCel(double T, double H) {
+
+        //our constants
+        double c1 = -8.78469475556d;
+        double c2 = 1.61139411d;
+        double c3 = 2.33854883889d;
+        double c4 = -0.14611605d;
+        double c5 = -0.012308094d;
+        double c6 = -0.0164248277778d;
+        double c7 = 0.002211732d;
+        double c8 = 0.00072546d;
+        double c9 = -0.000003582d;
+
+        //calculate heat index
+        double hi = c1 + (c2 * T) + (c3 * H) + (c4 * T * H) + (c5 * Math.pow(T, 2d)) +
+                (c6 * Math.pow(H, 2d)) + (c7 * Math.pow(T, 2d) * H) + (c8 * T * Math.pow(H, 2d)) +
+                (c9 * Math.pow(T, 2d) * Math.pow(H, 2d));
+
+        return hi;
+    }//calculateHeatIndexCel
+
+    /**
+     * This method calculates the windchill feel temperature in Cel
+     * @param T : given ambient temperature in Cel
+     * @param V : given wind speed (at 10 meters) in kmh
+     * @return : calculated windchill feel temperature in Cel
+     */
+    public static double windChillCel(double T, double V) {
+        double calculatedWindChillCel;
+
+        //constants
+        double c1 = 13.12d;
+        double c2 = 0.6215d;
+        double c3 = -11.37d;
+        double c4 = 0.3965d;
+
+        calculatedWindChillCel = c1 + (c2 * T) + (c3 * Math.pow(V, 0.16d)) +
+                (c4 * T * Math.pow(V, 0.16d));
+
+        return calculatedWindChillCel;
+    }//calculateWindChillCel
 
 }//class

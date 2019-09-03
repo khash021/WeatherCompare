@@ -61,6 +61,7 @@ public class ParseJSON {
      */
     private static final String DESCRIPTION_AW = "WeatherText";
     private static final String TEMPERATURE_AW = "Temperature";
+    private static final String FEEL_LIKE_AW = "RealFeelTemperature";
     private static final String METRIC_AW = "Metric";
     private static final String METRIC_VALUE_AW = "Value";
     private static final String HUMIDITY_AW = "RelativeHumidity";
@@ -75,6 +76,7 @@ public class ParseJSON {
     private static final String PRESSURE_AW = "Pressure";
     private static final String LOCATION_KEY_AW = "Key";
     private static final String ICON_AW = "WeatherIcon";
+
 
     //forecast AW
     private static final String DAILY_FORECASTS_AW = "DailyForecasts";
@@ -98,6 +100,7 @@ public class ParseJSON {
     private static final String SUMMARY_DS = "summary";
     private static final String ICON_DS = "icon";
     private static final String TEMPERATURE_DS = "temperature";
+    private static final String FEEL_LIKE_DS = "apparentTemperature";
     private static final String DEW_POINT_DS = "dewPoint";
     private static final String HUMIDITY_DS = "humidity";
     private static final String PRESSURE_DS = "pressure";
@@ -122,6 +125,7 @@ public class ParseJSON {
 
     private static final String DATA_WB = "data";
     private static final String TEMP_WB = "temp";
+    private static final String FEEL_LIKE_WB = "app_temp";
     private static final String WEATHER_WB = "weather";
     private static final String DESCRIPTION_WB = "description";
     private static final String ICON_WB = "icon";
@@ -143,6 +147,7 @@ public class ParseJSON {
 
     private static final String SUMMARY_WU = "wx_desc";
     private static final String TEMP_WU = "temp_c";
+    private static final String FEEL_LIKE_WU = "feelslike_c";
     private static final String DEW_WU = "dewpoint_c";
     private static final String HUMIDITY_WU = "humid_pct";
     private static final String WIND_SPEED_WU = "windspd_kmh";
@@ -198,7 +203,8 @@ public class ParseJSON {
             return null;
         }//if
 
-        String summary, temp, pressure, humidity, windSpeed, windDirection, cloudCoverage, icon;
+        String summary, temp, feelLike, dewPoint, pressure, humidity, windSpeed, windDirection,
+                cloudCoverage, icon;
 
         //create a Weather object
         Weather weather = new Weather();
@@ -207,40 +213,43 @@ public class ParseJSON {
         weather.setProvider(Weather.PROVIDER_OW);
 
         //create an object from the string
-        JSONObject forecastJson = new JSONObject(jsonString);
+        JSONObject currentObject = new JSONObject(jsonString);
         //get a reference to the main
-        JSONObject mainObject = forecastJson.getJSONObject(MAIN_OW);
+        JSONObject mainObject = currentObject.getJSONObject(MAIN_OW);
 
         //weather description
-        JSONArray weatherArray = forecastJson.getJSONArray(WEATHER_OW);
+        JSONArray weatherArray = currentObject.getJSONArray(WEATHER_OW);
         JSONObject weatherObject = weatherArray.getJSONObject(0);
         summary = weatherObject.optString(WEATHER_MAIN_OW);
         weather.setSummary(summary);
 
         //temp
         temp = mainObject.optString(TEMP_OW);
+        double T = mainObject.optDouble(TEMP_OW);
         //round if it contains a decimal point
-        temp = Conversions.roundDecimal(temp);
+        temp = Conversions.roundDecimalString(temp);
 
         weather.setTemperature(temp);
 
         //pressure
         pressure = mainObject.optString(PRESSURE_OW);
 
-        pressure = Conversions.roundDecimal(pressure);
+        pressure = Conversions.roundDecimalString(pressure);
 
         weather.setPressure(pressure);
 
         //humidity
         humidity = mainObject.getString(HUMIDITY_OW);
+        double H = mainObject.optDouble(HUMIDITY_OW);
         weather.setHumidity(humidity);
 
         //get a reference to the wind
-        JSONObject windObject = forecastJson.getJSONObject(WIND_OW);
+        JSONObject windObject = currentObject.getJSONObject(WIND_OW);
 
         //wind
         windSpeed = windObject.optString(WIND_SPEED_OW);
-        windSpeed = Conversions.roundDecimal(windSpeed);
+        double V = windObject.optDouble(WIND_SPEED_OW);
+        windSpeed = Conversions.roundDecimalString(windSpeed);
         weather.setWindSpeed(windSpeed);
 
         double windDirectionDouble = windObject.optDouble(WIND_DIRECTION_OW);
@@ -248,10 +257,19 @@ public class ParseJSON {
         weather.setWindDirection(windDirection);
 
         //cloud cover
-        JSONObject cloudObject = forecastJson.getJSONObject(CLOUD_OW);
+        JSONObject cloudObject = currentObject.getJSONObject(CLOUD_OW);
         cloudCoverage = cloudObject.optString(CLOUDS_ALL_OW);
-        cloudCoverage = Conversions.roundDecimal(cloudCoverage);
+        cloudCoverage = Conversions.roundDecimalString(cloudCoverage);
         weather.setCloudCoverage(cloudCoverage);
+
+        //Feel like temp and dew point
+        double feel = Conversions.calculateFeelsLikeTemp(T, H, V);
+        feelLike = Conversions.roundDecimalDouble(feel);
+        weather.setTempFeel(feelLike);
+
+        double dew = Conversions.calculateDewPointCel(T, H);
+        dewPoint = Conversions.roundDecimalDouble(dew);
+        weather.setDewPoint(dewPoint);
 
         //icon
         icon = weatherObject.optString(ICON_OW);
@@ -435,56 +453,62 @@ public class ParseJSON {
 
         //the response is in both imperial and metric, we extract the metric
 
-        String summary, temp, dewPoint, pressure, humidity, windSpeed, windDirection, windGust,
-                visibility, cloudCoverage, icon;
+        String summary, temp, feelLike, dewPoint, pressure, humidity, windSpeed, windDirection,
+                windGust, visibility, cloudCoverage, icon;
 
         //create a Weather object
         Weather weather = new Weather();
 
         //create the main array
-        JSONArray forecastArray = new JSONArray(jsonString);
+        JSONArray currentArray = new JSONArray(jsonString);
 
         //get the first element of the array containing all the current weather data
-        JSONObject forecastObject = forecastArray.getJSONObject(0);
+        JSONObject currentObject = currentArray.getJSONObject(0);
 
         //set the provider
         weather.setProvider(Weather.PROVIDER_AC);
 
         //summary
-        summary = forecastObject.optString(DESCRIPTION_AW);
+        summary = currentObject.optString(DESCRIPTION_AW);
         weather.setSummary(summary);
 
         //temp
-        JSONObject tempObject = forecastObject.getJSONObject(TEMPERATURE_AW);
+        JSONObject tempObject = currentObject.getJSONObject(TEMPERATURE_AW);
         JSONObject tempMetricObject = tempObject.getJSONObject(METRIC_AW);
         temp = tempMetricObject.optString(METRIC_VALUE_AW);
-        temp = Conversions.roundDecimal(temp);
+        temp = Conversions.roundDecimalString(temp);
         weather.setTemperature(temp);
 
+        JSONObject fellLikeObject = currentObject.getJSONObject(FEEL_LIKE_AW);
+        JSONObject fellLikeMetricObject = fellLikeObject.getJSONObject(METRIC_AW);
+        feelLike = fellLikeMetricObject.optString(METRIC_VALUE_AW);
+        feelLike = Conversions.roundDecimalString(feelLike);
+        weather.setTempFeel(feelLike);
+
         //dew point
-        JSONObject dewObject = forecastObject.getJSONObject(DEW_POINT_AW);
+        JSONObject dewObject = currentObject.getJSONObject(DEW_POINT_AW);
         JSONObject metricDewObject = dewObject.getJSONObject(METRIC_AW);
         dewPoint = metricDewObject.optString(METRIC_VALUE_AW);
-        dewPoint = Conversions.roundDecimal(dewPoint);
+        dewPoint = Conversions.roundDecimalString(dewPoint);
         weather.setDewPoint(dewPoint);
 
         //pressure
-        JSONObject pressObject = forecastObject.getJSONObject(PRESSURE_AW);
+        JSONObject pressObject = currentObject.getJSONObject(PRESSURE_AW);
         JSONObject pressMetricObject = pressObject.getJSONObject(METRIC_AW);
         pressure = pressMetricObject.optString(METRIC_VALUE_AW);
-        pressure = Conversions.roundDecimal(pressure);
+        pressure = Conversions.roundDecimalString(pressure);
         weather.setPressure(pressure);
 
         //humidity
-        humidity = forecastObject.optString(HUMIDITY_AW);
+        humidity = currentObject.optString(HUMIDITY_AW);
         weather.setHumidity(humidity);
 
         //wind
-        JSONObject windObject = forecastObject.getJSONObject(WIND_AW);
+        JSONObject windObject = currentObject.getJSONObject(WIND_AW);
         JSONObject windSpeedObject = windObject.getJSONObject(SPEED_AW);
         JSONObject windSpeedMetricObject = windSpeedObject.getJSONObject(METRIC_AW);
         windSpeed = windSpeedMetricObject.optString(METRIC_VALUE_AW);
-        windSpeed = Conversions.roundDecimal(windSpeed);
+        windSpeed = Conversions.roundDecimalString(windSpeed);
         weather.setWindSpeed(windSpeed);
 
         JSONObject windDirectionObject = windObject.getJSONObject(DIRECTION_AW);
@@ -492,26 +516,26 @@ public class ParseJSON {
         weather.setWindDirection(windDirection);
 
         //windGust
-        JSONObject gustObject = forecastObject.getJSONObject(WIND_GUST_AW);
+        JSONObject gustObject = currentObject.getJSONObject(WIND_GUST_AW);
         JSONObject gustSpeedObject = gustObject.getJSONObject(SPEED_AW);
         JSONObject gustSpeedMetricObject = gustSpeedObject.getJSONObject(METRIC_AW);
         windGust = gustSpeedMetricObject.optString(METRIC_VALUE_AW);
-        windGust = Conversions.roundDecimal(windGust);
+        windGust = Conversions.roundDecimalString(windGust);
         weather.setWindGust(windGust);
 
         //visibility
-        JSONObject visibilityObject = forecastObject.getJSONObject(VISIBILITY_AW);
+        JSONObject visibilityObject = currentObject.getJSONObject(VISIBILITY_AW);
         JSONObject visibilityMetricObject = visibilityObject.getJSONObject(METRIC_AW);
         visibility = visibilityMetricObject.optString(METRIC_VALUE_AW);
-        visibility = Conversions.roundDecimal(visibility);
+        visibility = Conversions.roundDecimalString(visibility);
         weather.setVisibility(visibility);
 
-        cloudCoverage = forecastObject.optString(CLOUD_COVER_AW);
+        cloudCoverage = currentObject.optString(CLOUD_COVER_AW);
         weather.setCloudCoverage(cloudCoverage);
 
 
         //icon
-        int iconId = forecastObject.optInt(ICON_AW);
+        int iconId = currentObject.optInt(ICON_AW);
         if (iconId < 10) {
             icon = "0" + iconId;
         } else {
@@ -574,12 +598,12 @@ public class ParseJSON {
 
             JSONObject minObject = tempObject.optJSONObject(FORECAST_MIN_AW);
             tempMin = minObject.optString(METRIC_VALUE_AW);
-            tempMin = Conversions.roundDecimal(tempMin);
+            tempMin = Conversions.roundDecimalString(tempMin);
             weather.setTempMin(tempMin);
 
             JSONObject manObject = tempObject.optJSONObject(FORECAST_MAX_AW);
             tempMax = manObject.optString(METRIC_VALUE_AW);
-            tempMax = Conversions.roundDecimal(tempMax);
+            tempMax = Conversions.roundDecimalString(tempMax);
             weather.setTempMax(tempMax);
 
             //day
@@ -631,7 +655,7 @@ public class ParseJSON {
             return null;
         }//if
 
-        String summary, temp, pressure, dewPoint, humidity, windSpeed, windGust, windDirection,
+        String summary, temp, feelLike, pressure, dewPoint, humidity, windSpeed, windGust, windDirection,
                 cloudCoverage, icon, pop, precipType, visibility;
 
         Weather weather = new Weather();
@@ -660,11 +684,15 @@ public class ParseJSON {
 
 
         temp = currentObject.optString(TEMPERATURE_DS);
-        temp = Conversions.roundDecimal(temp);
+        temp = Conversions.roundDecimalString(temp);
         weather.setTemperature(temp);
 
+        feelLike = currentObject.optString(FEEL_LIKE_DS);
+        feelLike = Conversions.roundDecimalString(feelLike);
+        weather.setTempFeel(feelLike);
+
         dewPoint = currentObject.optString(DEW_POINT_DS);
-        dewPoint = Conversions.roundDecimal(dewPoint);
+        dewPoint = Conversions.roundDecimalString(dewPoint);
         weather.setDewPoint(dewPoint);
 
         double humidDouble = currentObject.optDouble(HUMIDITY_DS);
@@ -672,15 +700,15 @@ public class ParseJSON {
         weather.setHumidity(humidity);
 
         pressure = currentObject.optString(PRESSURE_DS);
-        pressure = Conversions.roundDecimal(pressure);
+        pressure = Conversions.roundDecimalString(pressure);
         weather.setPressure(pressure);
 
         windSpeed = currentObject.optString(WIND_SPEED_DS);
-        windSpeed = Conversions.roundDecimal(windSpeed);
+        windSpeed = Conversions.roundDecimalString(windSpeed);
         weather.setWindSpeed(windSpeed);
 
         windGust = currentObject.optString(WIND_GUST_DS);
-        windGust = Conversions.roundDecimal(windGust);
+        windGust = Conversions.roundDecimalString(windGust);
         weather.setWindGust(windGust);
 
         double windDirDouble = currentObject.optDouble(WIND_DIRECTION_DS);
@@ -692,7 +720,7 @@ public class ParseJSON {
         weather.setCloudCoverage(cloudCoverage);
 
         visibility = currentObject.optString(VISIBILITY_DS);
-        visibility = Conversions.roundDecimal(visibility);
+        visibility = Conversions.roundDecimalString(visibility);
         weather.setVisibility(visibility);
 
         icon = currentObject.optString(ICON_DS);
@@ -749,17 +777,17 @@ public class ParseJSON {
 
             //temps
             tempMin = mainObject.optString(TEMP_MIN_DS);
-            tempMin = Conversions.roundDecimal(tempMin);
+            tempMin = Conversions.roundDecimalString(tempMin);
 
             tempMax = mainObject.optString(TEMP_MAX_DS);
-            tempMax = Conversions.roundDecimal(tempMax);
+            tempMax = Conversions.roundDecimalString(tempMax);
             weather.setTempMin(tempMin);
             weather.setTempMax(tempMax);
 
 
             //dew point
             dewPoint = mainObject.optString(DEW_POINT_DS);
-            dewPoint = Conversions.roundDecimal(dewPoint);
+            dewPoint = Conversions.roundDecimalString(dewPoint);
             weather.setDewPoint(dewPoint);
 
             //humidity
@@ -769,17 +797,17 @@ public class ParseJSON {
 
             //pressure
             pressure = mainObject.optString(PRESSURE_DS);
-            pressure = Conversions.roundDecimal(pressure);
+            pressure = Conversions.roundDecimalString(pressure);
             weather.setPressure(pressure);
 
             //wind speed
             windSpeed = mainObject.optString(WIND_SPEED_DS);
-            windSpeed = Conversions.roundDecimal(windSpeed);
+            windSpeed = Conversions.roundDecimalString(windSpeed);
             weather.setWindSpeed(windSpeed);
 
             //wind gust
             windGust = mainObject.optString(WIND_GUST_DS);
-            windGust = Conversions.roundDecimal(windGust);
+            windGust = Conversions.roundDecimalString(windGust);
             weather.setWindGust(windGust);
 
             //wind direction
@@ -794,7 +822,7 @@ public class ParseJSON {
 
             //visibility
             visibility = mainObject.optString(VISIBILITY_DS);
-            visibility = Conversions.roundDecimal(visibility);
+            visibility = Conversions.roundDecimalString(visibility);
             weather.setVisibility(visibility);
 
             //POP
@@ -837,8 +865,8 @@ public class ParseJSON {
             return null;
         }//if
 
-        String summary, temp, pressure, humidity, windSpeed, windDirection, cloudCoverage, icon,
-                dewPoint, visibility;
+        String summary, temp, feelLike, pressure, humidity, windSpeed, windDirection, cloudCoverage,
+                icon, dewPoint, visibility;
 
         //create a Weather object
         Weather weather = new Weather();
@@ -863,17 +891,21 @@ public class ParseJSON {
             //temp
             temp = mainObject.optString(TEMP_WB);
             //round if it contains a decimal point
-            temp = Conversions.roundDecimal(temp);
+            temp = Conversions.roundDecimalString(temp);
             weather.setTemperature(temp);
+
+            feelLike = mainObject.optString(FEEL_LIKE_WB);
+            feelLike = Conversions.roundDecimalString(feelLike);
+            weather.setTempFeel(feelLike);
 
             //dew
             dewPoint = mainObject.optString(DEW_WB);
-            dewPoint = Conversions.roundDecimal(dewPoint);
+            dewPoint = Conversions.roundDecimalString(dewPoint);
             weather.setDewPoint(dewPoint);
 
             //pressure
             pressure = mainObject.optString(PRESSURE_WB);
-            pressure = Conversions.roundDecimal(pressure);
+            pressure = Conversions.roundDecimalString(pressure);
             weather.setPressure(pressure);
 
             //humidity
@@ -882,7 +914,7 @@ public class ParseJSON {
 
             //wind
             windSpeed = mainObject.optString(WIND_SPEED_WB);
-            windSpeed = Conversions.roundDecimal(windSpeed);
+            windSpeed = Conversions.roundDecimalString(windSpeed);
             weather.setWindSpeed(windSpeed);
 
 
@@ -892,12 +924,12 @@ public class ParseJSON {
 
             //cloud cover
             cloudCoverage = mainObject.optString(CLOUD_WB);
-            cloudCoverage = Conversions.roundDecimal(cloudCoverage);
+            cloudCoverage = Conversions.roundDecimalString(cloudCoverage);
             weather.setCloudCoverage(cloudCoverage);
 
             //visibility
             visibility = mainObject.optString(VISIBILITY_WB);
-            visibility = Conversions.roundDecimal(visibility);
+            visibility = Conversions.roundDecimalString(visibility);
             weather.setVisibility(visibility);
 
 
@@ -959,36 +991,36 @@ public class ParseJSON {
 
             //temps
             tempMin = mainObject.optString(TEMP_MIN_WB);
-            tempMin = Conversions.roundDecimal(tempMin);
+            tempMin = Conversions.roundDecimalString(tempMin);
 
             tempMax = mainObject.optString(TEMP_MAX_WB);
-            tempMax = Conversions.roundDecimal(tempMax);
+            tempMax = Conversions.roundDecimalString(tempMax);
             weather.setTempMin(tempMin);
             weather.setTempMax(tempMax);
 
             //dew point
             dewPoint = mainObject.optString(DEW_WB);
-            dewPoint = Conversions.roundDecimal(dewPoint);
+            dewPoint = Conversions.roundDecimalString(dewPoint);
             weather.setDewPoint(dewPoint);
 
             //humidity
             humidity = mainObject.optString(HUMIDITY_WB);
-            humidity = Conversions.roundDecimal(humidity);
+            humidity = Conversions.roundDecimalString(humidity);
             weather.setHumidity(humidity);
 
             //pressure
             pressure = mainObject.optString(PRESSURE_WB);
-            pressure = Conversions.roundDecimal(pressure);
+            pressure = Conversions.roundDecimalString(pressure);
             weather.setPressure(pressure);
 
             //wind speed
             windSpeed = mainObject.optString(WIND_SPEED_WB);
-            windSpeed = Conversions.roundDecimal(windSpeed);
+            windSpeed = Conversions.roundDecimalString(windSpeed);
             weather.setWindSpeed(windSpeed);
 
             //wind gust
             windGust = mainObject.optString(WIND_GUST_DS);
-            windGust = Conversions.roundDecimal(windGust);
+            windGust = Conversions.roundDecimalString(windGust);
             weather.setWindGust(windGust);
 
             //wind direction
@@ -1002,12 +1034,12 @@ public class ParseJSON {
 
             //visibility
             visibility = mainObject.optString(VISIBILITY_WB);
-            visibility = Conversions.roundDecimal(visibility);
+            visibility = Conversions.roundDecimalString(visibility);
             weather.setVisibility(visibility);
 
             //POP
             pop = mainObject.optString(POP_WB);
-            pop = Conversions.roundDecimal(pop);
+            pop = Conversions.roundDecimalString(pop);
             weather.setPop(pop);
 
 
@@ -1033,7 +1065,7 @@ public class ParseJSON {
             return null;
         }//if
 
-        String summary, temp, humidity, windSpeed, windDirection, cloudCoverage, icon,
+        String summary, temp, feelLike,  humidity, windSpeed, windDirection, cloudCoverage, icon,
                 dewPoint, visibility;
 
         //create a Weather object
@@ -1052,22 +1084,26 @@ public class ParseJSON {
         //temp
         temp = mainObject.optString(TEMP_WU);
         //round if it contains a decimal point
-        temp = Conversions.roundDecimal(temp);
+        temp = Conversions.roundDecimalString(temp);
         weather.setTemperature(temp);
+
+        feelLike = mainObject.optString(FEEL_LIKE_WU);
+        feelLike = Conversions.roundDecimalString(feelLike);
+        weather.setTempFeel(feelLike);
 
         //dew
         dewPoint = mainObject.optString(DEW_WU);
-        dewPoint = Conversions.roundDecimal(dewPoint);
+        dewPoint = Conversions.roundDecimalString(dewPoint);
         weather.setDewPoint(dewPoint);
 
         //humidity
         humidity = mainObject.getString(HUMIDITY_WU);
-        humidity = Conversions.roundDecimal(humidity);
+        humidity = Conversions.roundDecimalString(humidity);
         weather.setHumidity(humidity);
 
         //wind
         windSpeed = mainObject.optString(WIND_SPEED_WU);
-        windSpeed = Conversions.roundDecimal(windSpeed);
+        windSpeed = Conversions.roundDecimalString(windSpeed);
         weather.setWindSpeed(windSpeed);
 
 
@@ -1077,12 +1113,12 @@ public class ParseJSON {
 
         //cloud cover
         cloudCoverage = mainObject.optString(CLOUD_COVER_WU);
-        cloudCoverage = Conversions.roundDecimal(cloudCoverage);
+        cloudCoverage = Conversions.roundDecimalString(cloudCoverage);
         weather.setCloudCoverage(cloudCoverage);
 
         //visibility
         visibility = mainObject.optString(VISIBILITY_WU);
-        visibility = Conversions.roundDecimal(visibility);
+        visibility = Conversions.roundDecimalString(visibility);
         weather.setVisibility(visibility);
 
 
@@ -1144,10 +1180,10 @@ public class ParseJSON {
 
             //temps
             tempMin = mainObject.optString(TEMP_MIN_WU);
-            tempMin = Conversions.roundDecimal(tempMin);
+            tempMin = Conversions.roundDecimalString(tempMin);
 
             tempMax = mainObject.optString(TEMP_MAX_WU);
-            tempMax = Conversions.roundDecimal(tempMax);
+            tempMax = Conversions.roundDecimalString(tempMax);
             weather.setTempMin(tempMin);
             weather.setTempMax(tempMax);
 
@@ -1155,26 +1191,26 @@ public class ParseJSON {
             double humidityMin = mainObject.optDouble(HUMIDITY_MIN_WU);
             double humidityMax = mainObject.optDouble(HUMIDITY_MAX_WU);
             double humidityDouble = (humidityMin + humidityMax)/ 2;
-            humidity = Conversions.roundDecimal(String.valueOf(humidityDouble));
+            humidity = Conversions.roundDecimalString(String.valueOf(humidityDouble));
             weather.setHumidity(humidity);
 
             //wind speed
             windSpeed = mainObject.optString(WIND_WU);
-            windSpeed = Conversions.roundDecimal(windSpeed);
+            windSpeed = Conversions.roundDecimalString(windSpeed);
             weather.setWindSpeed(windSpeed);
 
             //wind gust
             windGust = mainObject.optString(GUST_WU);
-            windGust = Conversions.roundDecimal(windGust);
+            windGust = Conversions.roundDecimalString(windGust);
             weather.setWindGust(windGust);
 
             //POP
             pop = mainObject.optString(POP_WU);
-            pop = Conversions.roundDecimal(pop);
+            pop = Conversions.roundDecimalString(pop);
             weather.setPop(pop);
 
             popTotal = mainObject.optString(PRECIP_TOTAL_WU);
-            popTotal = Conversions.roundDecimal(popTotal);
+            popTotal = Conversions.roundDecimalString(popTotal);
             weather.setPopTotal(popTotal);
 
             weatherArrayList.add(weather);

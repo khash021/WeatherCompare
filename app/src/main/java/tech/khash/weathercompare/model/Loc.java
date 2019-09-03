@@ -481,7 +481,7 @@ public class Loc {
         URL url = null;
         try {
             url = new URL(urlString);
-            Log.d(TAG, "generated current url: " + url.toString());
+            Log.d(TAG, "generated current url - AW: " + url.toString());
         } catch (MalformedURLException e) {
             Log.e(TAG, "Error creating current weather URL from string", e);
         }
@@ -502,7 +502,7 @@ public class Loc {
         URL url = null;
         try {
             url = new URL(urlString);
-            Log.d(TAG, "generated forecast url: " + url.toString());
+            Log.d(TAG, "generated forecast url - AW: " + url.toString());
         } catch (MalformedURLException e) {
             Log.e(TAG, "Error creating forecast weather URL from string", e);
         }
