@@ -76,6 +76,7 @@ public class ParseJSON {
     private static final String PRESSURE_AW = "Pressure";
     private static final String LOCATION_KEY_AW = "Key";
     private static final String ICON_AW = "WeatherIcon";
+    private static final String IS_DAY_AW = "IsDayTime";
 
 
     //forecast AW
@@ -87,6 +88,7 @@ public class ParseJSON {
     private static final String FORECAST_NIGHT_AW = "Night";
     private static final String FORECAST_SUMMARY_AW = "ShortPhrase";
     private static final String FORECAST_POP_AW = "PrecipitationProbability";
+    private static final String POP_TOTAL_AW = "TotalLiquid";
 
     //pictures
     private static final String ICON_BASE_URL_AW = "https://developer.accuweather.com/sites/default/files/";
@@ -144,6 +146,7 @@ public class ParseJSON {
     private static final String FEEL_LIKE_MIN_WB = "app_min_temp";
     private static final String FEEL_LIKE_MAX_WB = "app_max_temp";
     private static final String POP_WB = "pop";
+    private static final String PRECIPITATION_TOTAL_WB = "precip";
 
     /*
         --------------------------- Weather Unlocked -----------------------------------
@@ -170,6 +173,7 @@ public class ParseJSON {
     private static final String GUST_WU = "windgst_max_kmh";
     private static final String HUMIDITY_MAX_WU = "humid_max_pct";
     private static final String HUMIDITY_MIN_WU = "humid_min_pct";
+
 
 
     /*
@@ -501,6 +505,10 @@ public class ParseJSON {
         summary = currentObject.optString(DESCRIPTION_AW);
         weather.setSummary(summary);
 
+        //isDay
+        boolean isDay = currentObject.optBoolean(IS_DAY_AW);
+        weather.setIsDay(isDay);
+
         //temp
         JSONObject tempObject = currentObject.getJSONObject(TEMPERATURE_AW);
         JSONObject tempMetricObject = tempObject.getJSONObject(METRIC_AW);
@@ -590,7 +598,12 @@ public class ParseJSON {
         }
 
         String date, tempMin, tempMax, feelLikeMin, feelLikeMax, summaryDay, popDay, cloudDay,
-                summaryNight, popNight, cloudNight;
+                summaryNight, popNight, cloudNight, popTotal, windSpeed, windDirection, windGust;
+
+        /**
+         * Here we just use day values for pop, cloud, wind and windgust for now
+         */
+
         ArrayList<Weather> weatherArrayList = new ArrayList<>();
         Weather weather;
         //for formatting date
@@ -675,19 +688,48 @@ public class ParseJSON {
             feelLikeMax = Conversions.roundDecimalString(feelLikeMax);
             weather.setTempFeelMax(feelLikeMax);
 
-            //day
+            //-------------------- day -------------------------
             JSONObject dayObject = mainObject.optJSONObject(FORECAST_DAY_AW);
 
+            //summary
             summaryDay = dayObject.optString(FORECAST_SUMMARY_AW);
             weather.setSummaryDay(summaryDay);
 
+            //pop
             popDay = String.valueOf(dayObject.optInt(FORECAST_POP_AW));
             weather.setPopDay(popDay);
+            weather.setPop(popDay);
 
+            JSONObject popTotalObject = dayObject.optJSONObject(POP_TOTAL_AW);
+            double popTotalDouble = popTotalObject.optDouble(METRIC_VALUE_AW);
+            popTotal = Conversions.roundDecimalDouble(popTotalDouble);
+            weather.setPopTotal(popTotal);
+
+            //cloud
             cloudDay = String.valueOf(dayObject.optInt(CLOUD_COVER_AW));
             weather.setCloudDay(cloudDay);
+            weather.setCloudCoverage(cloudDay);
 
-            //night
+            //wind
+            JSONObject windObject = dayObject.optJSONObject(WIND_AW);
+
+            JSONObject speedObject = windObject.optJSONObject(SPEED_AW);
+            double windSpeedDouble = speedObject.optDouble(METRIC_VALUE_AW);
+            windSpeed = Conversions.roundDecimalDouble(windSpeedDouble);
+            weather.setWindSpeed(windSpeed);
+
+            JSONObject directionObject = windObject.optJSONObject(DIRECTION_AW);
+            windDirection = directionObject.optString(WIND_DIRECTION_ENGLISH_AW);
+            weather.setWindDirection(windDirection);
+
+            JSONObject gustObject = dayObject.getJSONObject(WIND_GUST_AW);
+            JSONObject gustSpeedObject = gustObject.getJSONObject(SPEED_AW);
+            double gustDouble = gustSpeedObject.optDouble(METRIC_VALUE_AW);
+            windGust = Conversions.roundDecimalDouble(gustDouble);
+            weather.setWindGust(windGust);
+
+
+            //--------------------- night   ------------------------------
             JSONObject nightObject = mainObject.optJSONObject(FORECAST_NIGHT_AW);
 
             summaryNight = nightObject.optString(FORECAST_SUMMARY_AW);
@@ -1053,7 +1095,7 @@ public class ParseJSON {
         }
 
         String date, summary, tempMin, tempMax, feelLikeMin, feelLikeMax, dewPoint, pressure,
-                humidity, windSpeed, windGust, windDirection, cloudCoverage, pop, visibility;
+                humidity, windSpeed, windGust, windDirection, cloudCoverage, pop, popTotal, visibility;
         ArrayList<Weather> weatherArrayList = new ArrayList<>();
         Weather weather;
         //for formatting date
@@ -1182,6 +1224,9 @@ public class ParseJSON {
             pop = Conversions.roundDecimalString(pop);
             weather.setPop(pop);
 
+            double popTotalDouble = mainObject.optDouble(PRECIPITATION_TOTAL_WB);
+            popTotal = Conversions.roundDecimalDouble(popTotalDouble);
+            weather.setPopTotal(popTotal);
 
             weatherArrayList.add(weather);
 
@@ -1385,8 +1430,8 @@ public class ParseJSON {
             pop = Conversions.roundDecimalString(pop);
             weather.setPop(pop);
 
-            popTotal = mainObject.optString(PRECIP_TOTAL_WU);
-            popTotal = Conversions.roundDecimalString(popTotal);
+            double popTotalDouble = mainObject.optDouble(PRECIP_TOTAL_WU);
+            popTotal = Conversions.roundDecimalDouble(popTotalDouble);
             weather.setPopTotal(popTotal);
 
             weatherArrayList.add(weather);

@@ -33,10 +33,8 @@ public class CompareActivity extends AppCompatActivity {
     //TODO: search for location, and automatic find me
     //TODO: move everything away from inner classes and use task loader
 
-
-    //TODO: use divider for the results
-
-    //TODO: right now the int tracker is not working when we load them all (it works for single ones) - do something about that
+    //TODO: restructure the whole thing, use recycler view and store weather array list
+    //TODO: add icons
 
     private final static String TAG = CompareActivity.class.getSimpleName();
 
@@ -55,6 +53,8 @@ public class CompareActivity extends AppCompatActivity {
     private TextView textCityName;
     private ArrayList<Integer> menuIdList;
     ArrayList<Loc> locArrayList;
+
+    private boolean isDay;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -639,6 +639,8 @@ public class CompareActivity extends AppCompatActivity {
     }//showOpenWeatherError
 
     private void showAccuWeatherResults(Weather weather) {
+
+        isDay = weather.getIsDay();
 
         //TODO: icons
         if (weather == null) {

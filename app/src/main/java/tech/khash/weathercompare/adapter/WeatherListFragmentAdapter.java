@@ -78,6 +78,7 @@ public class WeatherListFragmentAdapter extends RecyclerView.Adapter<WeatherList
             holder.textFeelMax.setText("Feels Max");
             holder.textHumidity.setText("Humidity");
             holder.textPop.setText("POP");
+            holder.textPopTotal.setText("P. Total");
             holder.textCloud.setText("Cloud");
             holder.textWind.setText("Wind");
             holder.textWindGust.setText("Gust");
@@ -101,8 +102,9 @@ public class WeatherListFragmentAdapter extends RecyclerView.Adapter<WeatherList
             holder.textFeelMax.setText(weather.getTempFeelMax());
             holder.textHumidity.setText(weather.getHumidity());
             holder.textPop.setText(weather.getPop());
+            holder.textPopTotal.setText(weather.getPopTotal());
             holder.textCloud.setText(weather.getCloudCoverage());
-            holder.textWind.setText(weather.getWindSpeed());
+            holder.textWind.setText(weather.getWindDirection() + " " + weather.getWindSpeed());
             holder.textWindGust.setText(weather.getWindGust());
         }
     }//onBindViewHolder
@@ -123,7 +125,7 @@ public class WeatherListFragmentAdapter extends RecyclerView.Adapter<WeatherList
         //views
         final WeatherListFragmentAdapter weatherListAdapter;
         final TextView textProvider, textTempMin, textTempMax, textFeelMin, textFeelMax,
-                textHumidity, textPop, textCloud, textWind, textWindGust;
+                textHumidity, textPop, textPopTotal, textCloud, textWind, textWindGust;
 
         //constructor
         private WeatherViewHolder(View itemView, WeatherListFragmentAdapter weatherListAdapter) {
@@ -137,6 +139,7 @@ public class WeatherListFragmentAdapter extends RecyclerView.Adapter<WeatherList
             textFeelMax = itemView.findViewById(R.id.text_feel_max);
             textHumidity = itemView.findViewById(R.id.text_humidity);
             textPop = itemView.findViewById(R.id.text_pop);
+            textPopTotal = itemView.findViewById(R.id.text_pop_total);
             textCloud = itemView.findViewById(R.id.text_cloud);
             textWind = itemView.findViewById(R.id.text_wind);
             textWindGust = itemView.findViewById(R.id.text_wind_gust);

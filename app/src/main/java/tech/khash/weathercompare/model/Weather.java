@@ -28,6 +28,8 @@ public class Weather {
     private String date, tempMin, tempFeelMin, tempMax, tempFeelMax, summaryDay, popDay, cloudDay,
             summaryNight, popNight, cloudNight;
 
+    private boolean isDay;
+
     //for WU
     private String popTotal;
     private long epoch;
@@ -168,6 +170,10 @@ public class Weather {
     public void setPopNight(String popNight) {
         this.popNight = popNight;
     }
+
+    public void setIsDay(boolean isDay) {
+        this.isDay = isDay;
+    }//setIsDay
 
     /*
         ------------------------ GETTER METHODS -----------------------------------------
@@ -368,6 +374,10 @@ public class Weather {
             return null;
         }
     }//getIconUri
+
+    public boolean getIsDay() {
+        return isDay;
+    }//getIsDay
 
     /**
      * Helper method to see if there is any icon associated with the weather object
