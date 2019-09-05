@@ -5,6 +5,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,6 +24,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ShareCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -109,6 +111,11 @@ public class MainActivity extends AppCompatActivity implements
                 openAddLocation();
             }
         });
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean metric = sharedPreferences.getBoolean("metric_pref_key", true);
+        Log.d(TAG, "SETTINGS - METRIC : " + metric);
+
 
     }//onCreate
 
@@ -256,8 +263,8 @@ public class MainActivity extends AppCompatActivity implements
                 openAddLocation();
                 return true;
             case R.id.nav_settings:
-                //TODO:
-                HelperFunctions.showToast(this, "Settings");
+                Intent settingsIntent = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(settingsIntent);
                 return true;
             case R.id.nav_contact:
                 //send email. Use Implicit intent so the user can choose their preferred app
@@ -409,7 +416,18 @@ public class MainActivity extends AppCompatActivity implements
             emptyView.setVisibility(View.VISIBLE);
         } else {
             emptyView.setVisibility(View.GONE);
+
+            //TODO: testing:
+            Loc loc = locArrayList.get(0);
+            Log.d(TAG, "URLs: " + "\nAW : " + loc.getCurrentUrlAW() + "\n" + loc.getForecastUrlAW() +
+                    "\nDS : " + loc.getCurrentUrlDS() + "\n" + loc.getForecastUrlDS() + "\nWB : " +
+                    loc.getCurrentUrlWB() + "\n" + loc.getForecastUrlWB());
+
+
+
         }
+
+
 
         // Get a handle to the RecyclerView.
         recyclerView = findViewById(R.id.recycler_view);

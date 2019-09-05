@@ -613,6 +613,7 @@ public class NetworkCallsUtils {
 
             try {
                 current = ParseJSON.parseWeatherUnlockedCurrent(s);
+                Log.d(TAG, "WU - Current response:\n" + s);
                 //pass data to interface
                 delegate.processFinish(current);
             } catch (JSONException e) {
@@ -660,7 +661,7 @@ public class NetworkCallsUtils {
                 Log.e(TAG, "WeatherUnlockedForecastTask - postExecute - response = null");
                 return;
             }
-            Log.d(TAG, "WeatherUnlockedForecastTask response : " + s);
+            Log.d(TAG, "WU - Forecast response:\n" + s);
             delegate.processFinish(s);
         }//onPostExecute
     }//WeatherUnlockedForecastTask

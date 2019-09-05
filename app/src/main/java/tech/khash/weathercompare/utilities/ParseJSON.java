@@ -117,7 +117,9 @@ public class ParseJSON {
     private static final String DATA_DS = "data";
     private static final String TIME_DS = "time";
     private static final String TEMP_MIN_DS = "temperatureMin";
+    private static final String FEEL_LIKE_MIN_DS = "apparentTemperatureMin";
     private static final String TEMP_MAX_DS = "temperatureMax";
+    private static final String FEEL_LIKE_MAX_DS = "apparentTemperatureMax";
 
     /*
         --------------------------- Weather Bit -----------------------------------
@@ -139,6 +141,8 @@ public class ParseJSON {
     private static final String EPOCH_WB = "ts";
     private static final String TEMP_MIN_WB = "min_temp";
     private static final String TEMP_MAX_WB = "max_temp";
+    private static final String FEEL_LIKE_MIN_WB = "app_min_temp";
+    private static final String FEEL_LIKE_MAX_WB = "app_max_temp";
     private static final String POP_WB = "pop";
 
     /*
@@ -154,6 +158,18 @@ public class ParseJSON {
     private static final String WIND_DIRECTION_WU = "winddir_deg";
     private static final String CLOUD_COVER_WU = "cloudtotal_pct";
     private static final String VISIBILITY_WU = "vis_km";
+
+    //forecast
+    private static final String DAYS_WU = "Days";
+    private static final String DATE_WU = "date";
+    private static final String TEMP_MIN_WU = "temp_min_c";
+    private static final String TEMP_MAX_WU = "temp_max_c";
+    private static final String POP_WU = "prob_precip_pct";
+    private static final String PRECIP_TOTAL_WU = "precip_total_mm";
+    private static final String WIND_WU = "windspd_max_kmh";
+    private static final String GUST_WU = "windgst_max_kmh";
+    private static final String HUMIDITY_MAX_WU = "humid_max_pct";
+    private static final String HUMIDITY_MIN_WU = "humid_min_pct";
 
 
     /*
@@ -182,6 +198,8 @@ public class ParseJSON {
     private static final String CHANCE_OF = " chance of ";
 
     private final static String LINE_BREAK = "\n";
+
+    private static final long DAY_MILLI = 86400000;
 
         /*
     -------------------------------- Open Weather ----------------------------------------
@@ -292,7 +310,7 @@ public class ParseJSON {
             return null;
         }
 
-        final long DAY_MILLI = 86400000;
+
         ArrayList<Weather> weatherArrayList = new ArrayList<>();
 
         //create calender using default timezone and locale for this moment
@@ -347,7 +365,7 @@ public class ParseJSON {
 
     private static ArrayList<Weather> getWeatherDayOW(long start, long end, JSONArray jsonArray) {
         long epoch;
-        String temp;
+        String temp, humidity, wind;
         ArrayList<Weather> outputList = new ArrayList<>();
         Weather weather;
         for (int i = 0; i < jsonArray.length(); i++) {
@@ -364,8 +382,19 @@ public class ParseJSON {
                 weather.setEpoch(epoch);
 
                 JSONObject mainObject = rootObject.optJSONObject(MAIN_OW);
+                //temp
                 temp = mainObject.optString(TEMP_OW);
                 weather.setTemperature(temp);
+
+                //hum
+                humidity = mainObject.optString(HUMIDITY_OW);
+                weather.setHumidity(humidity);
+
+                //wind
+                JSONObject windObject = rootObject.optJSONObject(WIND_OW);
+                wind = windObject.optString(WIND_SPEED_OW);
+                weather.setWindSpeed(wind);
+
                 outputList.add(weather);
             } catch (JSONException e) {
                 Log.e(TAG, "getWeatherDayOW - array error", e);
@@ -560,19 +589,43 @@ public class ParseJSON {
             return null;
         }
 
-        String date, tempMin, tempMax, summaryDay, popDay, cloudDay, summaryNight, popNight, cloudNight;
+        String date, tempMin, tempMax, feelLikeMin, feelLikeMax, summaryDay, popDay, cloudDay,
+                summaryNight, popNight, cloudNight;
         ArrayList<Weather> weatherArrayList = new ArrayList<>();
         Weather weather;
         //for formatting date
         SimpleDateFormat formatter = new SimpleDateFormat("EEE, MMM.dd", Locale.getDefault());
 
+        //we create our dates for the next three days to get the data for
+        //create calender using default timezone and locale for this moment
+        Calendar calendar = new GregorianCalendar();
+        // reset hour, minutes, seconds and millis
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        //next day
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+
+        //start of next 4 days
+        long day1StartMilli = calendar.getTimeInMillis();
+        long day2StartMilli = day1StartMilli + DAY_MILLI;
+        long day3StartMilli = day2StartMilli + DAY_MILLI;
+        long day4StartMilli = day3StartMilli + DAY_MILLI;
+
         JSONObject rootObject = new JSONObject(jsonString);
         JSONArray forecastArray = rootObject.getJSONArray(DAILY_FORECASTS_AW);
 
         /*we want data for the next three days (first object is for today, which we ignore for now
-        So we get index 1, 2, and 3
+        So we get index 1, 2, and 3. This method has a lot of bugs, instead, we will check each
+        entries against our dates and add the next three dates to the array
          */
-        for (int i = 1; i < 4; i++) {
+        for (int i = 0; i < forecastArray.length(); i++) {
+            //first check to see if we have three objects in our array meaning we have colledcted all data
+            if (weatherArrayList.size() == 3) {
+                break;
+            }
+
             weather = new Weather();
             JSONObject mainObject = forecastArray.getJSONObject(i);
 
@@ -588,6 +641,10 @@ public class ParseJSON {
             } else {
                 date = "";
             }
+            //check the date against our days
+            if (epoch < day1StartMilli || epoch >= day4StartMilli ) {
+                continue;
+            }
             weather.setDate(date);
 
             //set the provider
@@ -601,10 +658,22 @@ public class ParseJSON {
             tempMin = Conversions.roundDecimalString(tempMin);
             weather.setTempMin(tempMin);
 
-            JSONObject manObject = tempObject.optJSONObject(FORECAST_MAX_AW);
-            tempMax = manObject.optString(METRIC_VALUE_AW);
+            JSONObject maxObject = tempObject.optJSONObject(FORECAST_MAX_AW);
+            tempMax = maxObject.optString(METRIC_VALUE_AW);
             tempMax = Conversions.roundDecimalString(tempMax);
             weather.setTempMax(tempMax);
+
+            JSONObject feelLikeObject = mainObject.optJSONObject(FEEL_LIKE_AW);
+
+            JSONObject feelMinObject = feelLikeObject.optJSONObject(FORECAST_MIN_AW);
+            feelLikeMin = feelMinObject.optString(METRIC_VALUE_AW);
+            feelLikeMin = Conversions.roundDecimalString(feelLikeMin);
+            weather.setTempFeelMin(feelLikeMin);
+
+            JSONObject feelMaxObject = feelLikeObject.optJSONObject(FORECAST_MAX_AW);
+            feelLikeMax = feelMaxObject.optString(METRIC_VALUE_AW);
+            feelLikeMax = Conversions.roundDecimalString(feelLikeMax);
+            weather.setTempFeelMax(feelLikeMax);
 
             //day
             JSONObject dayObject = mainObject.optJSONObject(FORECAST_DAY_AW);
@@ -733,23 +802,45 @@ public class ParseJSON {
             return null;
         }
 
-        String date, tempMin, tempMax, summary, pressure, dewPoint, humidity, windSpeed, windGust,
-                windDirection, cloudCoverage, pop, precipType, visibility;
+        String date, tempMin, tempMax, feelLikeMin, feelLikeMax, summary, pressure, dewPoint, humidity,
+                windSpeed, windGust, windDirection, cloudCoverage, pop, precipType, visibility;
         ArrayList<Weather> weatherArrayList = new ArrayList<>();
         Weather weather;
         //for formatting date
         SimpleDateFormat formatter = new SimpleDateFormat("EEE, MMM.dd", Locale.getDefault());
+
+        //we create our dates for the next three days to get the data for
+        //create calender using default timezone and locale for this moment
+        Calendar calendar = new GregorianCalendar();
+        // reset hour, minutes, seconds and millis
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        //next day
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+
+        //start of next 4 days
+        long day1StartMilli = calendar.getTimeInMillis();
+        long day2StartMilli = day1StartMilli + DAY_MILLI;
+        long day3StartMilli = day2StartMilli + DAY_MILLI;
+        long day4StartMilli = day3StartMilli + DAY_MILLI;
 
         JSONObject rootObject = new JSONObject(jsonString);
         JSONObject dailyObject = rootObject.optJSONObject(DAILY_DS);
         JSONArray dataArray = dailyObject.optJSONArray(DATA_WB);
 
         /*we want data for the next three days (first object is for today, which we ignore for now
-        So we get index 1, 2, and 3
+        So we get index 1, 2, and 3. This method has a lot of bugs, instead, we will check each
+        entries against our dates and add the next three dates to the array
          */
 
+        for (int i = 0; i < dataArray.length(); i++) {
+            //first check to see if we have three objects in our array meaning we have colledcted all data
+            if (weatherArrayList.size() == 3) {
+                break;
+            }
 
-        for (int i = 1; i < 4; i++) {
             weather = new Weather();
             //set the provider
             weather.setProvider(Weather.PROVIDER_DS);
@@ -768,6 +859,12 @@ public class ParseJSON {
             } else {
                 date = "";
             }
+
+            //check the date against our days
+            if (epoch < day1StartMilli || epoch >= day4StartMilli ) {
+                continue;
+            }
+
             weather.setEpoch(epoch);
             weather.setDate(date);
 
@@ -783,6 +880,14 @@ public class ParseJSON {
             tempMax = Conversions.roundDecimalString(tempMax);
             weather.setTempMin(tempMin);
             weather.setTempMax(tempMax);
+
+            feelLikeMin = mainObject.optString(FEEL_LIKE_MIN_DS);
+            feelLikeMin = Conversions.roundDecimalString(feelLikeMin);
+            weather.setTempFeelMin(feelLikeMin);
+
+            feelLikeMax = mainObject.optString(FEEL_LIKE_MAX_DS);
+            feelLikeMax = Conversions.roundDecimalString(feelLikeMax);
+            weather.setTempFeelMax(feelLikeMax);
 
 
             //dew point
@@ -947,22 +1052,43 @@ public class ParseJSON {
             return null;
         }
 
-        String date, summary, tempMin, tempMax, dewPoint, pressure, humidity, windSpeed, windGust,
-                windDirection, cloudCoverage, pop, visibility;
+        String date, summary, tempMin, tempMax, feelLikeMin, feelLikeMax, dewPoint, pressure,
+                humidity, windSpeed, windGust, windDirection, cloudCoverage, pop, visibility;
         ArrayList<Weather> weatherArrayList = new ArrayList<>();
         Weather weather;
         //for formatting date
         SimpleDateFormat formatter = new SimpleDateFormat("EEE, MMM.dd", Locale.getDefault());
 
+        //we create our dates for the next three days to get the data for
+        //create calender using default timezone and locale for this moment
+        Calendar calendar = new GregorianCalendar();
+        // reset hour, minutes, seconds and millis
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        //next day
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+        //start of next 4 days
+        long day1StartMilli = calendar.getTimeInMillis();
+        long day2StartMilli = day1StartMilli + DAY_MILLI;
+        long day3StartMilli = day2StartMilli + DAY_MILLI;
+        long day4StartMilli = day3StartMilli + DAY_MILLI;
+
         JSONObject rootObject = new JSONObject(jsonString);
         JSONArray dataArray = rootObject.optJSONArray(DATA_WB);
 
         /*we want data for the next three days (first object is for today, which we ignore for now
-        So we get index 1, 2, and 3
+        So we get index 1, 2, and 3. This method has a lot of bugs, instead, we will check each
+        entries against our dates and add the next three dates to the array
          */
 
+        for (int i = 0; i < dataArray.length(); i++) {
+            //first check to see if we have three objects in our array meaning we have colledcted all data
+            if (weatherArrayList.size() == 3) {
+                break;
+            }
 
-        for (int i = 1; i < 4; i++) {
             weather = new Weather();
             //set the provider
             weather.setProvider(Weather.PROVIDER_WB);
@@ -981,6 +1107,12 @@ public class ParseJSON {
             } else {
                 date = "";
             }
+
+            //check the date against our days
+            if (epoch < day1StartMilli || epoch >= day4StartMilli ) {
+                continue;
+            }
+
             weather.setEpoch(epoch);
             weather.setDate(date);
 
@@ -997,6 +1129,14 @@ public class ParseJSON {
             tempMax = Conversions.roundDecimalString(tempMax);
             weather.setTempMin(tempMin);
             weather.setTempMax(tempMax);
+
+            feelLikeMin = mainObject.optString(FEEL_LIKE_MIN_WB);
+            feelLikeMin = Conversions.roundDecimalString(feelLikeMin);
+            weather.setTempFeelMin(feelLikeMin);
+
+            feelLikeMax = mainObject.optString(FEEL_LIKE_MAX_WB);
+            feelLikeMax = Conversions.roundDecimalString(feelLikeMax);
+            weather.setTempFeelMax(feelLikeMax);
 
             //dew point
             dewPoint = mainObject.optString(DEW_WB);
@@ -1125,37 +1265,48 @@ public class ParseJSON {
         return weather;
     }//parseWeatherUnlockedCurrent
 
-    private static final String DAYS_WU = "Days";
-    private static final String DATE_WU = "date";
-    private static final String TEMP_MIN_WU = "temp_min_c";
-    private static final String TEMP_MAX_WU = "temp_max_c";
-    private static final String POP_WU = "prob_precip_pct";
-    private static final String PRECIP_TOTAL_WU = "precip_total_mm";
-    private static final String WIND_WU = "windspd_max_kmh";
-    private static final String GUST_WU = "windgst_max_kmh";
-    private static final String HUMIDITY_MAX_WU = "humid_max_pct";
-    private static final String HUMIDITY_MIN_WU = "humid_min_pct";
-
     public static ArrayList<Weather> parseWeatherUnlockedForecast(String jsonString) throws JSONException {
         if (TextUtils.isEmpty(jsonString)) {
             return null;
         }
 
-        String date, tempMin, tempMax, humidity, windSpeed, windGust, pop, popTotal;
+        String date, tempMin, tempMax, feelLikeMin, feelLikeMax, humidity, dewPoint, windSpeed,
+                windGust, pop, popTotal;
         ArrayList<Weather> weatherArrayList = new ArrayList<>();
         Weather weather;
         //for formatting date
         SimpleDateFormat formatter = new SimpleDateFormat("EEE, MMM.dd", Locale.getDefault());
 
+        //we create our dates for the next three days to get the data for
+        //create calender using default timezone and locale for this moment
+        Calendar calendar = new GregorianCalendar();
+        // reset hour, minutes, seconds and millis
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        //next day
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+        //start of next 4 days
+        long day1StartMilli = calendar.getTimeInMillis();
+        long day2StartMilli = day1StartMilli + DAY_MILLI;
+        long day3StartMilli = day2StartMilli + DAY_MILLI;
+        long day4StartMilli = day3StartMilli + DAY_MILLI;
+
         JSONObject rootObject = new JSONObject(jsonString);
         JSONArray dataArray = rootObject.optJSONArray(DAYS_WU);
 
         /*we want data for the next three days (first object is for today, which we ignore for now
-        So we get index 1, 2, and 3
+        So we get index 1, 2, and 3. This method has a lot of bugs, instead, we will check each
+        entries against our dates and add the next three dates to the array
          */
 
+        for (int i = 0; i < dataArray.length(); i++) {
+            //first check to see if we have three objects in our array meaning we have colledcted all data
+            if (weatherArrayList.size() == 3) {
+                break;
+            }
 
-        for (int i = 1; i < 4; i++) {
             weather = new Weather();
             //set the provider
             weather.setProvider(Weather.PROVIDER_WU);
@@ -1171,6 +1322,12 @@ public class ParseJSON {
             try {
                 Date d = f.parse(date);
                 long epoch = d.getTime();
+
+                //check the date against our days
+                if (epoch < day1StartMilli || epoch >= day4StartMilli ) {
+                    continue;
+                }
+                
                 weather.setEpoch(epoch);
                 date = formatter.format(epoch);
                 weather.setDate(date);
@@ -1181,6 +1338,9 @@ public class ParseJSON {
             //temps
             tempMin = mainObject.optString(TEMP_MIN_WU);
             tempMin = Conversions.roundDecimalString(tempMin);
+
+            double tempMinDouble = mainObject.optDouble(TEMP_MIN_WU);
+            double tempMaxDouble = mainObject.optDouble(TEMP_MAX_WU);
 
             tempMax = mainObject.optString(TEMP_MAX_WU);
             tempMax = Conversions.roundDecimalString(tempMax);
@@ -1199,10 +1359,26 @@ public class ParseJSON {
             windSpeed = Conversions.roundDecimalString(windSpeed);
             weather.setWindSpeed(windSpeed);
 
+            double windMaxDouble = mainObject.optDouble(WIND_WU);
+
             //wind gust
             windGust = mainObject.optString(GUST_WU);
             windGust = Conversions.roundDecimalString(windGust);
             weather.setWindGust(windGust);
+
+            //dew
+            double dewDouble = Conversions.calculateDewPointCel(tempMaxDouble, humidityMax);
+            dewPoint = Conversions.roundDecimalDouble(dewDouble);
+            weather.setDewPoint(dewPoint);
+
+            //feel
+            double feelMinDouble = Conversions.calculateFeelsLikeTemp(tempMinDouble, humidityDouble,windMaxDouble );
+            feelLikeMin = Conversions.roundDecimalDouble(feelMinDouble);
+            weather.setTempFeelMin(feelLikeMin);
+
+            double feelMaxDouble = Conversions.calculateFeelsLikeTemp(tempMaxDouble, humidityDouble, windMaxDouble);
+            feelLikeMax = Conversions.roundDecimalDouble(feelMaxDouble);
+            weather.setTempFeelMax(feelLikeMax);
 
             //POP
             pop = mainObject.optString(POP_WU);

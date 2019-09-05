@@ -33,7 +33,7 @@ import tech.khash.weathercompare.utilities.SaveLoadList;
 
 /**
  * Created by Khashayar "Khash" Mortazavi
- *
+ * <p>
  * Responsible for showing the 3 day forecast using tabs and fragments
  */
 
@@ -68,13 +68,14 @@ public class ForecastActivity extends AppCompatActivity {
         setContentView(R.layout.activity_forecast);
 
         //toolbar
-        Toolbar toolbar =findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         // Get a support ActionBar corresponding to this toolbar
         ActionBar actionBar = getSupportActionBar();
 
         tabLayout = findViewById(R.id.tab_layout);
         viewPager = (ViewPager) findViewById(R.id.pager);
+
 
         //get the loc id from intent extra
         if (getIntent().hasExtra(Constant.INTENT_EXTRA_LOC_NAME)) {
@@ -95,6 +96,7 @@ public class ForecastActivity extends AppCompatActivity {
 
         getForecasts(currentLoc);
 
+
     }//onCreate
 
 
@@ -105,6 +107,7 @@ public class ForecastActivity extends AppCompatActivity {
     /**
      * Helper method for getting all the forecasts from all providers, parse them, and then
      * place each day's forecast from all providers in one arraylist to be used with fragments
+     *
      * @param loc
      */
     private void getForecasts(Loc loc) {
@@ -177,14 +180,10 @@ public class ForecastActivity extends AppCompatActivity {
         day3Date = formatter.format(new Date(day3Milli));
 
         //create our days
-        //TODO: fix
-//        while (tracker != 4) {
-//            Log.d(TAG, "tracker : " +tracker);
-//        }
 
         //if we get here, it means all the fetching of the data is done
         //---------------- AW -----------------------
-        if (weatherAW == null || weatherAW.size() <1) {
+        if (weatherAW == null || weatherAW.size() < 1) {
             Log.d(TAG, "weatherAW - null/empty");
         } else {
             for (Weather weather : weatherAW) {
@@ -200,7 +199,7 @@ public class ForecastActivity extends AppCompatActivity {
         }//if/else
 
         //---------------- DS -----------------------
-        if (weatherDS == null || weatherDS.size() <1) {
+        if (weatherDS == null || weatherDS.size() < 1) {
             Log.d(TAG, "weatherDS - null/empty");
         } else {
             for (Weather weather : weatherDS) {
@@ -216,7 +215,7 @@ public class ForecastActivity extends AppCompatActivity {
         }//if/else
 
         //---------------- WB -----------------------
-        if (weatherWB == null || weatherWB.size() <1) {
+        if (weatherWB == null || weatherWB.size() < 1) {
             Log.d(TAG, "weatherWB - null/empty");
         } else {
             for (Weather weather : weatherWB) {
@@ -232,7 +231,7 @@ public class ForecastActivity extends AppCompatActivity {
         }//if/else
 
         //---------------- WU -----------------------
-        if (weatherWU == null || weatherWU.size() <1) {
+        if (weatherWU == null || weatherWU.size() < 1) {
             Log.d(TAG, "weatherWB - null/empty");
         } else {
             for (Weather weather : weatherWU) {
@@ -285,7 +284,9 @@ public class ForecastActivity extends AppCompatActivity {
             }
         });
 
-        progressBar.setVisibility(View.GONE);
+        if (progressBar != null) {
+            progressBar.setVisibility(View.GONE);
+        }
     }//setupFragments
 
     //------------------------------- AW ----------------------------------
@@ -357,7 +358,7 @@ public class ForecastActivity extends AppCompatActivity {
     }//getWeathersDS
 
     //------------------------------- WB ----------------------------------
-    private void getResponseWB (URL url) {
+    private void getResponseWB(URL url) {
         Log.d(TAG, "getResponseWB called");
         //get the response
         NetworkCallsUtils.WeatherBitForecastTask forecastTask = new
@@ -391,7 +392,7 @@ public class ForecastActivity extends AppCompatActivity {
     }//getWeathersWB
 
     //------------------------------- WU ----------------------------------
-    private void getResponseWU (URL url) {
+    private void getResponseWU(URL url) {
         Log.d(TAG, "getResponseWU called");
         //get the response
         NetworkCallsUtils.WeatherUnlockedForecastTask forecastTask = new

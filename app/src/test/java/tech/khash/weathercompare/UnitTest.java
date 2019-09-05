@@ -58,25 +58,25 @@ public class UnitTest {
 //        assertEquals(latLngString, "lat=23.6&lon=-123.5");
 //    }
 
-//    @Test
-//    public void farToCel() {
-//        double far = 48.8d;
-//        double cel = 9.33d;
-//
-//        double calculated = (far -32d) * (5/9d);
-//
-//        assertEquals(calculated, cel, 0.01);
-//    }//farToCel
-//
-//    @Test
-//    public void celToFar() {
-//        double far = 48.79d;
-//        double cel = 9.33d;
-//
-//        double calculated = (cel * (9d / 5)) + 32d;
-//
-//        assertEquals(calculated, far, 0.01);
-//    }//celToFar
+    @Test
+    public void farToCel() {
+        double far = 48.8d;
+        double cel = 9.33d;
+
+        double calculated = (far -32d) * (5/9d);
+
+        assertEquals(calculated, cel, 0.01);
+    }//farToCel
+
+    @Test
+    public void celToFar() {
+        double far = 48.79d;
+        double cel = 9.33d;
+
+        double calculated = (cel * (9d / 5)) + 32d;
+
+        assertEquals(calculated, far, 0.01);
+    }//celToFar
 
 //    @Test
 //    public void heatIndex() {
@@ -135,26 +135,28 @@ public class UnitTest {
 //
 //    }//windChill
 
-    @Test
-    public void dewPointCel() {
-        double T = 20.8d;
-        double H = 71d;
+//    @Test
+//    public void dewPointCel() {
+//        double T = 20.8d;
+//        double H = 71d;
+//
+//        double check = 15.39d;
+//
+//        double c1 = 112d;
+//        double c2 = 0.9d;
+//        double c3 = 0.1d;
+//        double c4 = -112d;
+//
+//        double h = H / 100d;
+//
+//        double dew = (Math.pow(h, (1/8d))) * (c1 + (c2 * T)) + (c3 * T) + c4;
+//
+//        assertEquals(dew, check, 0.1d);
+//
+//
+//    }//dewPointCel
 
-        double check = 15.39d;
 
-        double c1 = 112d;
-        double c2 = 0.9d;
-        double c3 = 0.1d;
-        double c4 = -112d;
-
-        double h = H / 100d;
-
-        double dew = (Math.pow(h, (1/8d))) * (c1 + (c2 * T)) + (c3 * T) + c4;
-
-        assertEquals(dew, check, 0.1d);
-
-
-    }//dewPointCel
 
 //    @Test
 //    public void addition_isCorrect() {

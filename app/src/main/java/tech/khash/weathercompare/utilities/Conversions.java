@@ -116,14 +116,16 @@ public class Conversions {
     }//meterToKmh
 
     public static String farToCelString(double far) {
-        double cel = (far - 32) * 5 / 9;
-        String output = String.format("%.0f", cel);
-        return output;
+        double cel = (far - 32d) * (5d / 9d);
+        cel = Math.round(cel);
+        return String.valueOf(cel);
     }//farToCel
 
     public static String mileToKmString(double mile) {
-        double km = mile * 1.60934;
-        String output = String.format("%.0f", km);
+        double km = mile * 1.60934d;
+        km = Math.round(km);
+        String output = String.valueOf(km);
+        output = String.format("%.0f", output);
         return output;
     }//mileToKm
 

@@ -74,6 +74,8 @@ public class WeatherListFragmentAdapter extends RecyclerView.Adapter<WeatherList
             holder.textProvider.setText("Provider");
             holder.textTempMin.setText("Min Temp");
             holder.textTempMax.setText("Max Temp");
+            holder.textFeelMin.setText("Feels Min");
+            holder.textFeelMax.setText("Feels Max");
             holder.textHumidity.setText("Humidity");
             holder.textPop.setText("POP");
             holder.textCloud.setText("Cloud");
@@ -95,6 +97,8 @@ public class WeatherListFragmentAdapter extends RecyclerView.Adapter<WeatherList
             holder.textProvider.setText(weather.getProviderString());
             holder.textTempMin.setText(weather.getTempMin());
             holder.textTempMax.setText(weather.getTempMax());
+            holder.textFeelMin.setText(weather.getTempFeelMin());
+            holder.textFeelMax.setText(weather.getTempFeelMax());
             holder.textHumidity.setText(weather.getHumidity());
             holder.textPop.setText(weather.getPop());
             holder.textCloud.setText(weather.getCloudCoverage());
@@ -118,8 +122,8 @@ public class WeatherListFragmentAdapter extends RecyclerView.Adapter<WeatherList
     class WeatherViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         //views
         final WeatherListFragmentAdapter weatherListAdapter;
-        final TextView textProvider, textTempMin, textTempMax, textHumidity, textPop, textCloud, textWind,
-                textWindGust;
+        final TextView textProvider, textTempMin, textTempMax, textFeelMin, textFeelMax,
+                textHumidity, textPop, textCloud, textWind, textWindGust;
 
         //constructor
         private WeatherViewHolder(View itemView, WeatherListFragmentAdapter weatherListAdapter) {
@@ -129,6 +133,8 @@ public class WeatherListFragmentAdapter extends RecyclerView.Adapter<WeatherList
             textProvider = itemView.findViewById(R.id.text_provider);
             textTempMin = itemView.findViewById(R.id.text_temp_min);
             textTempMax = itemView.findViewById(R.id.text_temp_max);
+            textFeelMin = itemView.findViewById(R.id.text_feel_min);
+            textFeelMax = itemView.findViewById(R.id.text_feel_max);
             textHumidity = itemView.findViewById(R.id.text_humidity);
             textPop = itemView.findViewById(R.id.text_pop);
             textCloud = itemView.findViewById(R.id.text_cloud);

@@ -24,9 +24,9 @@ public class Weather {
     private String summary, temperature, tempFeel, humidity, dewPoint, pressure, windSpeed, windDirection,
             windGust, visibility, cloudCoverage, pop, popType, iconUrl;
 
-    //for forecast (AW now)
-    private String date, tempMin, tempMax, summaryDay, popDay, cloudDay, summaryNight, popNight,
-            cloudNight;
+    //for forecast
+    private String date, tempMin, tempFeelMin, tempMax, tempFeelMax, summaryDay, popDay, cloudDay,
+            summaryNight, popNight, cloudNight;
 
     //for WU
     private String popTotal;
@@ -85,9 +85,17 @@ public class Weather {
         this.tempMin = tempMin;
     }//setTempMin
 
+    public void setTempFeelMin (String tempFeelMin) {
+        this.tempFeelMin = tempFeelMin;
+    }//setTempFeelMin
+
     public void setTempMax(String tempMax) {
         this.tempMax = tempMax;
     }//setTempMax
+
+    public void setTempFeelMax (String tempFeelMax) {
+        this.tempFeelMax = tempFeelMax;
+    }//setTempFeelMax
 
     public void setDewPoint(String dewPoint) {
         this.dewPoint = dewPoint;
@@ -229,6 +237,20 @@ public class Weather {
         }
         return tempMin;
     }//getTempMin
+
+    public String getTempFeelMin() {
+        if (tempFeelMin == null) {
+            return "";
+        }
+        return tempFeelMin;
+    }//getTempFeelMin
+
+    public String getTempFeelMax() {
+        if (tempFeelMax == null) {
+            return "";
+        }
+        return tempFeelMax;
+    }//getTempFeelMax
 
     public String getDewPoint() {
         if (dewPoint == null) {
