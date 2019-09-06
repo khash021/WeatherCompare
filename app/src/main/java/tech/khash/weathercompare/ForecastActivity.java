@@ -127,6 +127,7 @@ public class ForecastActivity extends AppCompatActivity {
         if (forecastUrlAW == null) {
             Log.d(TAG, "forecastUrlAW = null");
         } else {
+            Log.d(TAG, "Forecast URL - AW: " + forecastUrlAW.toString());
             getResponseAW(forecastUrlAW);
         }//url null
 
@@ -135,6 +136,7 @@ public class ForecastActivity extends AppCompatActivity {
         if (forecastUrlDS == null) {
             Log.d(TAG, "forecastUrlDS = null");
         } else {
+            Log.d(TAG, "Forecast URL - DS: " + forecastUrlDS.toString());
             getResponseDS(forecastUrlDS);
         }//url null
 
@@ -143,10 +145,11 @@ public class ForecastActivity extends AppCompatActivity {
         if (forecastUrlWB == null) {
             Log.d(TAG, "forecastUrlWB = null");
         } else {
+            Log.d(TAG, "Forecast URL - WB: " + forecastUrlWB.toString());
             getResponseWB(forecastUrlWB);
         }//url null
 
-        //------------------------------- WB ----------------------------------
+        //------------------------------- WU ----------------------------------
         URL forecastUrlWU = loc.getForecastUrlWU();
         if (forecastUrlWU == null) {
             Log.d(TAG, "forecastUrlWU = null");

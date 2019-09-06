@@ -1,7 +1,5 @@
 package tech.khash.weathercompare.model;
 
-import android.net.Uri;
-
 /**
  * Class for weather object.
  * <p>
@@ -22,7 +20,7 @@ public class Weather {
     //TODO: make the variables match the return type from API (float, etc) and then convert on returning
 
     private String summary, temperature, tempFeel, humidity, dewPoint, pressure, windSpeed, windDirection,
-            windGust, visibility, cloudCoverage, pop, popType, iconUrl;
+            windGust, visibility, cloudCoverage, pop, popType, icon;
 
     //for forecast
     private String date, tempMin, tempFeelMin, tempMax, tempFeelMax, summaryDay, popDay, cloudDay,
@@ -34,8 +32,7 @@ public class Weather {
     private String popTotal;
     private long epoch;
 
-    private Uri iconUri;
-
+    //providers
     private int provider;
     public static final int PROVIDER_OW = 1; //Open Weather
     public static final int PROVIDER_DS = 2; //Dark Sky
@@ -143,10 +140,6 @@ public class Weather {
         this.popType = popType;
     }//setPopType
 
-    public void setIconUrl(String iconUrl) {
-        this.iconUrl = iconUrl;
-    }//setIconUrl
-
     public void setPopDay(String popDay) {
         this.popDay = popDay;
     }
@@ -174,6 +167,10 @@ public class Weather {
     public void setIsDay(boolean isDay) {
         this.isDay = isDay;
     }//setIsDay
+
+    public void setIcon (String icon) {
+        this.icon = icon;
+    }//setIcon
 
     /*
         ------------------------ GETTER METHODS -----------------------------------------
@@ -360,33 +357,11 @@ public class Weather {
         return cloudNight;
     }
 
-    public String getIconUrl() {
-        if (iconUrl == null) {
-            return "";
-        }
-        return iconUrl;
-    }//getIconUrl
-
-    public Uri getIconUri() {
-        if (hasIcon()) {
-            return Uri.parse(iconUrl);
-        } else {
-            return null;
-        }
-    }//getIconUri
+    public String getIcon() {
+        return icon;
+    }//getIcon
 
     public boolean getIsDay() {
         return isDay;
     }//getIsDay
-
-    /**
-     * Helper method to see if there is any icon associated with the weather object
-     */
-    public boolean hasIcon() {
-        if (iconUrl == null) {
-            return false;
-        } else {
-            return true;
-        }
-    }//hasIcon
 }//Weather

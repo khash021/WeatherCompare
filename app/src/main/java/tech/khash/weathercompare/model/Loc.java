@@ -88,6 +88,13 @@ public class Loc {
     //forecast
     private static final String BASE_URL_FORECAST_WU = "http://api.weatherunlocked.com/api/forecast/";
 
+    //----------------------   Geolocation   -----------------------------------------------
+    private static final String BASE_URL_GEO = "https://api.ipgeolocation.io/astronomy?";
+    private static final String API_KEY_GEO = "apiKey=";
+    private static final String API_KEY_VALUE_GEO = "98b89850973747db8eecae362053611b";
+    private static final String LAT_GEO = "lat=";
+    private static final String LONG_GEO = "long=";
+
 
     //Variable
     private LatLng latLng;
@@ -110,6 +117,9 @@ public class Loc {
     private URL forecastUrlDS;
     private URL forecastUrlWB;
     private URL forecastUrlWU;
+
+    //Sunrise/Sunset data
+    private URL sunriseSunsetUrl;
 
     //constructors
     public Loc() {
@@ -330,6 +340,21 @@ public class Loc {
             return forecastUrlWU;
         }//url null
     }//getForecastUrlWU
+
+    public URL getSunriseSunsetUrl() {
+        if (sunriseSunsetUrl != null) {
+            return sunriseSunsetUrl;
+        }
+
+        URL url = createSunriseSunsetUrl(latLng);
+        if (url == null) {
+            Log.d(TAG, "getSunriseSunsetUrl - URL null......Name: " + name);
+            return null;
+        } else {
+            sunriseSunsetUrl = url;
+            return sunriseSunsetUrl;
+        }
+    }//getSunriseSunsetUrl
 
     /*
         ------------------------ SETTER METHODS -----------------------------------------
@@ -711,5 +736,28 @@ public class Loc {
         return url;
 
     }//createForecastUrlWB
+
+
+    // -----------------------------  GEOLOCATION  ----------------
+
+    /**
+     * This creates the URL for geolocation api using LatLng  for sunset sunrise data
+     *
+     * @param latLng : LatLng
+     * @return : URL
+     */
+    private static URL createSunriseSunsetUrl(LatLng latLng) {
+        String urlString = BASE_URL_GEO + API_KEY_GEO + API_KEY_VALUE_GEO + "&" + LAT_GEO +
+                latLng.latitude + "&" + LONG_GEO + latLng.longitude;
+        Log.d(TAG, "GEOLOCATION URL string: " + urlString);
+
+        URL url = null;
+        try {
+            url = new URL(urlString);
+        } catch (MalformedURLException e) {
+            Log.e(TAG, "Error creating GEOLOCATION URL from string", e);
+        }
+        return url;
+    }//createSunriseSunsetUrl
 
 }//Loc

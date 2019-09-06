@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -112,9 +113,19 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
 
+        //TODO: testing
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         boolean metric = sharedPreferences.getBoolean("metric_pref_key", true);
         Log.d(TAG, "SETTINGS - METRIC : " + metric);
+
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int height = displayMetrics.heightPixels;
+        int width = displayMetrics.widthPixels;
+
+        Log.d(TAG, "Width/Height : " + width + " - " + height);
+
+
 
 
     }//onCreate

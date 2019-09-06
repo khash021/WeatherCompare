@@ -38,7 +38,6 @@ public class CompareActivity extends AppCompatActivity {
 
     private final static String TAG = CompareActivity.class.getSimpleName();
 
-    private ImageView mIconImage;
     private ProgressBar progressBar;
 
     //for sending and receiving location from add location activity
@@ -54,7 +53,7 @@ public class CompareActivity extends AppCompatActivity {
     private ArrayList<Integer> menuIdList;
     ArrayList<Loc> locArrayList;
 
-    private boolean isDay;
+    private Boolean isDay;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +65,6 @@ public class CompareActivity extends AppCompatActivity {
         tracker = 0;
 
         progressBar = findViewById(R.id.progress_bar);
-//        mIconImage = findViewById(R.id.image_icon);
         textCityName = findViewById(R.id.text_city_name);
 
         //get the loc id from intent extra
@@ -87,7 +85,8 @@ public class CompareActivity extends AppCompatActivity {
 
         setClickListeners();
 
-        getAllWeather();
+        //get the isDay first
+        calculateIsDay();
     }//onCreate
 
 
@@ -183,6 +182,34 @@ public class CompareActivity extends AppCompatActivity {
                     ---------------    HELPER METHODS    ---------------
     ------------------------------------------------------------------------------------------*/
 
+    private void calculateIsDay() {
+        if (currentLoc == null) {
+            Log.d(TAG, "calculateIsDay - currentLoc is null");
+            return;
+        }//null loc
+
+        //make the progress bar visible
+        progressBar.setVisibility(View.VISIBLE);
+
+        URL sinriseSunsetUrl = currentLoc.getSunriseSunsetUrl();
+        if (sinriseSunsetUrl == null) {
+            Log.d(TAG, "calculateIsDay - currentUrl = null");
+            //TODO: manage this case
+        } else {
+            NetworkCallsUtils.SunriseSunsetTask sunriseSunsetTask = new
+                    NetworkCallsUtils.SunriseSunsetTask(new NetworkCallsUtils.SunriseSunsetTask.AsyncResponse() {
+                @Override
+                public void processFinished(Boolean result) {
+                    isDay = result;
+                    //kick off weather
+                    getAllWeather();
+                }
+            });
+            sunriseSunsetTask.execute(sinriseSunsetUrl);
+        }
+
+    }//calculateIsDay
+
 
     private void getAllWeather() {
         if (currentLoc == null) {
@@ -193,12 +220,9 @@ public class CompareActivity extends AppCompatActivity {
         //set the name
         textCityName.setText(currentLoc.getName());
 
-        //make the progress bar visible
-        progressBar.setVisibility(View.VISIBLE);
-
         kickOffAccuWeather();
-        kickOffDarkSky();
         kickOffOpenWeather();
+        kickOffDarkSky();
         kickOffWeatherBit();
         kickOffWeatherUnlocked();
     }//getAllWeather
@@ -217,6 +241,7 @@ public class CompareActivity extends AppCompatActivity {
             Log.d(TAG, "kickOffDarkSky - currentUrl = null");
             showDarkSkyError();
         } else {
+            Log.d(TAG, "Current URL - DS : " + currentUrlDS.toString());
             NetworkCallsUtils.DarkSkyQueryTask darkSkyQueryTask = new
                     NetworkCallsUtils.DarkSkyQueryTask(new NetworkCallsUtils.DarkSkyQueryTask.AsyncResponse() {
                 @Override
@@ -259,6 +284,7 @@ public class CompareActivity extends AppCompatActivity {
             Log.d(TAG, "kickOffWeatherBit - currentUrl = null");
             showWeatherBitError();
         } else {
+            Log.d(TAG, "Current URL - WB : " + currentUrlWB.toString());
             NetworkCallsUtils.WeatherBitCurrentTask weatherBitCurrentTask = new
                     NetworkCallsUtils.WeatherBitCurrentTask(new NetworkCallsUtils.WeatherBitCurrentTask.AsyncResponse() {
                 @Override
@@ -309,6 +335,7 @@ public class CompareActivity extends AppCompatActivity {
             Log.d(TAG, "kickOffAccuWeather - currentUrl = null");
             showAccuWeatherError();
         } else {
+            Log.d(TAG, "Current URL - AW : " + currentUrlAW.toString());
             NetworkCallsUtils.AccuWeatherCurrentTask accuWeatherQueryTask = new
                     NetworkCallsUtils.AccuWeatherCurrentTask(new NetworkCallsUtils.AccuWeatherCurrentTask.AsyncResponse() {
                 @Override
@@ -351,6 +378,7 @@ public class CompareActivity extends AppCompatActivity {
             Log.d(TAG, "kickOffOpenWeather - currentUrl = null");
             showOpenWeatherError();
         } else {
+            Log.d(TAG, "Current URL - OW : " + currentUrlOW.toString());
             NetworkCallsUtils.OpenWeatherCurrentTask openWeatherQueryTask = new
                     NetworkCallsUtils.OpenWeatherCurrentTask(new NetworkCallsUtils.OpenWeatherCurrentTask.AsyncResponse() {
                 @Override
@@ -392,6 +420,7 @@ public class CompareActivity extends AppCompatActivity {
             Log.d(TAG, "kickOffWeatherUnlocked - currentUrl = null");
             showWeatherUnlockedError();
         } else {
+            Log.d(TAG, "Current URL - WU : " + currentUrlWU.toString());
             NetworkCallsUtils.WeatherUnlockedCurrentTask weatherUnlockedCurrentTask = new
                     NetworkCallsUtils.WeatherUnlockedCurrentTask(new NetworkCallsUtils.WeatherUnlockedCurrentTask.AsyncResponse() {
                 @Override
@@ -576,13 +605,16 @@ public class CompareActivity extends AppCompatActivity {
 
     private void showDarkSkyResults(Weather weather) {
 
-        //TODO: icons
+
         if (weather == null) {
             showOpenWeatherError();
             return;
         }
         //find views
         TextView summary, temp, feelLike, dew, press, humidity, wind, gust, cloud, visibility;
+        ImageView iconView;
+
+        iconView = findViewById(R.id.image_icon_dark_sky);
 
         summary = findViewById(R.id.text_summary_dark_sky);
         temp = findViewById(R.id.text_temp_dark_sky);
@@ -606,7 +638,55 @@ public class CompareActivity extends AppCompatActivity {
         gust.setText(weather.getWindGust());
         cloud.setText(weather.getCloudCoverage());
         visibility.setText(weather.getVisibility());
+
+        String iconString = weather.getIcon();
+        //we set it to day, if for some reason we don't have isDay data
+        if (isDay == null || isDay) {
+            iconString += "d";
+        } else {
+            iconString += "n";
+        }
+        int iconInt = getIconInteger(iconString);
+        if (iconInt != -1) {
+            iconView.setImageResource(iconInt);
+        }
     }//showOpenWeatherResults
+
+    private int getIconInteger(String icon) {
+        switch (icon) {
+            case "i01d":
+                return R.drawable.i01d;
+            case "i01n":
+                return R.drawable.i01n;
+            case "i02d":
+                return R.drawable.i02d;
+            case "i02n":
+                return R.drawable.i02n;
+            case "i03d":
+                return R.drawable.i03d;
+            case "i03n":
+                return R.drawable.i03n;
+            case "i04d":
+                return R.drawable.i04d;
+            case "i04n":
+                return R.drawable.i04n;
+            case "i05d":
+                return R.drawable.i05d;
+            case "i05n":
+                return R.drawable.i05n;
+            case "i06d":
+                return R.drawable.i06d;
+            case "i06n":
+                return R.drawable.i06n;
+            case "i07d":
+                return R.drawable.i07d;
+            case "i07n":
+                return R.drawable.i07n;
+
+                default:
+                    return -1;
+        }
+    }//getIconInteger
 
     private void showDarkSkyError() {
 
@@ -639,8 +719,6 @@ public class CompareActivity extends AppCompatActivity {
     }//showOpenWeatherError
 
     private void showAccuWeatherResults(Weather weather) {
-
-        isDay = weather.getIsDay();
 
         //TODO: icons
         if (weather == null) {

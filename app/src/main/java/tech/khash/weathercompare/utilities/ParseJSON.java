@@ -3,6 +3,10 @@ package tech.khash.weathercompare.utilities;
 import android.text.TextUtils;
 import android.util.Log;
 
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -174,6 +178,12 @@ public class ParseJSON {
     private static final String HUMIDITY_MAX_WU = "humid_max_pct";
     private static final String HUMIDITY_MIN_WU = "humid_min_pct";
 
+    /*
+        --------------------------- GEOLOCATION -----------------------------------
+     */
+    private static final String DATE_GEO = "date";
+    private static final String SUNRISE_GEO = "sunrise";
+    private static final String SUNSET_GEO = "sunset";
 
 
     /*
@@ -226,7 +236,7 @@ public class ParseJSON {
         }//if
 
         String summary, temp, feelLike, dewPoint, pressure, humidity, windSpeed, windDirection,
-                cloudCoverage, icon;
+                cloudCoverage;
 
         //create a Weather object
         Weather weather = new Weather();
@@ -294,9 +304,8 @@ public class ParseJSON {
         weather.setDewPoint(dewPoint);
 
         //icon
-        icon = weatherObject.optString(ICON_OW);
-        icon = OPENWEATHER_ICON_BASE_URL + icon + OPENWEATHER_ICON_EXTENSION;
-        weather.setIconUrl(icon);
+//        icon = weatherObject.optString(ICON_OW);
+
 
         return weather;
     }//parseOpenWeatherCurrent
@@ -487,7 +496,10 @@ public class ParseJSON {
         //the response is in both imperial and metric, we extract the metric
 
         String summary, temp, feelLike, dewPoint, pressure, humidity, windSpeed, windDirection,
-                windGust, visibility, cloudCoverage, icon;
+                windGust, visibility, cloudCoverage;
+
+        int icon;
+        boolean isDay;
 
         //create a Weather object
         Weather weather = new Weather();
@@ -506,7 +518,7 @@ public class ParseJSON {
         weather.setSummary(summary);
 
         //isDay
-        boolean isDay = currentObject.optBoolean(IS_DAY_AW);
+        isDay = currentObject.optBoolean(IS_DAY_AW);
         weather.setIsDay(isDay);
 
         //temp
@@ -573,13 +585,12 @@ public class ParseJSON {
 
         //icon
         int iconId = currentObject.optInt(ICON_AW);
-        if (iconId < 10) {
-            icon = "0" + iconId;
-        } else {
-            icon = String.valueOf(iconId);
-        }
-        icon = ICON_BASE_URL_AW + icon + ICON_EXTENSION_AW;
-        weather.setIconUrl(icon);
+//        if (iconId < 10) {
+//            icon = "0" + iconId;
+//        } else {
+//            icon = String.valueOf(iconId);
+//        }
+
 
         return weather;
     }//parseAccuWeatherCurrent
@@ -655,7 +666,7 @@ public class ParseJSON {
                 date = "";
             }
             //check the date against our days
-            if (epoch < day1StartMilli || epoch >= day4StartMilli ) {
+            if (epoch < day1StartMilli || epoch >= day4StartMilli) {
                 continue;
             }
             weather.setDate(date);
@@ -767,7 +778,7 @@ public class ParseJSON {
         }//if
 
         String summary, temp, feelLike, pressure, dewPoint, humidity, windSpeed, windGust, windDirection,
-                cloudCoverage, icon, pop, precipType, visibility;
+                cloudCoverage, pop, precipType, visibility, icon;
 
         Weather weather = new Weather();
 
@@ -834,10 +845,47 @@ public class ParseJSON {
         visibility = Conversions.roundDecimalString(visibility);
         weather.setVisibility(visibility);
 
-        icon = currentObject.optString(ICON_DS);
+        String iconString = currentObject.optString(ICON_DS);
+
+        //figure out icon
+        if (iconString.contains("clear")) {
+            icon = "01";
+        } else if (iconString.equalsIgnoreCase("rain")) {
+            icon = "06";
+        } else if (iconString.equalsIgnoreCase("snow")) {
+            icon = "07";
+        } else {
+            icon = getDSIcon(popDouble, cloudCoverDouble);
+        }
+
+        icon = "i" + icon;
+
+        weather.setIcon(icon);
 
         return weather;
     }//parseDarkSkyCurrent
+
+    private static String getDSIcon(double popDouble, double cloudDouble) {
+        int pop = (int) popDouble * 100;
+        int cloud = (int) (cloudDouble * 100);
+
+        if (pop < 30) {
+            //not much precip
+            if (cloud <= 40) {
+                return "02";
+            } else if (cloud < 80) {
+                return "03";
+            } else {
+                return "05";
+            }
+        } else {
+            if (pop < 70) {
+                return "04";
+            } else {
+                return "06";
+            }
+        }//if else pop30
+    }//getDSIcon
 
     public static ArrayList<Weather> parseDarkSkyForecast(String jsonString) throws JSONException {
         if (TextUtils.isEmpty(jsonString)) {
@@ -903,7 +951,7 @@ public class ParseJSON {
             }
 
             //check the date against our days
-            if (epoch < day1StartMilli || epoch >= day4StartMilli ) {
+            if (epoch < day1StartMilli || epoch >= day4StartMilli) {
                 continue;
             }
 
@@ -1151,7 +1199,7 @@ public class ParseJSON {
             }
 
             //check the date against our days
-            if (epoch < day1StartMilli || epoch >= day4StartMilli ) {
+            if (epoch < day1StartMilli || epoch >= day4StartMilli) {
                 continue;
             }
 
@@ -1235,7 +1283,6 @@ public class ParseJSON {
     }//parseWeatherBitForecast
 
 
-
     /**
      * This method is for parsing the current weather from Weather Unlocked
      *
@@ -1250,7 +1297,7 @@ public class ParseJSON {
             return null;
         }//if
 
-        String summary, temp, feelLike,  humidity, windSpeed, windDirection, cloudCoverage, icon,
+        String summary, temp, feelLike, humidity, windSpeed, windDirection, cloudCoverage, icon,
                 dewPoint, visibility;
 
         //create a Weather object
@@ -1369,10 +1416,10 @@ public class ParseJSON {
                 long epoch = d.getTime();
 
                 //check the date against our days
-                if (epoch < day1StartMilli || epoch >= day4StartMilli ) {
+                if (epoch < day1StartMilli || epoch >= day4StartMilli) {
                     continue;
                 }
-                
+
                 weather.setEpoch(epoch);
                 date = formatter.format(epoch);
                 weather.setDate(date);
@@ -1395,7 +1442,7 @@ public class ParseJSON {
             //humidity
             double humidityMin = mainObject.optDouble(HUMIDITY_MIN_WU);
             double humidityMax = mainObject.optDouble(HUMIDITY_MAX_WU);
-            double humidityDouble = (humidityMin + humidityMax)/ 2;
+            double humidityDouble = (humidityMin + humidityMax) / 2;
             humidity = Conversions.roundDecimalString(String.valueOf(humidityDouble));
             weather.setHumidity(humidity);
 
@@ -1417,7 +1464,7 @@ public class ParseJSON {
             weather.setDewPoint(dewPoint);
 
             //feel
-            double feelMinDouble = Conversions.calculateFeelsLikeTemp(tempMinDouble, humidityDouble,windMaxDouble );
+            double feelMinDouble = Conversions.calculateFeelsLikeTemp(tempMinDouble, humidityDouble, windMaxDouble);
             feelLikeMin = Conversions.roundDecimalDouble(feelMinDouble);
             weather.setTempFeelMin(feelLikeMin);
 
@@ -1439,5 +1486,49 @@ public class ParseJSON {
         }//for
         return weatherArrayList;
     }//parseWeatherUnlockedForecast
+
+
+
+    /**
+     * This parse data from IP Geolocation for sunset and sunrise and determines if it is daytime
+     * @param jsonString : JSON response
+     * @return : boolean for day. true : it is daytime ; false : it is night time ; null : error
+     * @throws JSONException
+     */
+    public static Boolean parseSunriseSunset (String jsonString) throws JSONException {
+        if (TextUtils.isEmpty(jsonString)) {
+            return null;
+        }
+        Boolean response = null;
+        //get the now time
+        DateTime nowDT = new DateTime();
+        long nowEpoch = nowDT.getMillis();
+
+        //get the data
+        JSONObject mainObject = new JSONObject(jsonString);
+        String dateString = mainObject.optString(DATE_GEO);
+        String sunriseString = mainObject.optString(SUNRISE_GEO);
+        String sunsetString = mainObject.optString(SUNSET_GEO);
+
+        //convert to Epoch using JodaTime
+        sunriseString = dateString + " at " + sunriseString;
+        sunsetString = dateString + " at " + sunsetString;
+
+        //formatter
+        DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd 'at' HH:mm");
+        //default timezone
+        formatter.withZone(DateTimeZone.getDefault());
+
+        DateTime sunriseDT = formatter.parseDateTime(sunriseString);
+        long sunriseEpoch = sunriseDT.getMillis();
+
+        DateTime sunsetDT = formatter.parseDateTime(sunsetString);
+        long sunsetEpoch = sunsetDT.getMillis();
+
+        //If the now is before sunrise and after sunset, then it is night, otherwise it is day
+        response = nowEpoch > sunriseEpoch && nowEpoch < sunsetEpoch;
+
+        return response;
+    }//parseSunriseSunset
 
 }//class

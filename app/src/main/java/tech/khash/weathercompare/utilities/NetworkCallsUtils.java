@@ -666,4 +666,57 @@ public class NetworkCallsUtils {
         }//onPostExecute
     }//WeatherUnlockedForecastTask
 
+    /*
+        ----------------------------- IP Geolocation --------------------------------------
+     */
+
+    /**
+     * Gets the respose from IP Geolocation API used for sunset/sunrise data
+     */
+
+    public static class SunriseSunsetTask extends AsyncTask<URL, Void, String> {
+        private static final String TAG = SunriseSunsetTask.class.getSimpleName();
+
+
+        public interface AsyncResponse {
+            void processFinished(Boolean result);
+        }
+
+        private AsyncResponse delegate = null;
+
+        public SunriseSunsetTask (AsyncResponse delegate) {
+            this.delegate = delegate;
+        }
+
+        @Override
+        protected String doInBackground(URL... urls) {
+            if (urls == null) {
+                return null;
+            }
+            String response = null;
+
+            try {
+                response = NetworkCallsUtils.getResponseFromHttpUrl(urls[0]);
+            } catch (IOException e) {
+                Log.e(TAG, "Error getting response", e);
+            }
+            return response;
+        }//doInBackground
+
+        @Override
+        protected void onPostExecute(String s) {
+            Boolean isday = null;
+            if (TextUtils.isEmpty(s)) {
+                Log.d(TAG, "SunriseSunset task results - null");
+            } else {
+                try {
+                    isday = ParseJSON.parseSunriseSunset(s);
+                } catch (JSONException e) {
+                    Log.e(TAG, "Error parsing sunrise sunset data", e);
+                }
+            }
+            delegate.processFinished(isday);
+        }//onPostExecute
+    }//SunriseSunsetTask
+
 }//NetworkCallsUtils - class
