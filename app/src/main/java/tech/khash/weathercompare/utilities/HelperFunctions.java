@@ -110,6 +110,7 @@ public class HelperFunctions {
         builder.create().show();
     }//askLocationPermission
 
+
     //checks location permission
     public static boolean checkLocationPermission(Context context) {
         //check for location permission and ask for it

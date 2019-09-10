@@ -168,8 +168,6 @@ public class AddLocationActivity extends AppCompatActivity implements OnMapReady
                     ---------------    HELPER METHODS    ---------------
     ------------------------------------------------------------------------------------------*/
 
-
-
     //Helper method for find me
     private void findMeMap() {
         //check for permission first and ask it if needed

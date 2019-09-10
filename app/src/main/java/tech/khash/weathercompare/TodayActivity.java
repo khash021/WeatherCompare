@@ -1,9 +1,16 @@
 package tech.khash.weathercompare;
 
+import android.app.Activity;
+import android.app.Dialog;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 
 import androidx.annotation.Nullable;
@@ -19,6 +26,7 @@ import tech.khash.weathercompare.adapter.WeatherListAdapterToday;
 import tech.khash.weathercompare.model.Constant;
 import tech.khash.weathercompare.model.Loc;
 import tech.khash.weathercompare.model.Weather;
+import tech.khash.weathercompare.utilities.HelperFunctions;
 import tech.khash.weathercompare.utilities.NetworkCallsUtils;
 import tech.khash.weathercompare.utilities.SaveLoadList;
 
@@ -32,6 +40,7 @@ public class TodayActivity extends AppCompatActivity {
     private Loc currentLoc;
 
     private ArrayList<Weather> weatherArrayList;
+    private ArrayList<Loc> locArrayList;
 
     private Boolean isDay;
     private int tracker;
@@ -58,11 +67,56 @@ public class TodayActivity extends AppCompatActivity {
         }//has extra
 
         tracker = 0;
-        weatherArrayList = new ArrayList<>();
+
+        locArrayList = SaveLoadList.loadLocList(this);
 
         calculateIsDay();
 
     }//onCreate
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        Log.d(TAG, "onCreateOptionsMenu Called");
+        getMenuInflater().inflate(R.menu.today_menu, menu);
+        //return true since we have managed it
+        return true;
+    }//onCreateOptionsMenu
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        //get the size of array
+        switch (item.getItemId()) {
+            case R.id.action_search:
+                openSearch();
+                return true;
+            case R.id.action_find_me:
+                findMe();
+                return true;
+            case R.id.action_saved_locations:
+                showSavedLocations();
+                return true;
+            case R.id.action_refresh:
+                refresh();
+            default:
+                return super.onOptionsItemSelected(item);
+        }//switch
+    }//onOptionsItemSelected
+
+    private void openSearch() {
+
+    }//openSearch
+
+    private void findMe() {
+
+    }//findMe
+
+    private void showSavedLocations() {
+        showLocListDialog(this, locArrayList);
+    }//showSavedLocations
+
+    private void refresh() {
+
+    }//refresh
 
     /*------------------------------------------------------------------------------------------
                     ---------------    HELPER METHODS    ---------------
@@ -102,6 +156,14 @@ public class TodayActivity extends AppCompatActivity {
             Log.d(TAG, "getAllWeather - currentLoc is null");
             return;
         }//null loc
+
+        //show progress bar if it is not visible
+        if (progressBar.getVisibility() != View.VISIBLE) {
+            progressBar.setVisibility(View.VISIBLE);
+        }
+
+        //refresh the array list
+        weatherArrayList = new ArrayList<>();
 
         kickOffAccuWeather();
         kickOffDarkSky();
@@ -259,12 +321,7 @@ public class TodayActivity extends AppCompatActivity {
             weatherUnlockedTodayTask.execute(todayUrlWU);
         }//if-else URL
     }//kickOffWeatherUnlocked
-
-
-
-
-
-
+    
     private void updateAdapter() {
         if (weatherArrayList == null || weatherArrayList.size() < 1) {
             Log.d(TAG, "updateAdapter - weatherArrayList null/empty");
@@ -287,6 +344,58 @@ public class TodayActivity extends AppCompatActivity {
                 DividerItemDecoration.HORIZONTAL);
         recyclerView.addItemDecoration(decoration);
     }//updateAdapter
+
+    /**
+     * This creates a custom dialog showing all the saved city names for the user to choose, and
+     * return the corresponding Loc object
+     * @param activity : host activity
+     * @param locArrayList : list of Locs
+     *
+     */
+    private void showLocListDialog(final Activity activity, final ArrayList<Loc> locArrayList) {
+        //check for empty list
+        if (locArrayList == null || locArrayList.size() < 1) {
+            Log.d(TAG, "showLocListDialog - locArrayList is null/empty ");
+            HelperFunctions.showToast(activity.getBaseContext(), "No saved locations");
+            return;
+        }//if
+
+        //create our name list
+        ArrayList<String> namesArrayList = new ArrayList<>();
+        for (Loc loc : locArrayList) {
+            namesArrayList.add(loc.getName());
+        }
+
+        if (namesArrayList == null || locArrayList.size() < 1) {
+            Log.d(TAG, "showLocListDialog - namesArrayList is null/empty ");
+            return;
+        }
+
+        final Dialog dialog = new Dialog(activity);
+        dialog.setContentView(R.layout.custom_dialog);
+
+
+        ListView listView = dialog.findViewById(R.id.list_view);
+        ArrayAdapter arrayAdapter = new ArrayAdapter(activity, R.layout.dialog_list_item,
+                R.id.text_city_name, namesArrayList);
+        listView.setAdapter(arrayAdapter);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //set current loc
+                currentLoc = locArrayList.get(position);
+                //get the weather
+                getAllWeather();
+                //set the title
+                activity.setTitle(currentLoc.getName());
+                //close dialog
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+    }//showLocListDialog
 
 
 

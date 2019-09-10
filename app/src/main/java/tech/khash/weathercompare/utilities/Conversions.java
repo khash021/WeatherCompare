@@ -3,10 +3,6 @@ package tech.khash.weathercompare.utilities;
 import android.text.TextUtils;
 import android.util.Log;
 
-import org.joda.time.DateTime;
-
-import java.util.Locale;
-
 
 /**
  * Created by Khashayar "Khash" Mortazavi
@@ -34,6 +30,16 @@ public class Conversions {
         return output;
     }//roundDecimalString
 
+    /**
+     * This rounds the double with no decimal points
+     * @param d : input double
+     * @return : output rounded double
+     */
+    public static String roundDecimalDouble (double d) {
+        d = Math.round(d);
+        return roundDecimalString(String.valueOf(d));
+    }//roundDecimalDouble
+
     public static String decimalToPercentage(double dec) {
         double perc = dec * 100;
         String output = String.format("%.0f", perc);
@@ -54,10 +60,77 @@ public class Conversions {
         return output;
     }//removeDecimal
 
-    public static String roundDecimalDouble (double d) {
-        d = Math.round(d);
-        return roundDecimalString(String.valueOf(d));
-    }//roundDecimalDouble
+
+
+
+    /*
+       -------------------------  Unit conversions ---------------------------------------
+     */
+
+    public static String celToFarString (String cel) {
+        String far;
+        float celF = Float.valueOf(cel);
+        float farF = (celF * (9f/5f)) + 32f;
+        far = String.format("%.0f", farF);
+        return far;
+    }//celToFarString
+
+    public static String mmToInchString (double mm) {
+        float mmF = (float) mm;
+        float inF = mmF * 0.0393701f;
+        String inS =  String.format("%.1f", inF);
+        return inS;
+    }//mmToInch
+
+    public static String kmToMileString (String km) {
+        String mile;
+        float kmF = Float.valueOf(km);
+        float mileF = kmF / 1.609f;
+        mile = String.format("%.0f", mileF);
+        return mile;
+    }//kmToMileString
+
+    public static String kmhToMphString (String kmh) {
+        String mph;
+        float kmhF = Float.valueOf(kmh);
+        float mphF = kmhF / 1.609f;
+        mph = String.format("%.0f", mphF);
+        return mph;
+    }//kmhToMphString
+
+
+    public static String meterToKmhString(double meter) {
+        Log.d(TAG, "m/s is: " + meter);
+        double kmh = meter * 3.6;
+        //TODO: use locale
+        String output = String.format("%.1f", kmh);
+        return output;
+    }//meterToKmh
+
+    /*
+       -------------------------  Other conversion/calculations ----------------------------------
+     */
+
+    /**
+     * This methods calculates dew point. All in Cel
+     * @param T : given ambient temperature in Cel
+     * @param H : given relative humidity in % (0-100)
+     * @return : calculated dew point in Cel
+     */
+    public static double calculateDewPointCel (double T, double H) {
+        //change humidity to decimal
+        H = H/100d;
+
+        //constants
+        double c1 = 112d;
+        double c2 = 0.9d;
+        double c3 = 0.1d;
+        double c4 = -112d;
+
+        double dewCel = (Math.pow(H, (1/8d))) * (c1 + (c2 * T)) + (c3 * T) + c4;
+
+        return dewCel;
+    }//calculateDewPointCel
 
     /**
      * This method calculates the feel like temp, either by Heat Index, or Wind chill factor
@@ -82,105 +155,6 @@ public class Conversions {
         return T;
     }//calculateFeelsLikeTemp
 
-    /**
-     * This methods calculates dew point. All in Cel
-     * @param T : given ambient temperature in Cel
-     * @param H : given relative humidity in % (0-100)
-     * @return : calculated dew point in Cel
-     */
-    public static double calculateDewPointCel (double T, double H) {
-        //change humidity to decimal
-        H = H/100d;
-
-        //constants
-        double c1 = 112d;
-        double c2 = 0.9d;
-        double c3 = 0.1d;
-        double c4 = -112d;
-
-        double dewCel = (Math.pow(H, (1/8d))) * (c1 + (c2 * T)) + (c3 * T) + c4;
-
-        return dewCel;
-    }//calculateDewPointCel
-
-    /*
-       -------------------------  Unit conversions ---------------------------------------
-     */
-
-    public static String meterToKmhString(double meter) {
-        Log.d(TAG, "m/s is: " + meter);
-        double kmh = meter * 3.6;
-        //TODO: use locale
-        String output = String.format("%.1f", kmh);
-        return output;
-    }//meterToKmh
-
-    public static String farToCelString(double far) {
-        double cel = (far - 32d) * (5d / 9d);
-        cel = Math.round(cel);
-        return String.valueOf(cel);
-    }//farToCel
-
-    public static String mileToKmString(double mile) {
-        double km = mile * 1.60934d;
-        km = Math.round(km);
-        String output = String.valueOf(km);
-        output = String.format("%.0f", output);
-        return output;
-    }//mileToKm
-
-    public static String getDayEpochString(long epoch) {
-        DateTime dateTime = new DateTime(epoch);
-        String day = dateTime.dayOfWeek().getAsText(Locale.getDefault());
-        return day;
-    }//getDayEpoch
-
-    //TODO: use enum for this
-    public static String degreeToDirection(double degree) {
-        Log.d(TAG, "Degree is: " + degree);
-
-        if (degree >= 348.75 || degree <= 11.25) {
-            return "N";
-        } else if (degree > 11.25 && degree <= 33.75) {
-            return "NNE";
-        } else if (degree > 33.75 && degree <= 56.25) {
-            return "NE";
-        } else if (degree > 56.25 && degree <= 78.75) {
-            return "ENE";
-        } else if (degree > 78.75 && degree <= 101.25) {
-            return "E";
-        } else if (degree > 101.25 && degree <= 123.75) {
-            return "ESE";
-        } else if (degree > 123.75 && degree <= 146.25) {
-            return "SE";
-        } else if (degree > 146.25 && degree <= 168.75) {
-            return "SSE";
-        } else if (degree > 168.75 && degree <= 191.25) {
-            return "S";
-        } else if (degree > 191.25 && degree <= 213.75) {
-            return "SSW";
-        } else if (degree > 213.75 && degree <= 236.25) {
-            return "SW";
-        } else if (degree > 236.25 && degree <= 258.75) {
-            return "WSW";
-        } else if (degree > 258.75 && degree <= 281.25) {
-            return "W";
-        } else if (degree > 281.25 && degree <= 303.75) {
-            return "WNW";
-        } else if (degree > 303.75 && degree <= 326.25) {
-            return "NW";
-        } else {
-            return "NNW";
-        }
-    }//degreeToDirection
-
-    public static double celToFarDouble(double cel) {
-        return (cel * (9d / 5d)) + 32d;
-    }//celToFar
-
-    public static double farToCelDouble(double far) {
-        return (far - 32d) * (5d / 9d);
-    }//farToCelDouble
 
     /**
      * This method calculates the Heat index in Cel
@@ -229,5 +203,43 @@ public class Conversions {
 
         return calculatedWindChillCel;
     }//calculateWindChillCel
+
+    public static String degreeToDirection(double degree) {
+        Log.d(TAG, "Degree is: " + degree);
+
+        if (degree >= 348.75 || degree <= 11.25) {
+            return "N";
+        } else if (degree > 11.25 && degree <= 33.75) {
+            return "NNE";
+        } else if (degree > 33.75 && degree <= 56.25) {
+            return "NE";
+        } else if (degree > 56.25 && degree <= 78.75) {
+            return "ENE";
+        } else if (degree > 78.75 && degree <= 101.25) {
+            return "E";
+        } else if (degree > 101.25 && degree <= 123.75) {
+            return "ESE";
+        } else if (degree > 123.75 && degree <= 146.25) {
+            return "SE";
+        } else if (degree > 146.25 && degree <= 168.75) {
+            return "SSE";
+        } else if (degree > 168.75 && degree <= 191.25) {
+            return "S";
+        } else if (degree > 191.25 && degree <= 213.75) {
+            return "SSW";
+        } else if (degree > 213.75 && degree <= 236.25) {
+            return "SW";
+        } else if (degree > 236.25 && degree <= 258.75) {
+            return "WSW";
+        } else if (degree > 258.75 && degree <= 281.25) {
+            return "W";
+        } else if (degree > 281.25 && degree <= 303.75) {
+            return "WNW";
+        } else if (degree > 303.75 && degree <= 326.25) {
+            return "NW";
+        } else {
+            return "NNW";
+        }
+    }//degreeToDirection
 
 }//class

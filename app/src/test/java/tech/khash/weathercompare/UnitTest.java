@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import static org.junit.Assert.assertEquals;
+import static junit.framework.TestCase.assertEquals;
 
 
 @RunWith(JUnit4.class)
@@ -58,25 +58,42 @@ public class UnitTest {
 //        assertEquals(latLngString, "lat=23.6&lon=-123.5");
 //    }
 
+
+//    @Test
+//    public void celToFar() {
+//        float far = 48.79f;
+//        float cel = 9.33f;
+//
+//        float calculated = (cel * (9f/5f)) + 32f;
+//
+//        String s = String.format("%.0f", calculated);
+//        String actual = "49";
+//
+//        assertEquals(actual, s);
+//    }//celToFar
+
     @Test
-    public void farToCel() {
-        double far = 48.8d;
-        double cel = 9.33d;
+    public void kmToMile() {
+        String km = "23";
+        String check = "14";
 
-        double calculated = (far -32d) * (5/9d);
+        float kmF = Float.valueOf(km);
+        float mileF = kmF / 1.609f;
+        String mile = String.format("%.0f", mileF);
 
-        assertEquals(calculated, cel, 0.01);
-    }//farToCel
+        assertEquals(check, mile);
+    }
 
-    @Test
-    public void celToFar() {
-        double far = 48.79d;
-        double cel = 9.33d;
-
-        double calculated = (cel * (9d / 5)) + 32d;
-
-        assertEquals(calculated, far, 0.01);
-    }//celToFar
+//    @Test
+//    public void roundOneDecimal() {
+//        double d = 34.635d;
+//        double dr = 34.6d;
+//        float f = (float) d;
+//        String s = "34.6";
+//
+//        String calculated = String.format("%.1f", f);
+//        assertEquals(s, calculated);
+//    }
 
 //    @Test
 //    public void heatIndex() {
