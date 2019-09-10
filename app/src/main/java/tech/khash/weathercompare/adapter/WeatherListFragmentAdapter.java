@@ -85,6 +85,10 @@ public class WeatherListFragmentAdapter extends RecyclerView.Adapter<WeatherList
             holder.textCloud.setText("Cloud");
             holder.textWind.setText("Wind");
             holder.textWindGust.setText("Gust");
+            holder.textVisibility.setText("Vis");
+            holder.textPressure.setText("Pressure");
+            holder.textTotalRain.setText("T. Rain");
+            holder.textTotalSnow.setText("T. Snow");
 
         } else {
 
@@ -110,6 +114,10 @@ public class WeatherListFragmentAdapter extends RecyclerView.Adapter<WeatherList
             holder.textCloud.setText(weather.getCloudCoverage());
             holder.textWind.setText(weather.getWindDirection() + " " + weather.getWindSpeed());
             holder.textWindGust.setText(weather.getWindGust());
+            holder.textVisibility.setText(weather.getVisibility());
+            holder.textPressure.setText(weather.getPressure());
+            holder.textTotalRain.setText(weather.getTotalRain());
+            holder.textTotalSnow.setText(weather.getTotalSnow());
 
             //imageview
             String iconString = weather.getIcon();
@@ -138,7 +146,8 @@ public class WeatherListFragmentAdapter extends RecyclerView.Adapter<WeatherList
         //views
         final WeatherListFragmentAdapter weatherListAdapter;
         final TextView textProvider, textTempMin, textTempMax, textFeelMin, textFeelMax,
-                textHumidity, textPop, textPopType, textPopTotal, textCloud, textWind, textWindGust;
+                textHumidity, textPop, textPopType, textPopTotal, textCloud, textWind, textWindGust,
+                textVisibility, textPressure, textTotalRain, textTotalSnow;
         final ImageView imageIcon;
 
         //constructor
@@ -158,6 +167,10 @@ public class WeatherListFragmentAdapter extends RecyclerView.Adapter<WeatherList
             textCloud = itemView.findViewById(R.id.text_cloud);
             textWind = itemView.findViewById(R.id.text_wind);
             textWindGust = itemView.findViewById(R.id.text_wind_gust);
+            textVisibility = itemView.findViewById(R.id.text_visibility);
+            textPressure = itemView.findViewById(R.id.text_pressure);
+            textTotalRain = itemView.findViewById(R.id.text_total_rain);
+            textTotalSnow = itemView.findViewById(R.id.text_total_snow);
 
             imageIcon = itemView.findViewById(R.id.image_icon);
 

@@ -15,7 +15,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
@@ -38,30 +37,7 @@ public class ParseJSON {
     private static final String SNOW = "snow";
     private static final String RAIN = "rain";
 
-    /*
-        --------------------------- Open Weather -----------------------------------
-     */
-    private static final String MAIN_OW = "main";
-    private static final String TEMP_OW = "temp";
-    private static final String PRESSURE_OW = "pressure";
-    private static final String HUMIDITY_OW = "humidity";
-    private static final String WIND_OW = "wind";
-    private static final String WIND_SPEED_OW = "speed";
-    private static final String WIND_DIRECTION_OW = "deg";
-    private static final String WEATHER_OW = "weather";
-    private static final String WEATHER_MAIN_OW = "main";
-    private static final String CLOUD_OW = "clouds";
-    private static final String CLOUDS_ALL_OW = "all";
-    private static final String ICON_OW = "icon";
 
-    //forecast
-    private static final String LIST_OW = "list";
-    private static final String DATA_OW = "dt";
-
-
-    //pictures
-    private static final String OPENWEATHER_ICON_BASE_URL = "http://openweathermap.org/img/w/";
-    private static final String OPENWEATHER_ICON_EXTENSION = ".png";
 
     /*
         --------------------------- Accu Weather -----------------------------------
@@ -84,6 +60,8 @@ public class ParseJSON {
     private static final String LOCATION_KEY_AW = "Key";
     private static final String ICON_AW = "WeatherIcon";
     private static final String IS_DAY_AW = "IsDayTime";
+    private static final String RAIN_AW = "Rain";
+    private static final String SNOW_AW = "Snow";
 
     //today
     private static final String DAILY_FORECAST_AW = "DailyForecasts";
@@ -91,6 +69,7 @@ public class ParseJSON {
     private static final String DAILY_EPOCH_RISE_AW = "EpochRise";
     private static final String DAILY_EPOCH_SET_AW = "EpochSet";
     private static final String POP_TYPE_AW = "PrecipitationType";
+
 
     //forecast AW
     private static final String DAILY_FORECASTS_AW = "DailyForecasts";
@@ -160,6 +139,7 @@ public class ParseJSON {
     private static final String FEEL_LIKE_MAX_WB = "app_max_temp";
     private static final String POP_WB = "pop";
     private static final String PRECIPITATION_TOTAL_WB = "precip";
+    private static final String PRECIPITATION_SNOW_WB = "snow";
 
     /*
         --------------------------- Weather Unlocked -----------------------------------
@@ -177,6 +157,7 @@ public class ParseJSON {
 
     private static final String TIMEFRAMES_WU = "Timeframes";
     private static final String CLOUD_TOTAL_WU = "cloudtotal_pct";
+    private static final String PRESSURE_WU = "slp_mb";
 
     //forecast
     private static final String DAYS_WU = "Days";
@@ -185,6 +166,8 @@ public class ParseJSON {
     private static final String TEMP_MAX_WU = "temp_max_c";
     private static final String POP_WU = "prob_precip_pct";
     private static final String PRECIP_TOTAL_WU = "precip_total_mm";
+    private static final String TOTAL_RAIN_WU = "rain_total_mm";
+    private static final String TOTAL_SNOW_WU = "snow_total_mm";
     private static final String WIND_WU = "windspd_max_kmh";
     private static final String GUST_WU = "windgst_max_kmh";
     private static final String HUMIDITY_MAX_WU = "humid_max_pct";
@@ -226,244 +209,6 @@ public class ParseJSON {
     private final static String LINE_BREAK = "\n";
 
     private static final long DAY_MILLI = 86400000;
-
-        /*
-    -------------------------------- Open Weather ----------------------------------------
-     */
-
-    //TODO: instead of removing decimal, round it for all weathers
-
-    /**
-     * This method is for parsing the current weather from Open Weather
-     *
-     * @param jsonString : raw JSON response from the server
-     * @return : Weather object
-     * @throws JSONException
-     */
-    public static Weather parseOpenWeatherCurrent(String jsonString) throws JSONException {
-
-        //dummy check for empty or null input
-        if (jsonString == null || TextUtils.isEmpty(jsonString)) {
-            return null;
-        }//if
-
-        String summary, temp, feelLike, dewPoint, pressure, humidity, windSpeed, windDirection,
-                cloudCoverage;
-
-        //create a Weather object
-        Weather weather = new Weather();
-
-        //set the provider
-        weather.setProvider(Weather.PROVIDER_OW);
-
-        //create an object from the string
-        JSONObject currentObject = new JSONObject(jsonString);
-        //get a reference to the main
-        JSONObject mainObject = currentObject.getJSONObject(MAIN_OW);
-
-        //weather description
-        JSONArray weatherArray = currentObject.getJSONArray(WEATHER_OW);
-        JSONObject weatherObject = weatherArray.getJSONObject(0);
-        summary = weatherObject.optString(WEATHER_MAIN_OW);
-        weather.setSummary(summary);
-
-        //temp
-        temp = mainObject.optString(TEMP_OW);
-        double T = mainObject.optDouble(TEMP_OW);
-        //round if it contains a decimal point
-        temp = Conversions.roundDecimalString(temp);
-
-        weather.setTemperature(temp);
-
-        //pressure
-        pressure = mainObject.optString(PRESSURE_OW);
-
-        pressure = Conversions.roundDecimalString(pressure);
-
-        weather.setPressure(pressure);
-
-        //humidity
-        humidity = mainObject.getString(HUMIDITY_OW);
-        double H = mainObject.optDouble(HUMIDITY_OW);
-        weather.setHumidity(humidity);
-
-        //get a reference to the wind
-        JSONObject windObject = currentObject.getJSONObject(WIND_OW);
-
-        //wind
-        windSpeed = windObject.optString(WIND_SPEED_OW);
-        double V = windObject.optDouble(WIND_SPEED_OW);
-        windSpeed = Conversions.roundDecimalString(windSpeed);
-        weather.setWindSpeed(windSpeed);
-
-        double windDirectionDouble = windObject.optDouble(WIND_DIRECTION_OW);
-        windDirection = Conversions.degreeToDirection(windDirectionDouble);
-        weather.setWindDirection(windDirection);
-
-        //cloud cover
-        JSONObject cloudObject = currentObject.getJSONObject(CLOUD_OW);
-        cloudCoverage = cloudObject.optString(CLOUDS_ALL_OW);
-        cloudCoverage = Conversions.roundDecimalString(cloudCoverage);
-        weather.setCloudCoverage(cloudCoverage);
-
-        //Feel like temp and dew point
-        double feel = Conversions.calculateFeelsLikeTemp(T, H, V);
-        feelLike = Conversions.roundDecimalDouble(feel);
-        weather.setTempFeel(feelLike);
-
-        double dew = Conversions.calculateDewPointCel(T, H);
-        dewPoint = Conversions.roundDecimalDouble(dew);
-        weather.setDewPoint(dewPoint);
-
-        //icon
-//        icon = weatherObject.optString(ICON_OW);
-
-
-        return weather;
-    }//parseOpenWeatherCurrent
-
-    /**
-     * This methods goes through the forecast data and create 3 Weather objects for next 3
-     * days and return the list
-     *
-     * @param jsonResponse : response
-     * @return : ArrayList<Weather> for the next 3 days
-     * @throws JSONException
-     */
-    public static ArrayList<Weather> parseOpenWeatherForecast(String jsonResponse) {
-        if (TextUtils.isEmpty(jsonResponse)) {
-            return null;
-        }
-
-
-        ArrayList<Weather> weatherArrayList = new ArrayList<>();
-
-        //create calender using default timezone and locale for this moment
-        Calendar calendar = new GregorianCalendar();
-        // reset hour, minutes, seconds and millis
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-        //next day
-        calendar.add(Calendar.DAY_OF_MONTH, 1);
-
-        //start of next 4 days
-        long day1StartMilli = calendar.getTimeInMillis();
-        long day2StartMilli = day1StartMilli + DAY_MILLI;
-        long day3StartMilli = day2StartMilli + DAY_MILLI;
-        long day4StartMilli = day3StartMilli + DAY_MILLI;
-
-        try {
-            JSONObject rootObject = new JSONObject(jsonResponse);
-            JSONArray listArray = rootObject.optJSONArray(LIST_OW);
-            ArrayList<Weather> day1Array = getWeatherDayOW(day1StartMilli, day2StartMilli, listArray);
-            ArrayList<Weather> day2Array = getWeatherDayOW(day2StartMilli, day3StartMilli, listArray);
-            ArrayList<Weather> day3Array = getWeatherDayOW(day3StartMilli, day4StartMilli, listArray);
-
-            //add to list
-            if (day1Array == null || day1Array.size() < 1) {
-                Log.d(TAG, "OW WEATHER LIST = null/empty");
-            } else {
-                Weather weather1 = calculateMinMax(day1Array);
-                weatherArrayList.add(weather1);
-            }//if/else null/empty
-
-            if (day2Array == null || day2Array.size() < 1) {
-                Log.d(TAG, "OW WEATHER LIST = null/empty");
-            } else {
-                Weather weather2 = calculateMinMax(day2Array);
-                weatherArrayList.add(weather2);
-            }//if/else null/empty
-
-            if (day3Array == null || day3Array.size() < 1) {
-                Log.d(TAG, "OW WEATHER LIST = null/empty");
-            } else {
-                Weather weather3 = calculateMinMax(day3Array);
-                weatherArrayList.add(weather3);
-            }//if/else null/empty
-        } catch (JSONException e) {
-            Log.e(TAG, "getForecastOW - error parsing json", e);
-        }
-        return weatherArrayList;
-    }//parseOpenWeatherForecast
-
-    private static ArrayList<Weather> getWeatherDayOW(long start, long end, JSONArray jsonArray) {
-        long epoch;
-        String temp, humidity, wind;
-        ArrayList<Weather> outputList = new ArrayList<>();
-        Weather weather;
-        for (int i = 0; i < jsonArray.length(); i++) {
-            weather = new Weather();
-            try {
-                JSONObject rootObject = (JSONObject) jsonArray.get(i);
-                epoch = rootObject.optLong(DATA_OW);
-                epoch *= 1000;
-                //check for dates
-                if (!(epoch > start && epoch < end))
-                    continue;
-                //set the provider
-                weather.setProvider(Weather.PROVIDER_OW);
-                weather.setEpoch(epoch);
-
-                JSONObject mainObject = rootObject.optJSONObject(MAIN_OW);
-                //temp
-                temp = mainObject.optString(TEMP_OW);
-                weather.setTemperature(temp);
-
-                //hum
-                humidity = mainObject.optString(HUMIDITY_OW);
-                weather.setHumidity(humidity);
-
-                //wind
-                JSONObject windObject = rootObject.optJSONObject(WIND_OW);
-                wind = windObject.optString(WIND_SPEED_OW);
-                weather.setWindSpeed(wind);
-
-                outputList.add(weather);
-            } catch (JSONException e) {
-                Log.e(TAG, "getWeatherDayOW - array error", e);
-            }
-
-        }//for
-        return outputList;
-    }//getWeatherDayOW
-
-    private static Weather calculateMinMax(ArrayList<Weather> weatherArrayList) {
-        SimpleDateFormat formatter = new SimpleDateFormat("EEE, MMM.dd", Locale.getDefault());
-        float min, max;
-        String date;
-        long epoch;
-        Weather weather = new Weather();
-
-        //epoch
-        epoch = (weatherArrayList.get(0)).getEpoch();
-        weather.setEpoch(epoch);
-
-        //date
-        Date d = new Date(epoch);
-        date = formatter.format(d);
-        weather.setDate(date);
-
-        ArrayList<Float> tempArrayList = new ArrayList<>();
-        for (Weather w : weatherArrayList) {
-            float temp = Float.valueOf(w.getTemperature());
-            tempArrayList.add(temp);
-        }
-
-        min = Collections.min(tempArrayList);
-        max = Collections.max(tempArrayList);
-
-        //round values
-        min = Math.round(min);
-        max = Math.round(max);
-
-        weather.setTempMin(Conversions.removeDemicalFloat(min));
-        weather.setTempMax(Conversions.removeDemicalFloat(max));
-
-        return weather;
-
-    }//calculateMinMax
 
     /*
     -------------------------------- Accu Weather ----------------------------------------
@@ -609,10 +354,8 @@ public class ParseJSON {
             return null;
         }//if
 
-        //TODO: maybe add more
-        //TODO: poptype
-        String date, tempMin, tempMax, feelLikeMin, feelLikeMax, pop, popTotal,
-                windSpeed, windDirection, windGust, cloud, icon;
+        String date, tempMin, tempMax, feelLikeMin, feelLikeMax, pop, popTotal, totalRain,
+                totalSnow, windSpeed, windDirection, windGust, cloud, icon;
 
         int popType;
 
@@ -693,6 +436,16 @@ public class ParseJSON {
         popType = getPopType(popTypeString);
         weather.setPopType(popType);
 
+        //total Rain
+        JSONObject totalRainObject = todayObject.optJSONObject(RAIN_AW);
+        totalRain = totalRainObject.optString(METRIC_VALUE_AW);
+        weather.setTotalRain(totalRain);
+
+        //total snow
+        JSONObject totalSnowObject = todayObject.optJSONObject(SNOW_AW);
+        totalSnow = totalSnowObject.optString(METRIC_VALUE_AW);
+        weather.setTotalSnow(totalSnow);
+
         //wind
         JSONObject windObject = todayObject.optJSONObject(WIND_AW);
 
@@ -738,8 +491,8 @@ public class ParseJSON {
         }
 
         String date, tempMin, tempMax, feelLikeMin, feelLikeMax, summaryDay, popDay, cloudDay,
-                summaryNight, popNight, cloudNight, popTotal, windSpeed, windDirection, windGust,
-                icon;
+                summaryNight, popNight, cloudNight, popTotal, totalRain, totalSnow, windSpeed,
+                windDirection, windGust, icon;
 
         int popType;
         /**
@@ -847,11 +600,21 @@ public class ParseJSON {
             popType = getPopType(popTypeString);
             weather.setPopType(popType);
 
-
+            //total POP
             JSONObject popTotalObject = dayObject.optJSONObject(POP_TOTAL_AW);
             double popTotalDouble = popTotalObject.optDouble(METRIC_VALUE_AW);
             popTotal = Conversions.roundDecimalDouble(popTotalDouble);
             weather.setPopTotal(popTotal);
+
+            //total Rain
+            JSONObject totalRainObject = dayObject.optJSONObject(RAIN_AW);
+            totalRain = totalRainObject.optString(METRIC_VALUE_AW);
+            weather.setTotalRain(totalRain);
+
+            //total snow
+            JSONObject totalSnowObject = dayObject.optJSONObject(SNOW_AW);
+            totalSnow = totalSnowObject.optString(METRIC_VALUE_AW);
+            weather.setTotalSnow(totalSnow);
 
             //cloud
             cloudDay = String.valueOf(dayObject.optInt(CLOUD_COVER_AW));
@@ -990,7 +753,7 @@ public class ParseJSON {
         }
 
         String date, summary, tempMin, tempMax, feelLikeMin, feelLikeMax, pressure, dewPoint, humidity,
-                pop, popTotal, windSpeed, windDirection, windGust, cloud, visibility, icon;
+                pop, windSpeed, windDirection, windGust, cloud, visibility, icon;
         int popType;
         Weather weather = new Weather();
         weather.setProvider(Weather.PROVIDER_DS);
@@ -1371,7 +1134,7 @@ public class ParseJSON {
         }
 
         String date, summary, tempMin, tempMax, feelLikeMin, feelLikeMax, dewPoint, pressure,
-                humidity, windSpeed, windGust, windDirection, cloudCoverage, pop, popTotal,
+                humidity, windSpeed, windGust, windDirection, cloudCoverage, pop, totalRain, totalSnow,
                 visibility, icon;
         Weather weather = new Weather();
         //set the provider
@@ -1476,9 +1239,16 @@ public class ParseJSON {
                 pop = Conversions.roundDecimalString(pop);
                 weather.setPop(pop);
 
-                double popTotalDouble = mainObject.optDouble(PRECIPITATION_TOTAL_WB);
-                popTotal = Conversions.roundDecimalDouble(popTotalDouble);
-                weather.setPopTotal(popTotal);
+                //total rain
+                double popRainDouble = mainObject.optDouble(PRECIPITATION_TOTAL_WB);
+                totalRain = Conversions.roundDecimalDouble(popRainDouble);
+                weather.setTotalRain(totalRain);
+
+                //total snow
+                double popSnowDouble = mainObject.optDouble(PRECIPITATION_SNOW_WB);
+                popSnowDouble = popSnowDouble / 10; //convert to cm
+                totalSnow = Conversions.roundDecimalDouble(popSnowDouble);
+                weather.setTotalSnow(totalSnow);
 
                 icon = getIcon(-1, Integer.valueOf(pop), Integer.valueOf(cloudCoverage));
                 weather.setIcon(icon);
@@ -1497,8 +1267,8 @@ public class ParseJSON {
         }
 
         String date, summary, tempMin, tempMax, feelLikeMin, feelLikeMax, dewPoint, pressure,
-                humidity, windSpeed, windGust, windDirection, cloudCoverage, pop, popTotal,
-                visibility, icon;
+                humidity, windSpeed, windGust, windDirection, cloudCoverage, pop, totalRain,
+                totalSnow, visibility, icon;
         ArrayList<Weather> weatherArrayList = new ArrayList<>();
         Weather weather;
         //for formatting date
@@ -1627,9 +1397,16 @@ public class ParseJSON {
             pop = Conversions.roundDecimalString(pop);
             weather.setPop(pop);
 
-            double popTotalDouble = mainObject.optDouble(PRECIPITATION_TOTAL_WB);
-            popTotal = Conversions.roundDecimalDouble(popTotalDouble);
-            weather.setPopTotal(popTotal);
+            //total rain
+            double totalRainDouble = mainObject.optDouble(PRECIPITATION_TOTAL_WB);
+            totalRain = Conversions.roundDecimalDouble(totalRainDouble);
+            weather.setTotalRain(totalRain);
+
+            //total snow
+            double popSnowDouble = mainObject.optDouble(PRECIPITATION_SNOW_WB);
+            popSnowDouble = popSnowDouble / 10; //convert to cm
+            totalSnow = Conversions.roundDecimalDouble(popSnowDouble);
+            weather.setTotalSnow(totalSnow);
 
             icon = getIcon(-1, Integer.valueOf(pop), Integer.valueOf(cloudCoverage));
             weather.setIcon(icon);
@@ -1722,7 +1499,7 @@ public class ParseJSON {
         }
 
         String date, tempMin, tempMax, feelLikeMin, feelLikeMax, humidity, dewPoint, windSpeed,
-                windGust, pop, popTotal, cloud, icon;
+                windGust, pop, popTotal, totalRain, totalSnow, visibility, pressure, cloud, icon;
         Weather weather = new Weather();
         weather.setProvider(Weather.PROVIDER_WU);
 
@@ -1814,19 +1591,44 @@ public class ParseJSON {
                     pop = Conversions.roundDecimalString(pop);
                     weather.setPop(pop);
 
+                    //popTotal
                     double popTotalDouble = mainObject.optDouble(PRECIP_TOTAL_WU);
                     popTotal = Conversions.roundDecimalDouble(popTotalDouble);
                     weather.setPopTotal(popTotal);
 
-                    //cloud
+                    //total rain
+                    double rainTotalDouble = mainObject.optDouble(TOTAL_RAIN_WU);
+                    totalRain = Conversions.roundDecimalDouble(rainTotalDouble);
+                    weather.setTotalRain(totalRain);
+
+                    //total snow
+                    double snowTotalDouble = mainObject.optDouble(TOTAL_SNOW_WU);
+                    snowTotalDouble *= snowTotalDouble * 10;//convert to cm
+                    totalSnow = Conversions.roundDecimalDouble(snowTotalDouble);
+                    weather.setTotalSnow(totalSnow);
+
+                    //time frames
                     JSONArray timeFrameArray = mainObject.optJSONArray(TIMEFRAMES_WU);
                     ArrayList<Integer> cloudList = new ArrayList<>();
+                    ArrayList<Double> pressureList = new ArrayList<>();
+                    ArrayList<Double> visibilityList = new ArrayList<>();
                     for (int j = 0; j < timeFrameArray.length(); j++) {
                         JSONObject timeFrameObject = timeFrameArray.optJSONObject(j);
 
+                        //cloud
                         Integer cloudInt = timeFrameObject.optInt(CLOUD_TOTAL_WU);
                         cloudList.add(cloudInt);
+
+                        //pressure
+                        Double pressureDouble = timeFrameObject.optDouble(PRESSURE_WU);
+                        pressureList.add(pressureDouble);
+
+                        //visibility
+                        Double visDouble = timeFrameObject.optDouble(VISIBILITY_WU);
+                        visibilityList.add(visDouble);
                     }//for
+
+                    //cloud
                     int cloudArraySize = cloudList.size();
                     int cloudTotal = 0;
                     for (Integer c : cloudList) {
@@ -1836,10 +1638,29 @@ public class ParseJSON {
                     cloud = Conversions.roundDecimalDouble(cloudDouble);
                     weather.setCloudCoverage(cloud);
 
+                    //pressure
+                    int pressureSize = pressureList.size();
+                    double pressureTotal = 0;
+                    for (Double p: pressureList) {
+                        pressureTotal += p;
+                    }
+                    double pressureDouble = pressureTotal / pressureSize;
+                    pressure = Conversions.roundDecimalDouble(pressureDouble);
+                    weather.setPressure(pressure);
 
+                    //visibility
+                    int visSize = visibilityList.size();
+                    double visTotal = 0;
+                    for (Double v: visibilityList) {
+                        visTotal += v;
+                    }
+                    double visDouble = visTotal / visSize;
+                    visibility = Conversions.roundDecimalDouble(visDouble);
+                    weather.setVisibility(visibility);
+
+                    //icon
                     icon = getIcon(-1, Integer.valueOf(pop), Integer.valueOf(cloud));
                     weather.setIcon(icon);
-
                     break;
 
                 }//if
@@ -1858,7 +1679,7 @@ public class ParseJSON {
         }
 
         String date, tempMin, tempMax, feelLikeMin, feelLikeMax, humidity, dewPoint, windSpeed,
-                windGust, pop, popTotal, cloud, icon;
+                windGust, pop, popTotal, cloud, icon, pressure, visibility, totalRain, totalSnow;
         ArrayList<Weather> weatherArrayList = new ArrayList<>();
         Weather weather;
         //for formatting date
@@ -1972,19 +1793,44 @@ public class ParseJSON {
             pop = Conversions.roundDecimalString(pop);
             weather.setPop(pop);
 
+            //popTotal
             double popTotalDouble = mainObject.optDouble(PRECIP_TOTAL_WU);
             popTotal = Conversions.roundDecimalDouble(popTotalDouble);
             weather.setPopTotal(popTotal);
 
-            //cloud
+            //total rain
+            double rainTotalDouble = mainObject.optDouble(TOTAL_RAIN_WU);
+            totalRain = Conversions.roundDecimalDouble(rainTotalDouble);
+            weather.setTotalRain(totalRain);
+
+            //total snow
+            double snowTotalDouble = mainObject.optDouble(TOTAL_SNOW_WU);
+            snowTotalDouble *= snowTotalDouble * 10;//convert to cm
+            totalSnow = Conversions.roundDecimalDouble(snowTotalDouble);
+            weather.setTotalSnow(totalSnow);
+
+            //time frames
             JSONArray timeFrameArray = mainObject.optJSONArray(TIMEFRAMES_WU);
             ArrayList<Integer> cloudList = new ArrayList<>();
+            ArrayList<Double> pressureList = new ArrayList<>();
+            ArrayList<Double> visibilityList = new ArrayList<>();
             for (int j = 0; j < timeFrameArray.length(); j++) {
                 JSONObject timeFrameObject = timeFrameArray.optJSONObject(j);
 
+                //cloud
                 Integer cloudInt = timeFrameObject.optInt(CLOUD_TOTAL_WU);
                 cloudList.add(cloudInt);
+
+                //pressure
+                Double pressureDouble = timeFrameObject.optDouble(PRESSURE_WU);
+                pressureList.add(pressureDouble);
+
+                //visibility
+                Double visDouble = timeFrameObject.optDouble(VISIBILITY_WU);
+                visibilityList.add(visDouble);
             }//for
+
+            //cloud
             int cloudArraySize = cloudList.size();
             int cloudTotal = 0;
             for (Integer c : cloudList) {
@@ -1994,6 +1840,27 @@ public class ParseJSON {
             cloud = Conversions.roundDecimalDouble(cloudDouble);
             weather.setCloudCoverage(cloud);
 
+            //pressure
+            int pressureSize = pressureList.size();
+            double pressureTotal = 0;
+            for (Double p: pressureList) {
+                pressureTotal += p;
+            }
+            double pressureDouble = pressureTotal / pressureSize;
+            pressure = Conversions.roundDecimalDouble(pressureDouble);
+            weather.setPressure(pressure);
+
+            //visibility
+            int visSize = visibilityList.size();
+            double visTotal = 0;
+            for (Double v: visibilityList) {
+                visTotal += v;
+            }
+            double visDouble = visTotal / visSize;
+            visibility = Conversions.roundDecimalDouble(visDouble);
+            weather.setVisibility(visibility);
+
+            //icon
             icon = getIcon(-1, Integer.valueOf(pop), Integer.valueOf(cloud));
             weather.setIcon(icon);
 

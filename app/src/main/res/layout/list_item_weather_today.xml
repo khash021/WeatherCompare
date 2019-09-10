@@ -109,5 +109,37 @@
         android:padding="6dp"
         android:textSize="12sp" />
 
+    <TextView
+        android:id="@+id/text_visibility"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="6dp"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/text_pressure"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="6dp"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/text_total_rain"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="6dp"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/text_total_snow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="6dp"
+        android:textSize="12sp" />
+
 
 </LinearLayout>

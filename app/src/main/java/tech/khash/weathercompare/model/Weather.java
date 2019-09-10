@@ -19,19 +19,15 @@ public class Weather {
 
     //TODO: make the variables match the return type from API (float, etc) and then convert on returning
 
-    private String summary, temperature, tempFeel, humidity, dewPoint, pressure, windSpeed, windDirection,
-            windGust, visibility, cloudCoverage, pop, icon;
-
-    //for forecast
-    private String date, tempMin, tempFeelMin, tempMax, tempFeelMax, summaryDay, popDay, cloudDay,
-            summaryNight, popNight, cloudNight;
+    private String summary, date, temperature, tempFeel, tempMin, tempFeelMin, tempMax, tempFeelMax,
+            humidity, dewPoint, pressure, windSpeed, windDirection, windGust, visibility,
+            cloudCoverage, pop, popTotal, totalRain, totalSnow, icon,
+            summaryDay, popDay, cloudDay, summaryNight, popNight, cloudNight;
 
     private boolean isDay;
 
     private Integer popType;
 
-    //for WU
-    private String popTotal;
     private long epoch;
 
     //providers
@@ -143,6 +139,14 @@ public class Weather {
     public void setPopTotal(String popTotal) {
         this.popTotal = popTotal;
     }//setPopTotal
+
+    public void setTotalRain(String totalRain) {
+        this.totalRain = totalRain;
+    }//setTotalRain
+
+    public void setTotalSnow(String totalSnow) {
+        this.totalSnow = totalSnow;
+    }//setTotalSnow
 
     public void setPopType(int popType) {
         this.popType = popType;
@@ -333,6 +337,22 @@ public class Weather {
             return popTotal;
         }
     }//getPopTotal
+
+    public String getTotalRain() {
+        if (totalRain == null) {
+            return "";
+        } else {
+            return totalRain;
+        }
+    }//getTotalRain
+
+    public String getTotalSnow() {
+        if (totalSnow == null) {
+            return "";
+        } else {
+            return totalSnow;
+        }
+    }//getTotalSnow
 
     public int getPopType() {
         if (popType != null) {

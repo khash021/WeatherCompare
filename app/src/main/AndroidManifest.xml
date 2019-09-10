@@ -37,52 +37,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="tech.khash.weathercompare.MainActivity" />
         </activity>
-        <activity
-            android:name=".CompareActivity"
-            android:label="@string/title_activity_compare">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="tech.khash.weathercompare.MainActivity" />
-        </activity>
-        <activity
-            android:name=".AccuWeatherForecastActivity"
-            android:label="@string/title_activity_open_weather_forecast">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="tech.khash.weathercompare.MainActivity" />
-        </activity>
-
-        <activity
-            android:name=".DarkSkyForecastActivity"
-            android:label="@string/title_dark_sky_forecast">
-        <meta-data
-            android:name="android.support.PARENT_ACTIVITY"
-            android:value="tech.khash.weathercompare.MainActivity" />
-        </activity>
-
-        <activity
-            android:name=".OpenWeatherForecastActivity"
-            android:label="@string/title_open_weather_forecast">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="tech.khash.weathercompare.MainActivity" />
-        </activity>
-
-        <activity
-            android:name=".WeatherBitForecastActivity"
-            android:label="@string/title_weather_bit_forecast">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="tech.khash.weathercompare.MainActivity" />
-        </activity>
-
-        <activity
-            android:name=".WeatherUnlockedForecastActivity"
-            android:label="@string/title_weather_unlocked_forecast">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="tech.khash.weathercompare.MainActivity" />
-        </activity>
 
         <activity
             android:name=".ForecastActivity"

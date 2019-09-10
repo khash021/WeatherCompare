@@ -344,11 +344,6 @@ public class MainActivity extends AppCompatActivity implements
             //TODO: remove one of them
             //for now, both are doing the same thing,
             case -1:
-                //start compare activity, passing in the loc object
-                Intent compareIntent = new Intent(MainActivity.this, CompareActivity.class);
-                compareIntent.putExtra(Constant.INTENT_EXTRA_LOC_NAME, id);
-                startActivity(compareIntent);
-                break;
             case LocListAdapter.TODAY_BUTTON:
                 //start compare activity, passing in the loc object
                 Intent todayIntent = new Intent(MainActivity.this, TodayActivity.class);
