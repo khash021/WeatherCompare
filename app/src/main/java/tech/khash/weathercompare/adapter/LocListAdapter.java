@@ -35,7 +35,7 @@ public class LocListAdapter extends RecyclerView.Adapter<LocListAdapter.LocViewH
     private ListItemClickListener itemClickListener;
 
     //constants for our button clicks
-    public static final int CURRENT_BUTTON = 1;
+    public static final int TODAY_BUTTON = 1;
     public static final int FORECAST_BUTTON = 2;
 
     /**
@@ -140,7 +140,7 @@ public class LocListAdapter extends RecyclerView.Adapter<LocListAdapter.LocViewH
             int position = getLayoutPosition();
             //we capture whether the buttons were clicked or not
             if (id == R.id.button_current) {
-                itemClickListener.onListItemClick(position, CURRENT_BUTTON);
+                itemClickListener.onListItemClick(position, TODAY_BUTTON);
             } else if (id == R.id.button_forecast) {
                 itemClickListener.onListItemClick(position, FORECAST_BUTTON);
             } else {

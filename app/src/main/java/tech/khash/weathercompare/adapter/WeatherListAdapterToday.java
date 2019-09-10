@@ -16,7 +16,7 @@ import tech.khash.weathercompare.R;
 import tech.khash.weathercompare.model.Weather;
 import tech.khash.weathercompare.utilities.HelperFunctions;
 
-public class WeatherListFragmentAdapter extends RecyclerView.Adapter<WeatherListFragmentAdapter.WeatherViewHolder> {
+public class WeatherListAdapterToday extends RecyclerView.Adapter<WeatherListAdapterToday.WeatherViewHolder> {
 
     //list of data
     private final ArrayList<Weather> weatherArrayList;
@@ -24,52 +24,26 @@ public class WeatherListFragmentAdapter extends RecyclerView.Adapter<WeatherList
     private LayoutInflater inflater;
     //context
     private Context context;
+    private boolean isDay;
 
-    //This is our listener implemented as an interface, to be used in the Activity
-    private WeatherListFragmentAdapter.ListItemClickListener itemClickListener;
-
-    /**
-     * The interface that receives onClick messages.
-     */
-    public interface ListItemClickListener {
-        void onListItemClick(int clickedItemIndex);
-    }//ListItemLongClickListener
-
-    /**
-     * Public constructor
-     *
-     * @param context          :context of parent activity
-     * @param weatherArrayList : ArrayList<Weather> containing data
-     * @param listener         : listener
-     */
-    public WeatherListFragmentAdapter(Context context, ArrayList<Weather> weatherArrayList,
-                                      WeatherListFragmentAdapter.ListItemClickListener listener) {
+    //constructor
+    public WeatherListAdapterToday (Context context, ArrayList<Weather> weatherArrayList, boolean isDay) {
         this.context = context;
-        inflater = LayoutInflater.from(context);
+        this.isDay = isDay;
         this.weatherArrayList = weatherArrayList;
-        this.itemClickListener = listener;
+        inflater = LayoutInflater.from(context);
     }//constructor
 
-    //It inflates the item layout, and returns a ViewHolder with the layout and the adapter.
+
     @NonNull
     @Override
-    public WeatherListFragmentAdapter.WeatherViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int i) {
-        View itemView = inflater.inflate(R.layout.list_item_fragment_forecast, parent, false);
-        return new WeatherListFragmentAdapter.WeatherViewHolder(itemView, this);
+    public WeatherViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View itemView = inflater.inflate(R.layout.list_item_weather_today, parent, false);
+        return new WeatherListAdapterToday.WeatherViewHolder(itemView, this);
     }//onCreateViewHolder
 
-    /**
-     * This connects the data to the view holder. This is where it creates each item
-     *
-     * @param holder   : the custom view holder
-     * @param position : index of the item in the list
-     */
     @Override
-    public void onBindViewHolder(@NonNull WeatherListFragmentAdapter.WeatherViewHolder holder, int position) {
-
-        //TODO: if position is zero: load the descriptions (name, temp, etc). Then make sure to subtract
-        //1 when getting the object from arraylist
-        //TODO: testing
+    public void onBindViewHolder(@NonNull WeatherViewHolder holder, int position) {
         if (position == 0) {
             //load the header
             //set the views
@@ -87,8 +61,6 @@ public class WeatherListFragmentAdapter extends RecyclerView.Adapter<WeatherList
             holder.textWindGust.setText("Gust");
 
         } else {
-
-
             //Get the weather object
             Weather weather = weatherArrayList.get(position - 1);
 
@@ -114,36 +86,45 @@ public class WeatherListFragmentAdapter extends RecyclerView.Adapter<WeatherList
             //imageview
             String iconString = weather.getIcon();
             //we set it to day, if for some reason we don't have isDay data
-            iconString += "d";
+            if (isDay) {
+                iconString += "d";
+            } else {
+                iconString += "n";
+            }
             int iconInt = HelperFunctions.getIconInteger(iconString);
             if (iconInt != -1) {
                 holder.imageIcon.setImageResource(iconInt);
             }//if/else isDay
         }
+
     }//onBindViewHolder
 
     @Override
     public int getItemCount() {
-        if (weatherArrayList == null) {
+        if (weatherArrayList == null || weatherArrayList.size() < 1) {
             return 0;
         } else {
-            //because the first element is header, we add one
             return (weatherArrayList.size() + 1);
         }
     }//getItemCount
 
 
-    //Inner class for the view holder
-    class WeatherViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+
+
+
+    class WeatherViewHolder extends RecyclerView.ViewHolder {
+        //adapter
+        final WeatherListAdapterToday adapter;
         //views
-        final WeatherListFragmentAdapter weatherListAdapter;
         final TextView textProvider, textTempMin, textTempMax, textFeelMin, textFeelMax,
                 textHumidity, textPop, textPopType, textPopTotal, textCloud, textWind, textWindGust;
         final ImageView imageIcon;
 
         //constructor
-        private WeatherViewHolder(View itemView, WeatherListFragmentAdapter weatherListAdapter) {
+        private WeatherViewHolder (View itemView, WeatherListAdapterToday adapter) {
             super(itemView);
+
+            this.adapter = adapter;
 
             //find views
             textProvider = itemView.findViewById(R.id.text_provider);
@@ -160,18 +141,7 @@ public class WeatherListFragmentAdapter extends RecyclerView.Adapter<WeatherList
             textWindGust = itemView.findViewById(R.id.text_wind_gust);
 
             imageIcon = itemView.findViewById(R.id.image_icon);
-
-            //adapter
-            this.weatherListAdapter = weatherListAdapter;
-            //for click listener
-            itemView.setOnClickListener(this);
         }//constructor
 
-        @Override
-        public void onClick(View v) {
-            //get the index of the item
-            int position = getLayoutPosition();
-            itemClickListener.onListItemClick(position);
-        }//onClick
     }//WeatherViewHolder
-}//WeatherListFragmentAdapter
+}//WeatherListAdapterToday

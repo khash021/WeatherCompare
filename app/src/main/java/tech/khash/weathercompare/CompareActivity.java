@@ -76,6 +76,10 @@ public class CompareActivity extends AppCompatActivity {
                 if (loc != null) {
                     currentLoc = loc;
                     textCityName.setText(loc.getName());
+                    //TODO: testing
+                    Log.d(TAG, "URLs\nToday AW : " + currentLoc.getTodayUrlAW().toString() +
+                            "\nForecast DS : " + currentLoc.getForecastUrlDS().toString() +
+                            "\nForecast WB : " + currentLoc.getForecastUrlWB().toString());
                 }//null-loc
             }//empty string
         }//has extra
@@ -646,47 +650,13 @@ public class CompareActivity extends AppCompatActivity {
         } else {
             iconString += "n";
         }
-        int iconInt = getIconInteger(iconString);
+        int iconInt = HelperFunctions.getIconInteger(iconString);
         if (iconInt != -1) {
             iconView.setImageResource(iconInt);
         }
     }//showOpenWeatherResults
 
-    private int getIconInteger(String icon) {
-        switch (icon) {
-            case "i01d":
-                return R.drawable.i01d;
-            case "i01n":
-                return R.drawable.i01n;
-            case "i02d":
-                return R.drawable.i02d;
-            case "i02n":
-                return R.drawable.i02n;
-            case "i03d":
-                return R.drawable.i03d;
-            case "i03n":
-                return R.drawable.i03n;
-            case "i04d":
-                return R.drawable.i04d;
-            case "i04n":
-                return R.drawable.i04n;
-            case "i05d":
-                return R.drawable.i05d;
-            case "i05n":
-                return R.drawable.i05n;
-            case "i06d":
-                return R.drawable.i06d;
-            case "i06n":
-                return R.drawable.i06n;
-            case "i07d":
-                return R.drawable.i07d;
-            case "i07n":
-                return R.drawable.i07n;
 
-                default:
-                    return -1;
-        }
-    }//getIconInteger
 
     private void showDarkSkyError() {
 

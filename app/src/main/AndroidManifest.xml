@@ -93,6 +93,14 @@
                 android:value="tech.khash.weathercompare.MainActivity" />
         </activity>
 
+        <activity
+            android:name=".TodayActivity"
+            android:label="@string/title_activity_today">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="tech.khash.weathercompare.MainActivity" />
+        </activity>
+
         <activity android:name=".SettingsActivity"
             android:label="@string/settings">
             <meta-data

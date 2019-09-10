@@ -38,6 +38,8 @@ public class Loc {
     private static final String API_ID_AW = "?apikey=";
     private static final String API_KEY_AW = "Lxds8cj5vJGWk7n1XBe8McAhJhyFnCaw";
     private static final String DETAILS_TRUE_AW = "&details=true";
+    //Today
+    private static final String BASE_URL_TODAY_AW = "http://dataservice.accuweather.com/forecasts/v1/daily/1day/";
     //forecast (5-day)
     private static final String BASE_URL_FORECAST_AW =
             "http://dataservice.accuweather.com/forecasts/v1/daily/5day/";
@@ -110,6 +112,9 @@ public class Loc {
     private URL currentUrlDS;
     private URL currentUrlWB;
     private URL currentUrlWU;
+
+    //today
+    private URL todayUrlAW;
 
     //forecast
     private URL forecastUrlAW;
@@ -194,6 +199,31 @@ public class Loc {
         }//if-else keyAW
     }//getCurrentUrlAW
 
+    public URL getTodayUrlAW() {
+        if (todayUrlAW != null) {
+            return todayUrlAW;
+        }
+
+        if (hasKeyAW()) {
+            //it already has a keyAW
+            URL url = createTodayUrlAW(keyAW);
+            if (url == null) {
+                Log.d(TAG, "getTodayUrlAW - URL null......Name: " + name);
+                return null;
+            } else {
+                todayUrlAW = url;
+                return todayUrlAW;
+            }//if-else
+
+        } else {
+            //we need keyAW
+            //TODO:
+            //get keyAW
+            Log.d(TAG, "getTodayUrlAW - no keyAW......Name: " + name);
+            return null;
+        }//if-else keyAW
+    }//getTodayUrlAW
+
     public URL getForecastUrlAW() {
         if (forecastUrlAW != null) {
             return forecastUrlAW;
@@ -232,6 +262,7 @@ public class Loc {
             return currentUrlOW;
         }//if-else
     }//currentUrlOW
+
 
     public URL getForecastUrlOW() {
         if (forecastUrlOW != null) {
@@ -396,6 +427,11 @@ public class Loc {
             getCurrentUrlWU();
         }
 
+        //today
+        if (!hasTodayUrlAW()) {
+            getTodayUrlAW();
+        }
+
         //forecast
         if (!hasForecastUrlAW()) {
             getForecastUrlAW();
@@ -468,6 +504,10 @@ public class Loc {
         return forecastUrlWU != null;
     }//hasForecastUrlWU
 
+    public boolean hasTodayUrlAW() {
+        return todayUrlAW != null;
+    }//hasTodayUrlAW
+
     // -----------------------------  AW ----------------
 
     /**
@@ -512,6 +552,22 @@ public class Loc {
         }
         return url;
     }//createCurrentWeatherUrlId
+
+    private static URL createTodayUrlAW(String locCode) {
+        String urlString = BASE_URL_TODAY_AW + locCode + API_ID_AW +
+                API_KEY_AW + DETAILS_TRUE_AW + METRIC_TRUE_AW;
+        Log.d(TAG, "Today URL string - AW: " + urlString);
+
+        URL url = null;
+        try {
+            url = new URL(urlString);
+            Log.d(TAG, "generated today url - AW: " + url.toString());
+        } catch (MalformedURLException e) {
+            Log.e(TAG, "Error creating today weather URL from string", e);
+        }
+        return url;
+
+    }//createTodayUrlAW
 
     /**
      * This creates the URL for forecast weather using city ID - AW
@@ -559,6 +615,7 @@ public class Loc {
         }
         return url;
     }//createCurrentWeatherUrlId
+
 
     /**
      * This creates the URL for forecast weather using LatLng - OW

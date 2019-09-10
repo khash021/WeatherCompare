@@ -122,4 +122,47 @@ public class HelperFunctions {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
     }//showToast
 
+    public static int getIconInteger(String icon) {
+        switch (icon) {
+            case "01d":
+                return R.drawable.i01d;
+            case "01n":
+                return R.drawable.i01n;
+            case "02d":
+                return R.drawable.i02d;
+            case "02n":
+                return R.drawable.i02n;
+            case "03d":
+                return R.drawable.i03d;
+            case "03n":
+                return R.drawable.i03n;
+            case "04d":
+                return R.drawable.i04d;
+            case "04n":
+                return R.drawable.i04n;
+            case "05d":
+                return R.drawable.i05d;
+            case "05n":
+                return R.drawable.i05n;
+            case "06d":
+                return R.drawable.i06d;
+            case "06n":
+                return R.drawable.i06n;
+            case "07d":
+                return R.drawable.i07d;
+            case "07n":
+                return R.drawable.i07n;
+            case "08d":
+                return R.drawable.i08d;
+            case "08n":
+                return R.drawable.i08n;
+            case "09d":
+                return R.drawable.i09d;
+            case "09n":
+                return R.drawable.i09n;
+            default:
+                return -1;
+        }
+    }//getIconInteger
+
 }//HelperFunctions

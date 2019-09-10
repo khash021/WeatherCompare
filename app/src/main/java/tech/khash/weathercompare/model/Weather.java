@@ -20,13 +20,15 @@ public class Weather {
     //TODO: make the variables match the return type from API (float, etc) and then convert on returning
 
     private String summary, temperature, tempFeel, humidity, dewPoint, pressure, windSpeed, windDirection,
-            windGust, visibility, cloudCoverage, pop, popType, icon;
+            windGust, visibility, cloudCoverage, pop, icon;
 
     //for forecast
     private String date, tempMin, tempFeelMin, tempMax, tempFeelMax, summaryDay, popDay, cloudDay,
             summaryNight, popNight, cloudNight;
 
     private boolean isDay;
+
+    private Integer popType;
 
     //for WU
     private String popTotal;
@@ -37,7 +39,7 @@ public class Weather {
     public static final int PROVIDER_OW = 1; //Open Weather
     public static final int PROVIDER_DS = 2; //Dark Sky
     public static final int PROVIDER_WB = 3; //Weather Bit
-    public static final int PROVIDER_AC = 4; //Accu Weather
+    public static final int PROVIDER_AW = 4; //Accu Weather
     public static final int PROVIDER_WU = 5; //Weather Unlocked
     //TODO: for testing now, think of a better way for future (it just takes too much space right now)
     private static final String OPEN_WEATHER = "O-Weather";
@@ -45,6 +47,12 @@ public class Weather {
     private static final String WEATHER_BIT = "W-Bit";
     private static final String ACCU_WEATHER = "A-Weather";
     private static final String WEATHER_UNLOCKED = "W-Unlocked";
+
+    //popType
+    public static final int POP_TYPE_NO_INPUT = 0;
+    public static final int POP_TYPE_RAIN = 1;
+    public static final int POP_TYPE_SNOW = 2;
+    public static final int POP_TYPE_RAIN_SNOW = 3;
 
 
     //default public constructor
@@ -136,7 +144,7 @@ public class Weather {
         this.popTotal = popTotal;
     }//setPopTotal
 
-    public void setPopType(String popType) {
+    public void setPopType(int popType) {
         this.popType = popType;
     }//setPopType
 
@@ -192,7 +200,7 @@ public class Weather {
                 return DARK_SKY;
             case PROVIDER_WB:
                 return WEATHER_BIT;
-            case PROVIDER_AC:
+            case PROVIDER_AW:
                 return ACCU_WEATHER;
             case PROVIDER_WU:
                 return WEATHER_UNLOCKED;
@@ -326,12 +334,30 @@ public class Weather {
         }
     }//getPopTotal
 
-    public String getPopType() {
+    public int getPopType() {
+        if (popType != null) {
+            return popType;
+        } else {
+            return POP_TYPE_NO_INPUT;
+        }
+    }//getPopType
+
+    public String getPopTypeString() {
         if (popType == null) {
             return "";
         }
-        return popType;
-    }//getPopType
+        switch (popType) {
+            case POP_TYPE_RAIN:
+                return "Rain";
+            case POP_TYPE_SNOW:
+                return "Snow";
+            case POP_TYPE_RAIN_SNOW:
+                return "Rain/Snow";
+            case POP_TYPE_NO_INPUT:
+                default:
+                    return "";
+        }//switch
+    }//getPopTypeString
 
     public String getSummaryDay() {
         return summaryDay;
