@@ -98,6 +98,7 @@ public class WeatherListFragmentAdapter extends RecyclerView.Adapter<WeatherList
 
             //check for null Weather
             if (weather == null) {
+                //TODO: show error somehow
                 return;
             }
 

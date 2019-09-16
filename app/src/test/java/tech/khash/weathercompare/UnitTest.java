@@ -5,7 +5,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import static junit.framework.TestCase.assertEquals;
+import java.util.HashMap;
+
+import static org.junit.Assert.assertEquals;
 
 
 @RunWith(JUnit4.class)
@@ -72,16 +74,32 @@ public class UnitTest {
 //        assertEquals(actual, s);
 //    }//celToFar
 
+//    @Test
+//    public void kmToMile() {
+//        String km = "23";
+//        String check = "14";
+//
+//        float kmF = Float.valueOf(km);
+//        float mileF = kmF / 1.609f;
+//        String mile = String.format("%.0f", mileF);
+//
+//        assertEquals(check, mile);
+//    }
+
     @Test
-    public void kmToMile() {
-        String km = "23";
-        String check = "14";
+    public void hashMap() {
+        final String NAME = "name";
+        final String CODE = "code";
 
-        float kmF = Float.valueOf(km);
-        float mileF = kmF / 1.609f;
-        String mile = String.format("%.0f", mileF);
+        String nameCheck = "Vancouver";
+        String codeCheck = "234523";
 
-        assertEquals(check, mile);
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put(NAME, "Vancouver");
+        hashMap.put(CODE, "234523");
+
+        assertEquals(nameCheck, hashMap.get(NAME));
+        assertEquals(codeCheck, hashMap.get(CODE));
     }
 
 //    @Test

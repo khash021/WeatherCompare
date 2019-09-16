@@ -2,6 +2,7 @@ package tech.khash.weathercompare;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.location.Location;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -13,14 +14,23 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
+
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import tech.khash.weathercompare.adapter.WeatherListAdapterToday;
 import tech.khash.weathercompare.model.Constant;
@@ -43,6 +53,7 @@ public class TodayActivity extends AppCompatActivity {
     private ArrayList<Loc> locArrayList;
 
     private Boolean isDay;
+    private boolean deviceLocation = false;
     private int tracker;
 
     @Override
@@ -107,8 +118,126 @@ public class TodayActivity extends AppCompatActivity {
     }//openSearch
 
     private void findMe() {
-
+        //check for permission first and ask it if needed
+        if (HelperFunctions.checkLocationPermission(this)) {
+            //we have permission, get the user's location
+            getDeviceLocation();
+        } else {
+            //don't have permission, ask for it
+            HelperFunctions.askLocationPermission(this, this);
+        }
     }//findMe
+
+    private void getDeviceLocation() {
+        // Construct a FusedLocationProviderClient.
+        FusedLocationProviderClient fusedLocationProviderClient =
+                LocationServices.getFusedLocationProviderClient(this);
+        try {
+            if (HelperFunctions.checkLocationPermission(this)) {
+                Task<Location> locationResult = fusedLocationProviderClient.getLastLocation();
+                locationResult.addOnCompleteListener(this, new OnCompleteListener<Location>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Location> task) {
+                        if (task.isSuccessful()) {
+                            //get the result and save it
+                            Location location = task.getResult();
+                            setUserLocation(location);
+                        } else {
+                            HelperFunctions.showToast(getApplicationContext(), "Unable to get location");
+                            Log.e(TAG, "Exception: %s", task.getException());
+                        }
+                    }
+                })
+                        .addOnFailureListener(this, new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.e(TAG, "Failed to get the last know location", e);
+                                HelperFunctions.showToast(getApplicationContext(), "Unable to get location");
+                            }
+                        });
+            } else {
+                //permission denied (should never happen since we have already checked it before this call
+                Log.wtf(TAG, "Location permission denied from getDeviceLocation");
+                return;
+            }
+
+        } catch (Exception e) {
+            Log.e(TAG, "Error finding my location from getDeviceLocation", e);
+        }//try-catch
+
+    }//getDeviceLocation
+
+    private void setUserLocation(Location location) {
+        if (location == null) {
+            Log.d(TAG, "setUserLocation - location is null");
+            return;
+        }
+
+        //set the boolean to true
+        deviceLocation = true;
+
+        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+        //create a new Loc
+        final Loc loc = new Loc(latLng);
+
+        Log.d(TAG, "USER LOCATION: " + latLng.toString());
+
+        //get the AW code and set all URLs
+        progressBar.setVisibility(View.VISIBLE);
+
+        //first we need to get the codeURL and then get the code
+        URL locationCodeUrl = loc.getLocationCodeUrlAW();
+        if (locationCodeUrl == null) {
+            Log.d(TAG, "setUserLocation - codeURL = null");
+            return;
+        }
+
+        NetworkCallsUtils.NetworkCallAccuWeatherCode networkCallAccuWeatherCode = new
+                NetworkCallsUtils.NetworkCallAccuWeatherCode(new NetworkCallsUtils.NetworkCallAccuWeatherCode.AsyncResponse() {
+            /**
+             *  This gets called when the code is ready from the background network
+             *  call and we set the data on loc
+             * @param output : HashMap containing key and name
+             */
+            @Override
+            public void processFinish(HashMap<String, String> output) {
+                if (output == null) {
+                    Log.d(TAG, "processFinish - null response");
+                }
+                //set key and name
+                String key = output.get(Constant.AW_KEY);
+                String name = output.get(Constant.AW_NAME);
+
+                //set the key
+                loc.setKeyAW(key);
+
+                //set all urls
+                loc.setAllUrls();
+
+                //set current loc
+                currentLoc = loc;
+
+                //set the title
+                //TODO: in case this fails, we will set it in WB (maybe remove this)
+                if (!TextUtils.isEmpty(name)) {
+                    setTitle(name);
+                } else {
+                    setTitle("Device Location");
+                }
+
+                //check to see if we need to calculate isDay first, otherwise get all weather
+                if (isDay == null) {
+                    calculateIsDay();
+                } else {
+                    getAllWeather();
+                }
+
+            }//processFinish
+
+        });
+        networkCallAccuWeatherCode.execute(locationCodeUrl);
+
+    }//setUserLocation
 
     private void showSavedLocations() {
         showLocListDialog(this, locArrayList);
@@ -268,6 +397,13 @@ public class TodayActivity extends AppCompatActivity {
                 @Override
                 public void processFinish(Weather output) {
                     weatherArrayList.add(output);
+
+                    //is this is from device location, set the name
+                    //TODO: testing
+//                    if (deviceLocation) {
+//                        setTitle(output.getCityName());
+//                    }
+
                     //if it is 3 (meaning all tasks are finished), remove, otherwise increment
                     if (tracker == 3) {
                         //remove progress bar and reset the tracker
@@ -321,7 +457,7 @@ public class TodayActivity extends AppCompatActivity {
             weatherUnlockedTodayTask.execute(todayUrlWU);
         }//if-else URL
     }//kickOffWeatherUnlocked
-    
+
     private void updateAdapter() {
         if (weatherArrayList == null || weatherArrayList.size() < 1) {
             Log.d(TAG, "updateAdapter - weatherArrayList null/empty");
@@ -362,6 +498,8 @@ public class TodayActivity extends AppCompatActivity {
 
         //create our name list
         ArrayList<String> namesArrayList = new ArrayList<>();
+        //add device location
+        namesArrayList.add("Device's location");
         for (Loc loc : locArrayList) {
             namesArrayList.add(loc.getName());
         }
@@ -383,12 +521,17 @@ public class TodayActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //set current loc
-                currentLoc = locArrayList.get(position);
-                //get the weather
-                getAllWeather();
-                //set the title
-                activity.setTitle(currentLoc.getName());
+                //handle device location choice
+                if (position == 0) {
+                    findMe();
+                } else {
+                    //set current loc
+                    currentLoc = locArrayList.get(position);
+                    //get the weather
+                    getAllWeather();
+                    //set the title
+                    activity.setTitle(currentLoc.getName());
+                }
                 //close dialog
                 dialog.dismiss();
             }

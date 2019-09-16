@@ -72,6 +72,8 @@ public class AddLocationActivity extends AppCompatActivity implements OnMapReady
         setContentView(R.layout.activity_add_location);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        //enable up
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -385,7 +387,8 @@ public class AddLocationActivity extends AppCompatActivity implements OnMapReady
                 //add the name to the filed
                 String featureName = address.getFeatureName();
                 if (featureName != null && !featureName.isEmpty()) {
-                    editTextName.setText(featureName);
+                    editTextName.setText(query);
+//                    editTextName.setText(featureName);
                 }
                 return;
             }

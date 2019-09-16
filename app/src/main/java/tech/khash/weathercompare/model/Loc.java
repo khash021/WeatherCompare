@@ -100,7 +100,7 @@ public class Loc {
 
     //Variable
     private LatLng latLng;
-    private String name;
+    private String name, awLocationName;
 
     //for AW only
     private String keyAW; //used only for AccuWeather
@@ -130,6 +130,10 @@ public class Loc {
     public Loc() {
     }
 
+    public Loc(LatLng latLng) {
+        this.latLng = latLng;
+    }
+
     public Loc(String name, LatLng latLng) {
         this.latLng = latLng;
         this.name = name;
@@ -145,6 +149,13 @@ public class Loc {
     public String getName() {
         return name;
     }//getName
+
+    public String getAwLocationName() {
+        if (awLocationName == null) {
+            return "";
+        }
+        return awLocationName;
+    }
 
     public LatLng getLatLng() {
         return latLng;
@@ -393,6 +404,10 @@ public class Loc {
 
     public void setKeyAW(String keyAW) {
         this.keyAW = keyAW;
+    }
+
+    public void setAwLocationName (String awLocationName) {
+        this.awLocationName = awLocationName;
     }
 
     public void setName(String name) {

@@ -1,5 +1,7 @@
 package tech.khash.weathercompare.model;
 
+import android.text.TextUtils;
+
 /**
  * Class for weather object.
  * <p>
@@ -22,7 +24,7 @@ public class Weather {
     private String summary, date, temperature, tempFeel, tempMin, tempFeelMin, tempMax, tempFeelMax,
             humidity, dewPoint, pressure, windSpeed, windDirection, windGust, visibility,
             cloudCoverage, pop, popTotal, totalRain, totalSnow, icon,
-            summaryDay, popDay, cloudDay, summaryNight, popNight, cloudNight;
+            summaryDay, popDay, cloudDay, summaryNight, popNight, cloudNight, cityName;
 
     private boolean isDay;
 
@@ -183,6 +185,10 @@ public class Weather {
     public void setIcon (String icon) {
         this.icon = icon;
     }//setIcon
+
+    public void setCityName (String cityName) {
+        this.cityName = cityName;
+    }
 
     /*
         ------------------------ GETTER METHODS -----------------------------------------
@@ -410,4 +416,11 @@ public class Weather {
     public boolean getIsDay() {
         return isDay;
     }//getIsDay
+
+    public String getCityName() {
+        if (TextUtils.isEmpty(cityName)) {
+            return "";
+        }
+        return cityName;
+    }//getCityName
 }//Weather

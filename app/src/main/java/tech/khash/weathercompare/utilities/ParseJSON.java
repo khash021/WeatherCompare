@@ -17,8 +17,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.Locale;
 
+import tech.khash.weathercompare.model.Constant;
 import tech.khash.weathercompare.model.Weather;
 
 /**
@@ -58,6 +60,7 @@ public class ParseJSON {
     private static final String CLOUD_COVER_AW = "CloudCover";
     private static final String PRESSURE_AW = "Pressure";
     private static final String LOCATION_KEY_AW = "Key";
+    private static final String LOCATION_NAME_AW = "EnglishName";
     private static final String ICON_AW = "WeatherIcon";
     private static final String IS_DAY_AW = "IsDayTime";
     private static final String RAIN_AW = "Rain";
@@ -120,6 +123,7 @@ public class ParseJSON {
      */
 
     private static final String DATA_WB = "data";
+    private static final String CITY_NAME_WB = "city_name";
     private static final String TEMP_WB = "temp";
     private static final String FEEL_LIKE_WB = "app_temp";
     private static final String WEATHER_WB = "weather";
@@ -218,22 +222,30 @@ public class ParseJSON {
      * It extracts AccuWeather's location code from the JSON response
      *
      * @param jsonString : JSON response from AW API
-     * @return : location code
+     * @return : HashMap<String, String> : containing the code and name for AW
      * @throws JSONException
      */
-    public static String parseAccuLocationCode(String jsonString) throws JSONException {
+    public static HashMap<String, String> parseAccuLocationCode(String jsonString) throws JSONException {
         if (TextUtils.isEmpty(jsonString)) {
             return null;
         }
-        String locationCode;
+        String locationCode, locationName;
         JSONObject responseObject = new JSONObject(jsonString);
 
         //by using optString, if such string does not exists, it returns an empty string.
         locationCode = responseObject.optString(LOCATION_KEY_AW);
 
+        //location name to be used for when using user's location
+        locationName = responseObject.optString(LOCATION_NAME_AW);
+
+        //create Hash map to return results
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put(Constant.AW_NAME, locationName);
+        hashMap.put(Constant.AW_KEY, locationCode);
+
         Log.d(TAG, "location code: " + locationCode);
 
-        return locationCode;
+        return hashMap;
     }//parseAccuLocationCode
 
     /**
@@ -1133,7 +1145,7 @@ public class ParseJSON {
             return null;
         }
 
-        String date, summary, tempMin, tempMax, feelLikeMin, feelLikeMax, dewPoint, pressure,
+        String cityName, date, summary, tempMin, tempMax, feelLikeMin, feelLikeMax, dewPoint, pressure,
                 humidity, windSpeed, windGust, windDirection, cloudCoverage, pop, totalRain, totalSnow,
                 visibility, icon;
         Weather weather = new Weather();
@@ -1157,6 +1169,11 @@ public class ParseJSON {
         long dayEndMillis = calendar.getTimeInMillis();
 
         JSONObject rootObject = new JSONObject(jsonString);
+
+        //city name
+        cityName = rootObject.optString(CITY_NAME_WB);
+        weather.setCityName(cityName);
+
         JSONArray dataArray = rootObject.optJSONArray(DATA_WB);
 
         for (int i = 0; i < dataArray.length(); i++) {
@@ -1266,7 +1283,7 @@ public class ParseJSON {
             return null;
         }
 
-        String date, summary, tempMin, tempMax, feelLikeMin, feelLikeMax, dewPoint, pressure,
+        String cityName, date, summary, tempMin, tempMax, feelLikeMin, feelLikeMax, dewPoint, pressure,
                 humidity, windSpeed, windGust, windDirection, cloudCoverage, pop, totalRain,
                 totalSnow, visibility, icon;
         ArrayList<Weather> weatherArrayList = new ArrayList<>();
@@ -1291,6 +1308,10 @@ public class ParseJSON {
         long day4StartMilli = day3StartMilli + DAY_MILLI;
 
         JSONObject rootObject = new JSONObject(jsonString);
+
+        //city Name
+        cityName = rootObject.optString(CITY_NAME_WB);
+
         JSONArray dataArray = rootObject.optJSONArray(DATA_WB);
 
         /*we want data for the next three days (first object is for today, which we ignore for now
@@ -1305,6 +1326,9 @@ public class ParseJSON {
             }
 
             weather = new Weather();
+            //set city name
+            weather.setCityName(cityName);
+
             //set the provider
             weather.setProvider(Weather.PROVIDER_WB);
 

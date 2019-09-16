@@ -11,6 +11,8 @@ public final class Constant {
 
     //Preference keys
     public static final String PREF_KEY_ARRAY = "pref_key_array";
+    public static final String PREF_KEY_METRIC = "pref_key_metric";
+
 
     //location permission
     public final static int LOCATION_PERMISSION_REQUEST_CODE = 1;
@@ -18,6 +20,10 @@ public final class Constant {
 
     //Intents
     public static final String INTENT_EXTRA_LOC_NAME = "intent-extra-loc-name";
+
+    //Loc AW code and name
+    public static final String AW_KEY = "code";
+    public static final String AW_NAME = "name";
 
 
 }//Constant

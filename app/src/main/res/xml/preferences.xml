@@ -2,11 +2,11 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
 <PreferenceCategory
-    android:title="Units">
+    android:title="@string/units">
 
     <SwitchPreference
         android:title="Metric"
-        android:key="metric_pref_key"
+        android:key="@string/pref_key_metric"
         android:defaultValue="true"/>
 
 </PreferenceCategory>

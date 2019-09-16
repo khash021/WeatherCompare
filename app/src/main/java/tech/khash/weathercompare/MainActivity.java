@@ -37,6 +37,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Objects;
 
 import tech.khash.weathercompare.adapter.LocListAdapter;
@@ -389,15 +390,17 @@ public class MainActivity extends AppCompatActivity implements
             /**
              *  This gets called when the code is ready from the background network
              *  call and we set the data on loc
-             * @param output : AW location key
+             * @param output : HashMap containing name and code
              */
             @Override
-            public void processFinish(String output) {
+            public void processFinish(HashMap<String, String> output) {
                 if (output == null) {
                     Log.d(TAG, "processFinish - null response");
                 }
+                //we only need the key here,
+                String key = output.get(Constant.AW_KEY);
                 //set the key
-                currentLoc.setKeyAW(output);
+                currentLoc.setKeyAW(key);
 
                 //set all urls
                 currentLoc.setAllUrls();

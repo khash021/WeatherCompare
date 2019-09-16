@@ -83,4 +83,13 @@
 
 
 
+    <!--preferences-->
+    <string name="pref_key_metric">pref_key_metric</string>
+
+
+    <string name="units">Units</string>
+
+
+
+
 </resources>

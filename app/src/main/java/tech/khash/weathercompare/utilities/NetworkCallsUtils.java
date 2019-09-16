@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Scanner;
 
 import tech.khash.weathercompare.model.Weather;
@@ -133,7 +134,7 @@ public class NetworkCallsUtils {
         private final String TAG = NetworkCallAccuWeatherCode.class.getSimpleName();
 
         public interface AsyncResponse {
-            void processFinish(String output);
+            void processFinish(HashMap<String, String> output);
         }//AsyncResponse
 
         private AsyncResponse delegate = null;
@@ -159,10 +160,10 @@ public class NetworkCallsUtils {
             //parse the response and get the code
             try {
                 //parse response
-                String locationCode = ParseJSON.parseAccuLocationCode(s);
+                HashMap<String, String> responseHashMap = ParseJSON.parseAccuLocationCode(s);
 
                 //pass data to the interface so we get it in the main activity
-                delegate.processFinish(locationCode);
+                delegate.processFinish(responseHashMap);
 
             } catch (JSONException e) {
                 Log.e(TAG, "Error parsing location code response - AccuWeather ", e);
