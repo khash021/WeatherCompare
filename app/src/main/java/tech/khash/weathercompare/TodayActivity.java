@@ -2,8 +2,13 @@ package tech.khash.weathercompare;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
@@ -11,11 +16,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.SearchView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -28,9 +36,12 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 
 import tech.khash.weathercompare.adapter.WeatherListAdapterToday;
 import tech.khash.weathercompare.model.Constant;
@@ -55,6 +66,11 @@ public class TodayActivity extends AppCompatActivity {
     private Boolean isDay;
     private boolean deviceLocation = false;
     private int tracker;
+
+    private static final int ALERT_CODE_NO_RESULT = 1;
+    private static final int ALERT_CODE_MULTIPLE_RESULTS = 2;
+    private static final int ALERT_CODE_NO_GEOCODER = 3;
+    private static final int ALERT_CODE_UNABLE_FIND_DEVICE = 4;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -89,6 +105,13 @@ public class TodayActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         Log.d(TAG, "onCreateOptionsMenu Called");
         getMenuInflater().inflate(R.menu.today_menu, menu);
+
+        //find the search item
+        final MenuItem searchItem = menu.findItem(R.id.action_search);
+        if (searchItem != null) {
+            setupSearch(searchItem);
+        }//if
+
         //return true since we have managed it
         return true;
     }//onCreateOptionsMenu
@@ -97,14 +120,21 @@ public class TodayActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         //get the size of array
         switch (item.getItemId()) {
-            case R.id.action_search:
-                openSearch();
-                return true;
             case R.id.action_find_me:
                 findMe();
                 return true;
             case R.id.action_saved_locations:
                 showSavedLocations();
+                return true;
+            case R.id.action_forecast:
+                Intent forecastIntent = new Intent(TodayActivity.this, ForecastActivity.class);
+                forecastIntent.putExtra(Constant.INTENT_EXTRA_LOC_NAME, currentLoc.getName());
+                startActivity(forecastIntent);
+                return true;
+            case R.id.action_add_locations:
+                //TODO: change this for results
+                Intent intent = new Intent(TodayActivity.this, AddLocationActivity.class);
+                startActivity(intent);
                 return true;
             case R.id.action_refresh:
                 refresh();
@@ -113,7 +143,89 @@ public class TodayActivity extends AppCompatActivity {
         }//switch
     }//onOptionsItemSelected
 
-    private void openSearch() {
+    private void setupSearch(MenuItem searchItem) {
+        //create a SearchView object using the search menu item
+        SearchView searchView = (SearchView) searchItem.getActionView();
+        //add hint
+        searchView.setQueryHint(getString(R.string.enter_address_hint));
+        //closes the keyboard when the user clicks the search button
+        searchView.setIconifiedByDefault(true);
+        //get a reference to the search box, so we can change the input type to cap words
+        int id1 = searchView.getContext().getResources().
+                getIdentifier("android:id/search_src_text", null, null);
+        EditText searchEditText = searchView.findViewById(id1);
+        searchEditText.setInputType(InputType.TYPE_TEXT_FLAG_CAP_WORDS);
+
+        // use this method for search process
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            /* Called when the user submits the query. This could be due to a key press on the
+                keyboard or due to pressing a submit button. The listener can override the standard
+                behavior by returning true to indicate that it has handled the submit request.
+                Otherwise return false to let the SearchView handle the submission by launching
+                any associated intent. */
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                // use this method when query submitted
+                searchAddress(query);
+                return false;
+            }
+
+            //Called when the query text is changed by the user.
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                // use this method for auto complete search process
+                return false;
+            }
+        });//query text change listener
+    }//setupSearch
+
+    private void searchAddress(String query) {
+        //TODO: show dialog for going to add location if no result or more than 1
+        //check for geocoder availability
+        if (!Geocoder.isPresent()) {
+            Log.d(TAG, "Geocoder not available - searchAddress");
+            showAddLocationDialog(ALERT_CODE_NO_GEOCODER);
+            return;
+        }
+        //Now we know it is available, Create geocoder to retrieve the location
+        // responses will be localized for the given Locale. (A Locale object represents a specific geographical,
+        // political, or cultural region. An operation that requires a Locale to perform its task is called locale-sensitive )
+
+        //create localized geocoder
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+
+        try {
+            //the second parameter is the number of max results, here we set it to 3
+            List<Address> addresses = geocoder.getFromLocationName(query, 3);
+            //check to make sure we got results
+            if (addresses.size() < 1) {
+                showAddLocationDialog(ALERT_CODE_NO_RESULT);
+                Log.d(TAG, "No results - searchAddress");
+                return;
+            }//if
+
+            //go through all the results and put them on map
+            int counter = 0;
+            for (Address result : addresses) {
+                LatLng latLng = new LatLng(result.getLatitude(), result.getLongitude());
+                counter++;
+            }//for
+
+            //don't need to set bounds if there is only one result. Just move the camera
+            if (counter <= 1) {
+                Address address = addresses.get(0);
+                LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+
+                //pass to helper method to set it up
+                setUserLocation(latLng);
+            } else {
+                //more than one result
+                showAddLocationDialog(ALERT_CODE_MULTIPLE_RESULTS);
+            }
+
+        } catch (IOException e) {
+            Log.e(TAG, "Error getting location", e);
+        }//try/catch
 
     }//openSearch
 
@@ -141,9 +253,10 @@ public class TodayActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             //get the result and save it
                             Location location = task.getResult();
-                            setUserLocation(location);
+                            LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                            setUserLocation(latLng);
                         } else {
-                            HelperFunctions.showToast(getApplicationContext(), "Unable to get location");
+                            showAddLocationDialog(ALERT_CODE_UNABLE_FIND_DEVICE);
                             Log.e(TAG, "Exception: %s", task.getException());
                         }
                     }
@@ -152,7 +265,7 @@ public class TodayActivity extends AppCompatActivity {
                             @Override
                             public void onFailure(@NonNull Exception e) {
                                 Log.e(TAG, "Failed to get the last know location", e);
-                                HelperFunctions.showToast(getApplicationContext(), "Unable to get location");
+                                showAddLocationDialog(ALERT_CODE_UNABLE_FIND_DEVICE);
                             }
                         });
             } else {
@@ -167,8 +280,8 @@ public class TodayActivity extends AppCompatActivity {
 
     }//getDeviceLocation
 
-    private void setUserLocation(Location location) {
-        if (location == null) {
+    private void setUserLocation(LatLng latLng) {
+        if (latLng == null) {
             Log.d(TAG, "setUserLocation - location is null");
             return;
         }
@@ -176,7 +289,6 @@ public class TodayActivity extends AppCompatActivity {
         //set the boolean to true
         deviceLocation = true;
 
-        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
         //create a new Loc
         final Loc loc = new Loc(latLng);
 
@@ -203,26 +315,32 @@ public class TodayActivity extends AppCompatActivity {
             public void processFinish(HashMap<String, String> output) {
                 if (output == null) {
                     Log.d(TAG, "processFinish - null response");
-                }
-                //set key and name
-                String key = output.get(Constant.AW_KEY);
-                String name = output.get(Constant.AW_NAME);
 
-                //set the key
-                loc.setKeyAW(key);
+                    loc.setAllUrls();
 
-                //set all urls
-                loc.setAllUrls();
+                    currentLoc = loc;
 
-                //set current loc
-                currentLoc = loc;
-
-                //set the title
-                //TODO: in case this fails, we will set it in WB (maybe remove this)
-                if (!TextUtils.isEmpty(name)) {
-                    setTitle(name);
                 } else {
-                    setTitle("Device Location");
+                    //set key and name
+                    String key = output.get(Constant.AW_KEY);
+                    String name = output.get(Constant.AW_NAME);
+
+                    //set the key
+                    loc.setKeyAW(key);
+
+                    //set all urls
+                    loc.setAllUrls();
+
+                    //set current loc
+                    currentLoc = loc;
+
+                    //set the title
+                    //TODO: in case this fails, we will set it in WB (maybe remove this)
+                    if (!TextUtils.isEmpty(name)) {
+                        setTitle(name);
+                    } else {
+                        setTitle("Device Location");
+                    }
                 }
 
                 //check to see if we need to calculate isDay first, otherwise get all weather
@@ -283,6 +401,10 @@ public class TodayActivity extends AppCompatActivity {
 
         if (currentLoc == null) {
             Log.d(TAG, "getAllWeather - currentLoc is null");
+            //remove progress bar if it is running
+            if (progressBar.getVisibility() == View.VISIBLE) {
+                progressBar.setVisibility(View.GONE);
+            }
             return;
         }//null loc
 
@@ -310,6 +432,16 @@ public class TodayActivity extends AppCompatActivity {
 
         if (!currentLoc.hasKeyAW()) {
             Log.d(TAG, "kickOffAccuWeather - currentLoc.hasKey = false");
+            if (tracker == 3) {
+                //remove progress bar and reset the tracker
+                progressBar.setVisibility(View.GONE);
+                tracker = 0;
+                //start adapter
+                updateAdapter();
+            } else {
+                //this means this is part the group load and just increment
+                tracker++;
+            }
             return;
         }
 
@@ -318,13 +450,26 @@ public class TodayActivity extends AppCompatActivity {
 
         if (todayUrlAW == null) {
             Log.d(TAG, "kickOffAccuWeather - currentUrl = null");
+            if (tracker == 3) {
+                //remove progress bar and reset the tracker
+                progressBar.setVisibility(View.GONE);
+                tracker = 0;
+                //start adapter
+                updateAdapter();
+            } else {
+                //this means this is part the group load and just increment
+                tracker++;
+            }
         } else {
             Log.d(TAG, "Current URL - AW : " + todayUrlAW.toString());
             NetworkCallsUtils.AccuWeatherTodayTask accuWeatherTodayTask = new
                     NetworkCallsUtils.AccuWeatherTodayTask(new NetworkCallsUtils.AccuWeatherTodayTask.AsyncResponse() {
                 @Override
                 public void processFinish(Weather output) {
-                    weatherArrayList.add(output);
+                    //only add if it is not null
+                    if (output != null) {
+                        weatherArrayList.add(output);
+                    }
                     //if it is 3 (meaning all tasks are finished), remove, otherwise increment
                     if (tracker == 3) {
                         //remove progress bar and reset the tracker
@@ -360,7 +505,10 @@ public class TodayActivity extends AppCompatActivity {
                     NetworkCallsUtils.DarkSkyTodayTask(new NetworkCallsUtils.DarkSkyTodayTask.AsyncResponse() {
                 @Override
                 public void processFinish(Weather output) {
-                    weatherArrayList.add(output);
+                    //only add if it is not null
+                    if (output != null) {
+                        weatherArrayList.add(output);
+                    }
                     //if it is 3 (meaning all tasks are finished), remove, otherwise increment
                     if (tracker == 3) {
                         //remove progress bar and reset the tracker
@@ -396,13 +544,16 @@ public class TodayActivity extends AppCompatActivity {
                     NetworkCallsUtils.WeatherBitTodayTask(new NetworkCallsUtils.WeatherBitTodayTask.AsyncResponse() {
                 @Override
                 public void processFinish(Weather output) {
-                    weatherArrayList.add(output);
+                    //only add if it is not null
+                    if (output != null) {
+                        weatherArrayList.add(output);
+                    }
 
                     //is this is from device location, set the name
                     //TODO: testing
-//                    if (deviceLocation) {
-//                        setTitle(output.getCityName());
-//                    }
+                    if (deviceLocation) {
+                        setTitle(output.getCityName());
+                    }
 
                     //if it is 3 (meaning all tasks are finished), remove, otherwise increment
                     if (tracker == 3) {
@@ -439,7 +590,10 @@ public class TodayActivity extends AppCompatActivity {
                     NetworkCallsUtils.WeatherUnlockedTodayTask(new NetworkCallsUtils.WeatherUnlockedTodayTask.AsyncResponse() {
                 @Override
                 public void processFinish(Weather output) {
-                    weatherArrayList.add(output);
+                    //only add if it is not null
+                    if (output != null) {
+                        weatherArrayList.add(output);
+                    }
                     //if it is 3 (meaning all tasks are finished), remove, otherwise increment
                     if (tracker == 3) {
                         //remove progress bar and reset the tracker
@@ -484,9 +638,9 @@ public class TodayActivity extends AppCompatActivity {
     /**
      * This creates a custom dialog showing all the saved city names for the user to choose, and
      * return the corresponding Loc object
-     * @param activity : host activity
-     * @param locArrayList : list of Locs
      *
+     * @param activity     : host activity
+     * @param locArrayList : list of Locs
      */
     private void showLocListDialog(final Activity activity, final ArrayList<Loc> locArrayList) {
         //check for empty list
@@ -498,8 +652,6 @@ public class TodayActivity extends AppCompatActivity {
 
         //create our name list
         ArrayList<String> namesArrayList = new ArrayList<>();
-        //add device location
-        namesArrayList.add("Device's location");
         for (Loc loc : locArrayList) {
             namesArrayList.add(loc.getName());
         }
@@ -521,17 +673,13 @@ public class TodayActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //handle device location choice
-                if (position == 0) {
-                    findMe();
-                } else {
-                    //set current loc
-                    currentLoc = locArrayList.get(position);
-                    //get the weather
-                    getAllWeather();
-                    //set the title
-                    activity.setTitle(currentLoc.getName());
-                }
+
+                //set current loc
+                currentLoc = locArrayList.get(position);
+                //get the weather
+                getAllWeather();
+                //set the title
+                activity.setTitle(currentLoc.getName());
                 //close dialog
                 dialog.dismiss();
             }
@@ -540,6 +688,54 @@ public class TodayActivity extends AppCompatActivity {
         dialog.show();
     }//showLocListDialog
 
+    private void showAddLocationDialog(int alertCode) {
+
+        //Instantiate an AlertDialog.Builder with its constructor
+        AlertDialog.Builder builderQuestion = new AlertDialog.Builder(this);
+
+        //set the title based on alert code
+        switch (alertCode) {
+            case ALERT_CODE_NO_RESULT:
+                builderQuestion.setMessage("No results found." +
+                        "\nWould you like to add location manually?").setTitle("No results");
+                break;
+            case ALERT_CODE_MULTIPLE_RESULTS:
+                builderQuestion.setMessage("Multiple results were found." +
+                        "\nWould you like to add location manually?").setTitle("Multiple results");
+                break;
+            case ALERT_CODE_NO_GEOCODER:
+                builderQuestion.setMessage("Unable to finish search." +
+                        "\nWould you like to add location manually?").setTitle("Error");
+                break;
+            case ALERT_CODE_UNABLE_FIND_DEVICE:
+                builderQuestion.setMessage("Unable to locate device." +
+                        "\nWould you like to add location manually?").setTitle("Error");
+                break;
+            default:
+                return;
+
+        }//switch
+
+        // Add the buttons. We can call helper methods from inside the onClick if we need to
+        builderQuestion.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                Intent intent = new Intent(TodayActivity.this, AddLocationActivity.class);
+                //TODO: add extra and do startActivityForResults
+                startActivity(intent);
+            }
+        });
+        builderQuestion.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                //what happens on this click goes here.
+                dialog.dismiss();
+            }
+        });
+
+        final AlertDialog dialog = builderQuestion.create();
+        dialog.show();
+    }//showAddLocationDialog
 
 
 }//TodayActivity

@@ -309,10 +309,11 @@ public class NetworkCallsUtils {
         protected void onPostExecute(String s) {
             if (TextUtils.isEmpty(s)) {
                 Log.e(TAG, "AccuWeatherForecast - postExecute - response = null");
-                return;
+                delegate.processFinish(null);
+            } else {
+                Log.d(TAG, "AccuWeatherForecast response : " + s);
+                delegate.processFinish(s);
             }
-            Log.d(TAG, "AccuWeatherForecast response : " + s);
-            delegate.processFinish(s);
         }//onPostExecute
     }//AccuWeatherForecastTask
 

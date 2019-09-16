@@ -18,9 +18,21 @@
         app:showAsAction="ifRoom" />
 
     <item
+        android:id="@+id/action_forecast"
+        android:orderInCategory="7"
+        android:title="Forecast"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/action_saved_locations"
-        android:orderInCategory="5"
+        android:orderInCategory="10"
         android:title="Saved Locations"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_add_locations"
+        android:orderInCategory="20"
+        android:title="Add New Location"
         app:showAsAction="never" />
 
     <item

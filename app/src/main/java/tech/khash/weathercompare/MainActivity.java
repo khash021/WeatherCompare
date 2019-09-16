@@ -274,6 +274,9 @@ public class MainActivity extends AppCompatActivity implements
             case R.id.nav_add_location:
                 openAddLocation();
                 return true;
+            case R.id.nav_view_location:
+                //TODO:
+                return true;
             case R.id.nav_settings:
                 Intent settingsIntent = new Intent(MainActivity.this, SettingsActivity.class);
                 startActivity(settingsIntent);

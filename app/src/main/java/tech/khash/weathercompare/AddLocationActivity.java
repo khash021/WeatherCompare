@@ -226,7 +226,7 @@ public class AddLocationActivity extends AppCompatActivity implements OnMapReady
     }//getDeviceLocation
 
     //Sets the latlng of the user from get last location
-    private void setUserLocation() {
+    private void    setUserLocation() {
         if (mLastKnownLocation == null) {
             return;
         }

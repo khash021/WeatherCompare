@@ -87,7 +87,9 @@ public class ForecastActivity extends AppCompatActivity {
                     currentLoc = loc;
                     //set the title
                     actionBar.setTitle(currentLoc.getName() + " " + getString(R.string.title_activity_forecast));
-                }//null-loc
+                } else {
+                    //TODO: handle in case it is not in the db
+                }
             }//empty string
         }//has extra
 
