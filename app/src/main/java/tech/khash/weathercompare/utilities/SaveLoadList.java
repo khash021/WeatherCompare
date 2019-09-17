@@ -191,7 +191,20 @@ public class SaveLoadList {
     }//removeAllFences
 
 
-    //TODO: add method to replace a specific object in array list
+    public static void deleteLoc (Context context, Loc loc) {
+        //get the index of loc
+        int index = getLocIndex(context, loc);
+
+        //get the list
+        ArrayList<Loc> locArrayList = loadLocList(context);
+
+        //delete the specified object
+        locArrayList.remove(index);
+
+        //save the new database
+        savedLocList(context, locArrayList);
+    }//deleteLoc
+
 
 
 }//SaveLoadList

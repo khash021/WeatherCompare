@@ -34,6 +34,9 @@ public class LocListAdapter extends RecyclerView.Adapter<LocListAdapter.LocViewH
     //This is our listener implemented as an interface, to be used in the Activity
     private ListItemClickListener itemClickListener;
 
+    //Listener for long clicks
+    private ListLongClickListener longClickListener;
+
     //constants for our button clicks
     public static final int TODAY_BUTTON = 1;
     public static final int FORECAST_BUTTON = 2;
@@ -49,6 +52,10 @@ public class LocListAdapter extends RecyclerView.Adapter<LocListAdapter.LocViewH
         void onListItemClick(int clickedItemIndex, int buttonClick);
     }//ListItemLongClickListener
 
+    public interface ListLongClickListener {
+        void onLongClick (int position);
+    }//ListLongClickListener
+
     /**
      * Public constructor
      *
@@ -56,11 +63,12 @@ public class LocListAdapter extends RecyclerView.Adapter<LocListAdapter.LocViewH
      * @param locArrayList : ArrayList<Loc> containing data
      */
     public LocListAdapter(Context context, ArrayList<Loc> locArrayList,
-                            ListItemClickListener listener) {
+                            ListItemClickListener clickListener, ListLongClickListener longClickListener) {
         this.context = context;
         inflater = LayoutInflater.from(context);
         this.locArrayList = locArrayList;
-        itemClickListener = listener;
+        itemClickListener = clickListener;
+        this.longClickListener = longClickListener;
     }//constructor
 
     //It inflates the item layout, and returns a ViewHolder with the layout and the adapter.
@@ -108,7 +116,7 @@ public class LocListAdapter extends RecyclerView.Adapter<LocListAdapter.LocViewH
 
 
     //Inner class for the view holder
-    class LocViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    class LocViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         //our views
         final TextView idTextView, codeTextView;
         final Button buttonCurrent, buttonForecast;
@@ -131,6 +139,8 @@ public class LocListAdapter extends RecyclerView.Adapter<LocListAdapter.LocViewH
             this.locListAdapter = adapter;
             //for click listener
             itemView.setOnClickListener(this);
+            //long click listener
+            itemView.setOnLongClickListener(this);
         }//FenceViewHolder
 
         @Override
@@ -147,6 +157,15 @@ public class LocListAdapter extends RecyclerView.Adapter<LocListAdapter.LocViewH
                 itemClickListener.onListItemClick(position, -1);
             }
         }//onClick
+
+        @Override
+        public boolean onLongClick(View v) {
+            //get the position
+            int position = getLayoutPosition();
+            longClickListener.onLongClick(position);
+            //we have consumed it, so we return true
+            return true;
+        }
     }//LocViewHolder
 
 }//LocListAdapter

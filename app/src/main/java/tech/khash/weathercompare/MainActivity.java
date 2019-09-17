@@ -49,7 +49,8 @@ import tech.khash.weathercompare.utilities.SaveLoadList;
 
 public class MainActivity extends AppCompatActivity implements
         NavigationView.OnNavigationItemSelectedListener,
-        LocListAdapter.ListItemClickListener {
+        LocListAdapter.ListItemClickListener,
+        LocListAdapter.ListLongClickListener{
 
     //TODO: settings for units
     //TODO: sunrise and sunset (?)
@@ -364,6 +365,15 @@ public class MainActivity extends AppCompatActivity implements
         }//switch
     }//onListItemClick
 
+    @Override
+    public void onLongClick(int position) {
+        //get the corresponding Loc object
+        Loc loc = locArrayList.get(position);
+
+        //show a dialog for deleting
+        showLongClickDialog(this, loc);
+    }//onLongClick
+
     /*------------------------------------------------------------------------------------------
                     ---------------    HELPER METHODS    ---------------
     ------------------------------------------------------------------------------------------*/
@@ -449,7 +459,7 @@ public class MainActivity extends AppCompatActivity implements
         // Get a handle to the RecyclerView.
         recyclerView = findViewById(R.id.recycler_view);
         // Create an adapter and supply the data to be displayed.
-        adapter = new LocListAdapter(this, locArrayList, this);
+        adapter = new LocListAdapter(this, locArrayList, this, this);
         // Connect the adapter with the RecyclerView.
         recyclerView.setAdapter(adapter);
         // Give the RecyclerView a default layout manager.
@@ -553,4 +563,41 @@ public class MainActivity extends AppCompatActivity implements
         AlertDialog dialog = builder.create();
         dialog.show();
     }//showUnsavedChangesDialog
+
+    private void showLongClickDialog(final Context context, final Loc loc) {
+        //create the builder
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        //set the title
+        String title = "Warning";
+        builder.setTitle(title);
+
+        //set the body
+        String message = "Are you sure you want to delete \"" + loc.getName() + "\"?" ;
+        builder.setMessage(message);
+
+        //set the buttons
+        builder.setPositiveButton("delete", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                //delete the loc
+                SaveLoadList.deleteLoc(context, loc);
+
+                //update the arraylist
+                updateRecyclerView();
+            }
+        })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //close dialog
+                        dialog.dismiss();
+                    }
+                });
+
+        //create and show dialog
+        builder.create().show();
+    }//showLongClickDialog
+
+
 }//MainActivity
