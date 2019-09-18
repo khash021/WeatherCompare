@@ -35,6 +35,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
+import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.net.URL;
@@ -64,6 +65,7 @@ public class TodayActivity extends AppCompatActivity {
     private ArrayList<Loc> locArrayList;
 
     private Boolean isDay;
+    private boolean isDeviceLocation;
     private boolean deviceLocation = false;
     private int tracker;
 
@@ -80,25 +82,34 @@ public class TodayActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progress_bar);
         recyclerView = findViewById(R.id.recycler_view);
 
+        tracker = 0;
+
+        locArrayList = SaveLoadList.loadLocList(this);
+
         //get the loc id from intent extra
         if (getIntent().hasExtra(Constant.INTENT_EXTRA_LOC_NAME)) {
+            //set device location to false
+            isDeviceLocation = false;
             String id = getIntent().getStringExtra(Constant.INTENT_EXTRA_LOC_NAME);
             if (!TextUtils.isEmpty(id)) {
                 //get the corresponding loc
                 Loc loc = SaveLoadList.getLocFromDb(this, id);
                 if (loc != null) {
+                    //set the current loc
                     currentLoc = loc;
+                    //set title
                     setTitle(currentLoc.getName());
+                    //start getting results
+                    calculateIsDay();
                 }//null-loc
             }//empty string
-        }//has extra
-
-        tracker = 0;
-
-        locArrayList = SaveLoadList.loadLocList(this);
-
-        calculateIsDay();
-
+        } else if (getIntent().hasExtra(Constant.INTENT_EXTRA_DEVICE_LOCATION)) {
+            if (getIntent().getBooleanExtra(Constant.INTENT_EXTRA_DEVICE_LOCATION, false)) {
+                //set device location to true
+                isDeviceLocation = true;
+                findMe();
+            }
+        }
     }//onCreate
 
     @Override
@@ -127,9 +138,19 @@ public class TodayActivity extends AppCompatActivity {
                 showSavedLocations();
                 return true;
             case R.id.action_forecast:
+                //create intent
                 Intent forecastIntent = new Intent(TodayActivity.this, ForecastActivity.class);
-                forecastIntent.putExtra(Constant.INTENT_EXTRA_LOC_NAME, currentLoc.getName());
-                startActivity(forecastIntent);
+                //figure out if it is device location, or Loc
+                if (isDeviceLocation) {
+                    //convert our Loc object to Gson to pass it in extra
+                    Gson gson = new Gson();
+                    String json = gson.toJson(currentLoc);
+                    forecastIntent.putExtra(Constant.INTENT_EXTRA_DEVICE_LOCATION, json);
+                    startActivity(forecastIntent);
+                } else {
+                    forecastIntent.putExtra(Constant.INTENT_EXTRA_LOC_NAME, currentLoc.getName());
+                    startActivity(forecastIntent);
+                }
                 return true;
             case R.id.action_add_locations:
                 //TODO: change this for results
@@ -376,11 +397,16 @@ public class TodayActivity extends AppCompatActivity {
             return;
         }//null loc
 
+        if (isDay != null) {
+            getAllWeather();
+            return;
+        }
+
         //make the progress bar visible
         progressBar.setVisibility(View.VISIBLE);
 
-        URL sinriseSunsetUrl = currentLoc.getSunriseSunsetUrl();
-        if (sinriseSunsetUrl == null) {
+        URL sunriseSunsetUrl = currentLoc.getSunriseSunsetUrl();
+        if (sunriseSunsetUrl == null) {
             Log.d(TAG, "calculateIsDay - currentUrl = null");
             //TODO: manage this case
         } else {
@@ -392,7 +418,7 @@ public class TodayActivity extends AppCompatActivity {
                     getAllWeather();
                 }
             });
-            sunriseSunsetTask.execute(sinriseSunsetUrl);
+            sunriseSunsetTask.execute(sunriseSunsetUrl);
         }
 
     }//calculateIsDay

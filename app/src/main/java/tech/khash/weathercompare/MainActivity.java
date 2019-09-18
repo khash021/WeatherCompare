@@ -71,6 +71,8 @@ public class MainActivity extends AppCompatActivity implements
 
     private Loc currentLoc;
 
+    private SharedPreferences sharedPreferences;
+
     //for tracking changes that needs the list to be updated/recreated
     private boolean needsUpdate = false;
 
@@ -99,6 +101,8 @@ public class MainActivity extends AppCompatActivity implements
             navigationView.setNavigationItemSelectedListener(this);
         }
 
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
         seekBar = findViewById(R.id.seekbar);
 
         //this gets the db, and set the corresponding empty view/recycler view
@@ -118,18 +122,16 @@ public class MainActivity extends AppCompatActivity implements
         //TODO: testing
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         boolean metric = sharedPreferences.getBoolean("metric_pref_key", true);
-        Log.d(TAG, "SETTINGS - METRIC : " + metric);
+
 
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int height = displayMetrics.heightPixels;
         int width = displayMetrics.widthPixels;
-
         Log.d(TAG, "Width/Height : " + width + " - " + height);
 
-
-
-
+        //ask for rate (based on number of visits)
+        rateApp();
     }//onCreate
 
     @Override
@@ -243,14 +245,10 @@ public class MainActivity extends AppCompatActivity implements
                 drawerLayout.openDrawer(GravityCompat.START);
                 return true;
             case R.id.action_find_me:
-                //TODO:
-                //Testing only
-//                for (Loc loc : locArrayList) {
-//                    AccuWeatherUtils.createLocationCodeUrl(loc.getLatLng());
-//                }
-                return true;
-            case R.id.action_log_db:
-                logList();
+                //start today activity with user's location
+                Intent deviceTodayIntent = new Intent(MainActivity.this, TodayActivity.class);
+                deviceTodayIntent.putExtra(Constant.INTENT_EXTRA_DEVICE_LOCATION, true);
+                startActivity(deviceTodayIntent);
                 return true;
             case R.id.action_sort_name_ascending:
                 sortNameAscending();
@@ -295,19 +293,7 @@ public class MainActivity extends AppCompatActivity implements
                 }
                 return false;
             case R.id.nav_rate:
-                Uri uri = Uri.parse("market://details?id=" + this.getPackageName());
-                Intent goToMarket = new Intent(Intent.ACTION_VIEW, uri);
-                // To count with Play market backstack, After pressing back button,
-                // to taken back to our application, we need to add following flags to intent.
-                goToMarket.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY |
-                        Intent.FLAG_ACTIVITY_NEW_DOCUMENT |
-                        Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
-                try {
-                    startActivity(goToMarket);
-                } catch (ActivityNotFoundException e) {
-                    startActivity(new Intent(Intent.ACTION_VIEW,
-                            Uri.parse("http://play.google.com/store/apps/details?id=" + this.getPackageName())));
-                }
+                rateOnGooglePlay();
                 return true;
             case R.id.nav_share:
                 ShareCompat.IntentBuilder.from(this)
@@ -336,6 +322,8 @@ public class MainActivity extends AppCompatActivity implements
                 return false;
         }//switch
     }//onNavigationItemSelected
+
+
 
     @Override
     public void onListItemClick(int clickedItemIndex, int buttonClick) {
@@ -443,18 +431,7 @@ public class MainActivity extends AppCompatActivity implements
             emptyView.setVisibility(View.VISIBLE);
         } else {
             emptyView.setVisibility(View.GONE);
-
-            //TODO: testing:
-            Loc loc = locArrayList.get(0);
-            Log.d(TAG, "URLs: " + "\nAW : " + loc.getCurrentUrlAW() + "\n" + loc.getForecastUrlAW() +
-                    "\nDS : " + loc.getCurrentUrlDS() + "\n" + loc.getForecastUrlDS() + "\nWB : " +
-                    loc.getCurrentUrlWB() + "\n" + loc.getForecastUrlWB());
-
-
-
-        }
-
-
+        }//if/else - empty view
 
         // Get a handle to the RecyclerView.
         recyclerView = findViewById(R.id.recycler_view);
@@ -577,7 +554,7 @@ public class MainActivity extends AppCompatActivity implements
         builder.setMessage(message);
 
         //set the buttons
-        builder.setPositiveButton("delete", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 //delete the loc
@@ -598,6 +575,81 @@ public class MainActivity extends AppCompatActivity implements
         //create and show dialog
         builder.create().show();
     }//showLongClickDialog
+
+    /**
+     * Helper method for checking the number of times the user has opened the app
+     * Once it hits 10, it will ask the user to rate, if the accept, they never get this again.
+     * Otherwise it will show twice more after another 10 visits
+     */
+    private void rateApp() {
+        boolean haveRated = sharedPreferences.getBoolean(getResources().getString(R.string.rated_app_pref_key), false);
+        if (haveRated) {
+            return;
+        }
+
+        int count = sharedPreferences.getInt(getResources().getString(R.string.app_open_count_pref_key), 0);
+        if (count == 10 || count == 20 || count == 30) {
+            //increase the count
+            count++;
+            sharedPreferences.edit().putInt(getResources().getString(R.string.app_open_count_pref_key), count).apply();
+            //show dialog
+            showRateDialog();
+        } else {
+            count++;
+            sharedPreferences.edit().putInt(getResources().getString(R.string.app_open_count_pref_key), count).apply();
+        }
+    }//rateApp
+
+
+    private void showRateDialog() {
+        //create the builder
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        //set the title
+        String title = "Rate us!";
+        builder.setTitle(title);
+
+        //set the body
+        String message = "Do you enjoy using Weather Compare?\nRate us on Google Play";
+        builder.setMessage(message);
+
+        //set the buttons
+        builder.setPositiveButton("Rate us", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                //set the boolean to true so it never asks the user again
+                sharedPreferences.edit().putBoolean(getResources().getString(R.string.rated_app_pref_key), true).apply();
+                //direct to google play
+                rateOnGooglePlay();
+            }
+        })
+                .setNegativeButton("Not now", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //close dialog
+                        dialog.dismiss();
+                    }
+                });
+
+        //create and show dialog
+        builder.create().show();
+    }//showRateDialog
+
+    private void rateOnGooglePlay() {
+        Uri uri = Uri.parse("market://details?id=" + this.getPackageName());
+        Intent goToMarket = new Intent(Intent.ACTION_VIEW, uri);
+        // To count with Play market backstack, After pressing back button,
+        // to taken back to our application, we need to add following flags to intent.
+        goToMarket.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY |
+                Intent.FLAG_ACTIVITY_NEW_DOCUMENT |
+                Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+        try {
+            startActivity(goToMarket);
+        } catch (ActivityNotFoundException e) {
+            startActivity(new Intent(Intent.ACTION_VIEW,
+                    Uri.parse("http://play.google.com/store/apps/details?id=" + this.getPackageName())));
+        }
+    }//rateOnGooglePlay
 
 
 }//MainActivity

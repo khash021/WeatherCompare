@@ -5,6 +5,17 @@
     <color name="colorPrimaryLight">#67daff</color>
     <color name="colorAccent">#a003f4</color>
 
+    <color name="background">#eeffff</color>
+
+    <color name="ic_launcher_background">#49ACF1</color>
+
+    <!--Button-->
+    <color name="button">#d752ff</color>
+
+
+    <color name="background3">#90caf9</color>
+    <color name="color_light">#bcf0ff</color>
+
     <!--could work-->
     <color name="colorAccentOctonary">#a003f4</color>
     <!--maybe-->
@@ -16,11 +27,12 @@
     <!--maybe-->
     <color name="colorAccentSenary">#f4cc03</color>
 
+    <color name="background_light">#bbdefb</color>
+
     <color name="black">#000000</color>
     <color name="grey">#8e939c</color>
+    <color name="white">#ffffff</color>
+    <color name="dark_grey">#3a3a3a</color>
 
 
-
-
-    <color name="ic_launcher_background">#49ACF1</color>
 </resources>

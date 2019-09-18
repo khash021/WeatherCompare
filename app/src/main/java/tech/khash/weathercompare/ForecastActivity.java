@@ -13,6 +13,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
+import com.google.gson.Gson;
 
 import org.json.JSONException;
 
@@ -91,7 +92,21 @@ public class ForecastActivity extends AppCompatActivity {
                     //TODO: handle in case it is not in the db
                 }
             }//empty string
-        }//has extra
+        } else if (getIntent().hasExtra(Constant.INTENT_EXTRA_DEVICE_LOCATION)) {
+            String json = getIntent().getStringExtra(Constant.INTENT_EXTRA_DEVICE_LOCATION);
+            if (json != null) {
+                //convert json back to Loc
+                Gson gson = new Gson();
+                Loc loc = gson.fromJson(json, Loc.class);
+                if (loc != null) {
+                    currentLoc = loc;
+                } else {
+                    //TODO: handle this
+                }//if/else : null loc
+            } else {
+                //TODO: handle this
+            }
+        }
 
         progressBar = findViewById(R.id.progress_bar);
         tracker = 0;

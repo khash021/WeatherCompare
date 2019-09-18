@@ -88,8 +88,8 @@
 
 
     <string name="units">Units</string>
-
-
+    <string name="rated_app_pref_key">rated-app-pref-key</string>
+    <string name="app_open_count_pref_key">app-open-count-pref-key</string>
 
 
 </resources>

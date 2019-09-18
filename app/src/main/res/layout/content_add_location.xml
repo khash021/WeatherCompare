@@ -64,8 +64,7 @@
 
         <Button
             android:id="@+id/button_save_location"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/button_style"
             android:layout_marginTop="8dp"
             android:text="@string/save"
             app:layout_constraintStart_toStartOf="parent"

@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -38,7 +39,7 @@ public class WeatherListAdapterToday extends RecyclerView.Adapter<WeatherListAda
     @NonNull
     @Override
     public WeatherViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = inflater.inflate(R.layout.list_item_weather_today, parent, false);
+        View itemView = inflater.inflate(R.layout.list_item_today, parent, false);
         return new WeatherListAdapterToday.WeatherViewHolder(itemView, this);
     }//onCreateViewHolder
 
@@ -63,6 +64,9 @@ public class WeatherListAdapterToday extends RecyclerView.Adapter<WeatherListAda
             holder.textPressure.setText("Pressure");
             holder.textTotalRain.setText("T. Rain");
             holder.textTotalSnow.setText("T. Snow");
+
+            //set the background color
+            holder.rootLayout.setBackgroundColor(context.getResources().getColor(R.color.background));
 
         } else {
             //Get the weather object
@@ -129,6 +133,7 @@ public class WeatherListAdapterToday extends RecyclerView.Adapter<WeatherListAda
                 textHumidity, textPop, textPopType, textPopTotal, textCloud, textWind, textWindGust,
                 textVisibility, textPressure, textTotalRain, textTotalSnow;
         final ImageView imageIcon;
+        final LinearLayout rootLayout;
 
         //constructor
         private WeatherViewHolder (View itemView, WeatherListAdapterToday adapter) {
@@ -155,6 +160,8 @@ public class WeatherListAdapterToday extends RecyclerView.Adapter<WeatherListAda
             textTotalSnow = itemView.findViewById(R.id.text_total_snow);
 
             imageIcon = itemView.findViewById(R.id.image_icon);
+
+            rootLayout = itemView.findViewById(R.id.root_layout);
         }//constructor
 
     }//WeatherViewHolder

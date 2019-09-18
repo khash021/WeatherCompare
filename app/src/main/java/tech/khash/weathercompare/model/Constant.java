@@ -20,6 +20,7 @@ public final class Constant {
 
     //Intents
     public static final String INTENT_EXTRA_LOC_NAME = "intent-extra-loc-name";
+    public static final String INTENT_EXTRA_DEVICE_LOCATION = "intent-extra-device-location";
 
     //Loc AW code and name
     public static final String AW_KEY = "code";
