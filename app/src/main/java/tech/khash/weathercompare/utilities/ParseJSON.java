@@ -85,10 +85,6 @@ public class ParseJSON {
     private static final String FORECAST_POP_AW = "PrecipitationProbability";
     private static final String POP_TOTAL_AW = "TotalLiquid";
 
-    //pictures
-    private static final String ICON_BASE_URL_AW = "https://developer.accuweather.com/sites/default/files/";
-    private static final String ICON_EXTENSION_AW = "-s.png";
-
 
     /*
         --------------------------- Dark Sky -----------------------------------
@@ -184,33 +180,6 @@ public class ParseJSON {
     private static final String SUNRISE_GEO = "sunrise";
     private static final String SUNSET_GEO = "sunset";
 
-
-    /*
-        --------------------------- Some constants for results ---------------------------------
-     */
-    private static final String TEMPERATURE = "Temperature: ";
-    private static final String TEMPERATURE_UNIT_METRIC = " °C";
-
-    private static final String PRESSURE = "Pressure: ";
-    private static final String PRESSURE_UNIT = " hPa";
-
-    private static final String HUMIDITY = "Humidity: ";
-    private static final String UNIT_PERCENTAGE = " %";
-
-    private static final String WIND = "Wind: ";
-    private static final String WIND_GUST = "Gusting  ";
-    private static final String WIND_SPEED_UNIT = " km/h";
-    private static final String WIND_DIRECTION = " from: ";
-
-    private static final String DEW_POINT = "Dew point: ";
-    private static final String POP = "POP: ";
-    private static final String VISIBILITY = "Visibility: ";
-    private static final String UNIT_KM = " km";
-
-    private static final String CLOUD_COVERAGE = "Cloud coverage:  ";
-    private static final String CHANCE_OF = " chance of ";
-
-    private final static String LINE_BREAK = "\n";
 
     private static final long DAY_MILLI = 86400000;
 
@@ -376,7 +345,6 @@ public class ParseJSON {
         JSONArray dailyArray = rootObject.optJSONArray(DAILY_FORECAST_AW);
 
         if (dailyArray == null || dailyArray.length() < 1) {
-            Log.d(TAG, "parseAccuWeatherToday - daily array is empty/null");
             return null;
         }
         Weather weather = new Weather();
@@ -677,87 +645,6 @@ public class ParseJSON {
     /*
     -------------------------------- Dark Sky -----------------------------------------
      */
-    //TODO: use the new url to get metric and then remove all this conversions
-
-    /**
-     * This method is for parsing the current weather from DarkSky
-     *
-     * @param jsonString : raw JSON response from the server
-     * @return : Weather object
-     * @throws JSONException
-     */
-    public static Weather parseDarkSkyCurrent(String jsonString) throws JSONException {
-
-        //dummy check for empty or null input
-        if (jsonString == null || TextUtils.isEmpty(jsonString)) {
-            return null;
-        }//if
-
-        String summary, temp, feelLike, pressure, dewPoint, humidity, windSpeed, windGust, windDirection,
-                cloudCoverage, pop, precipType, visibility, icon;
-
-        Weather weather = new Weather();
-
-        //set the provider
-        weather.setProvider(Weather.PROVIDER_DS);
-
-        //create the main object
-        JSONObject forecastObject = new JSONObject(jsonString);
-
-        JSONObject currentObject = forecastObject.getJSONObject(CURRENTLY_DS);
-
-        summary = currentObject.optString(SUMMARY_DS);
-        weather.setSummary(summary);
-
-        double popDouble = currentObject.optDouble(POP_DS);
-        pop = Conversions.decimalToPercentage(popDouble);
-        weather.setPop(pop);
-
-
-        temp = currentObject.optString(TEMPERATURE_DS);
-        temp = Conversions.roundDecimalString(temp);
-        weather.setTemperature(temp);
-
-        feelLike = currentObject.optString(FEEL_LIKE_DS);
-        feelLike = Conversions.roundDecimalString(feelLike);
-        weather.setTempFeel(feelLike);
-
-        dewPoint = currentObject.optString(DEW_POINT_DS);
-        dewPoint = Conversions.roundDecimalString(dewPoint);
-        weather.setDewPoint(dewPoint);
-
-        double humidDouble = currentObject.optDouble(HUMIDITY_DS);
-        humidity = Conversions.decimalToPercentage(humidDouble);
-        weather.setHumidity(humidity);
-
-        pressure = currentObject.optString(PRESSURE_DS);
-        pressure = Conversions.roundDecimalString(pressure);
-        weather.setPressure(pressure);
-
-        windSpeed = currentObject.optString(WIND_SPEED_DS);
-        windSpeed = Conversions.roundDecimalString(windSpeed);
-        weather.setWindSpeed(windSpeed);
-
-        windGust = currentObject.optString(WIND_GUST_DS);
-        windGust = Conversions.roundDecimalString(windGust);
-        weather.setWindGust(windGust);
-
-        double windDirDouble = currentObject.optDouble(WIND_DIRECTION_DS);
-        windDirection = Conversions.degreeToDirection(windDirDouble);
-        weather.setWindDirection(windDirection);
-
-        double cloudCoverDouble = currentObject.optDouble(CLOUD_COVER_DS);
-        cloudCoverage = Conversions.decimalToPercentage(cloudCoverDouble);
-        weather.setCloudCoverage(cloudCoverage);
-
-        visibility = currentObject.optString(VISIBILITY_DS);
-        visibility = Conversions.roundDecimalString(visibility);
-        weather.setVisibility(visibility);
-
-        String iconString = currentObject.optString(ICON_DS);
-
-        return weather;
-    }//parseDarkSkyCurrent
 
     public static Weather parseDarkSkyToday(String jsonString) throws JSONException {
         if (TextUtils.isEmpty(jsonString)) {
@@ -1049,96 +936,6 @@ public class ParseJSON {
     /*
     -------------------------------- Weather Bit -----------------------------------------
      */
-
-    /**
-     * This method is for parsing the current weather from Weather Bit
-     *
-     * @param jsonString : raw JSON response from the server
-     * @return : Weather object
-     * @throws JSONException
-     */
-    public static Weather parseWeatherBitCurrent(String jsonString) throws JSONException {
-
-        //dummy check for empty or null input
-        if (jsonString == null || TextUtils.isEmpty(jsonString)) {
-            return null;
-        }//if
-
-        String summary, temp, feelLike, pressure, humidity, windSpeed, windDirection, cloudCoverage,
-                icon, dewPoint, visibility;
-
-        //create a Weather object
-        Weather weather = new Weather();
-
-        //set the provider
-        weather.setProvider(Weather.PROVIDER_WB);
-
-        //create an object from the string
-        JSONObject rootObject = new JSONObject(jsonString);
-        //get a reference to the data array
-        JSONArray dataArray = rootObject.getJSONArray(DATA_WB);
-        //get the first element of the array for current data
-        try {
-            JSONObject mainObject = dataArray.getJSONObject(0);
-
-            //summary and icon are both in weather object
-            JSONObject weatherObject = mainObject.optJSONObject(WEATHER_WB);
-            summary = weatherObject.optString(DESCRIPTION_WB);
-            weather.setSummary(summary);
-            icon = weatherObject.optString(ICON_WB);
-
-            //temp
-            temp = mainObject.optString(TEMP_WB);
-            //round if it contains a decimal point
-            temp = Conversions.roundDecimalString(temp);
-            weather.setTemperature(temp);
-
-            feelLike = mainObject.optString(FEEL_LIKE_WB);
-            feelLike = Conversions.roundDecimalString(feelLike);
-            weather.setTempFeel(feelLike);
-
-            //dew
-            dewPoint = mainObject.optString(DEW_WB);
-            dewPoint = Conversions.roundDecimalString(dewPoint);
-            weather.setDewPoint(dewPoint);
-
-            //pressure
-            pressure = mainObject.optString(PRESSURE_WB);
-            pressure = Conversions.roundDecimalString(pressure);
-            weather.setPressure(pressure);
-
-            //humidity
-            humidity = mainObject.getString(HUMIDITY_WB);
-            weather.setHumidity(humidity);
-
-            //wind
-            windSpeed = mainObject.optString(WIND_SPEED_WB);
-            windSpeed = Conversions.roundDecimalString(windSpeed);
-            weather.setWindSpeed(windSpeed);
-
-
-            double windDirectionDouble = mainObject.optDouble(WIND_DIRECTION_WB);
-            windDirection = Conversions.degreeToDirection(windDirectionDouble);
-            weather.setWindDirection(windDirection);
-
-            //cloud cover
-            cloudCoverage = mainObject.optString(CLOUD_WB);
-            cloudCoverage = Conversions.roundDecimalString(cloudCoverage);
-            weather.setCloudCoverage(cloudCoverage);
-
-            //visibility
-            visibility = mainObject.optString(VISIBILITY_WB);
-            visibility = Conversions.roundDecimalString(visibility);
-            weather.setVisibility(visibility);
-
-
-            return weather;
-        } catch (NullPointerException e) {
-            //this happens when for some reason the main data array is empty
-            Log.e("parseWeatherBitCurrent", "parseWeatherBitCurrent - data array is null", e);
-            return null;
-        }
-    }//parseWeatherBitCurrent
 
     public static Weather parseWeatherBitToday(String jsonString) throws JSONException {
         if (TextUtils.isEmpty(jsonString)) {
@@ -1440,81 +1237,6 @@ public class ParseJSON {
         }//for
         return weatherArrayList;
     }//parseWeatherBitForecast
-
-
-    /**
-     * This method is for parsing the current weather from Weather Unlocked
-     *
-     * @param jsonString : raw JSON response from the server
-     * @return : Weather object
-     * @throws JSONException
-     */
-    public static Weather parseWeatherUnlockedCurrent(String jsonString) throws JSONException {
-
-        //dummy check for empty or null input
-        if (jsonString == null || TextUtils.isEmpty(jsonString)) {
-            return null;
-        }//if
-
-        String summary, temp, feelLike, humidity, windSpeed, windDirection, cloudCoverage, icon,
-                dewPoint, visibility;
-
-        //create a Weather object
-        Weather weather = new Weather();
-
-        //set the provider
-        weather.setProvider(Weather.PROVIDER_WU);
-
-        //create an object from the string
-        JSONObject mainObject = new JSONObject(jsonString);
-
-        //set summary
-        summary = mainObject.optString(SUMMARY_WU);
-        weather.setSummary(summary);
-
-        //temp
-        temp = mainObject.optString(TEMP_WU);
-        //round if it contains a decimal point
-        temp = Conversions.roundDecimalString(temp);
-        weather.setTemperature(temp);
-
-        feelLike = mainObject.optString(FEEL_LIKE_WU);
-        feelLike = Conversions.roundDecimalString(feelLike);
-        weather.setTempFeel(feelLike);
-
-        //dew
-        dewPoint = mainObject.optString(DEW_WU);
-        dewPoint = Conversions.roundDecimalString(dewPoint);
-        weather.setDewPoint(dewPoint);
-
-        //humidity
-        humidity = mainObject.getString(HUMIDITY_WU);
-        humidity = Conversions.roundDecimalString(humidity);
-        weather.setHumidity(humidity);
-
-        //wind
-        windSpeed = mainObject.optString(WIND_SPEED_WU);
-        windSpeed = Conversions.roundDecimalString(windSpeed);
-        weather.setWindSpeed(windSpeed);
-
-
-        double windDirectionDouble = mainObject.optDouble(WIND_DIRECTION_WU);
-        windDirection = Conversions.degreeToDirection(windDirectionDouble);
-        weather.setWindDirection(windDirection);
-
-        //cloud cover
-        cloudCoverage = mainObject.optString(CLOUD_COVER_WU);
-        cloudCoverage = Conversions.roundDecimalString(cloudCoverage);
-        weather.setCloudCoverage(cloudCoverage);
-
-        //visibility
-        visibility = mainObject.optString(VISIBILITY_WU);
-        visibility = Conversions.roundDecimalString(visibility);
-        weather.setVisibility(visibility);
-
-
-        return weather;
-    }//parseWeatherUnlockedCurrent
 
 
     public static Weather parseWeatherUnlockedToday(String jsonString) throws JSONException {

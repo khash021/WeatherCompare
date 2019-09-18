@@ -24,7 +24,7 @@
 
         <Button
             android:id="@+id/button_current"
-            android:text="Today"
+            android:text="@string/today"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -33,7 +33,7 @@
             />
         <Button
             android:id="@+id/button_forecast"
-            android:text="Forecast"
+            android:text="@string/forecast"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

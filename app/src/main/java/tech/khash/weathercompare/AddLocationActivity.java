@@ -49,7 +49,6 @@ public class AddLocationActivity extends AppCompatActivity implements OnMapReady
     private static final String TAG = AddLocationActivity.class.getSimpleName();
 
     //TODO: check against duplicate names
-    //TODO: unsaved changes
 
     private GoogleMap mMap;
     private LatLng latLngCamera;
@@ -63,11 +62,9 @@ public class AddLocationActivity extends AppCompatActivity implements OnMapReady
     //DEFAULTS FOR NOW
     private final LatLng DEFAULT_LAT_LNG_VANCOUVER = new LatLng(49.273367, -123.102950);
     private final float DEFAULT_ZOOM = 14.0f;
-    private final int SEARCH_MAX_RESULTS = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d(TAG, "onCreate Called");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_location);
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -105,7 +102,6 @@ public class AddLocationActivity extends AppCompatActivity implements OnMapReady
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        Log.d(TAG, "onMapReady Called");
         mMap = googleMap;
 
         //set the camera idle listener to get the location
@@ -113,7 +109,6 @@ public class AddLocationActivity extends AppCompatActivity implements OnMapReady
 
         //disable map toolbar
         UiSettings uiSettings = mMap.getUiSettings();
-//        uiSettings.setMapToolbarEnabled(false);
         uiSettings.setZoomControlsEnabled(true); //for emulator since cant zoom out with mouse
         uiSettings.setCompassEnabled(true);
 
@@ -158,8 +153,6 @@ public class AddLocationActivity extends AppCompatActivity implements OnMapReady
                 findMeMap();
                 return true;
             case R.id.action_search:
-                //TODO:
-                HelperFunctions.showToast(this, "Search");
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -178,8 +171,7 @@ public class AddLocationActivity extends AppCompatActivity implements OnMapReady
             if (isMapReady()) {
                 getDeviceLocation();
             } else {
-                Log.d(TAG, "Map not ready from findMeMap");
-                HelperFunctions.showToast(this, "Map not ready");
+                HelperFunctions.showToast(this, getResources().getString(R.string.map_not_ready));
             }
         } else {
             //don't have permission, ask for it
@@ -201,8 +193,6 @@ public class AddLocationActivity extends AppCompatActivity implements OnMapReady
                             setUserLocation();
                             moveCamera(latLngUser, 14.0f);
                         } else {
-                            Log.d(TAG, "Current location is null. Using defaults.");
-                            Log.e(TAG, "Exception: %s", task.getException());
                             mMap.moveCamera(CameraUpdateFactory
                                     .newLatLngZoom(DEFAULT_LAT_LNG_VANCOUVER, DEFAULT_ZOOM));
                         }
@@ -211,17 +201,11 @@ public class AddLocationActivity extends AppCompatActivity implements OnMapReady
                         .addOnFailureListener(this, new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
-                                Log.e(TAG, "Failed to get the last know location", e);
                             }
                         });
-            } else {
-                //permission denied (should never happen since we have already checked it before this call
-                Log.wtf(TAG, "Location permission denied from getDeviceLocation");
-                return;
             }
 
         } catch (Exception e) {
-            Log.e(TAG, "Error finding my location from getDeviceLocation", e);
         }//try-catch
     }//getDeviceLocation
 
@@ -233,7 +217,6 @@ public class AddLocationActivity extends AppCompatActivity implements OnMapReady
         try {
             latLngUser = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
         } catch (Exception e) {
-            Log.e(TAG, "Error setting user lat, lng from setUserLocation", e);
         }//try-catch
     }//setUserLocation
 
@@ -241,15 +224,13 @@ public class AddLocationActivity extends AppCompatActivity implements OnMapReady
     private void moveCamera(LatLng latLng, float zoom) {
         //check map first
         if (!isMapReady()) {
-            HelperFunctions.showToast(this, "Map not ready");
-            Log.d(TAG, "Map not ready from moveCamera");
+            HelperFunctions.showToast(this, getResources().getString(R.string.map_not_ready));
             return;
         }//map not ready
         //use try catch in case there is something wrong with the input
         try {
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
         } catch (Exception e) {
-            Log.e(TAG, "Error movign camera from moveCamera", e);
         }
     }//moveCamera
 
@@ -263,7 +244,6 @@ public class AddLocationActivity extends AppCompatActivity implements OnMapReady
 
         if (latLngCamera == null) {
             HelperFunctions.showToast(this, getResources().getString(R.string.error_getting_location_toast));
-            Log.d(TAG, "latLngCamera is null from saveLocation method");
             return;
         }
 
@@ -273,7 +253,6 @@ public class AddLocationActivity extends AppCompatActivity implements OnMapReady
         SaveLoadList.addToLocList(this, location);
 
         HelperFunctions.showToast(this, "\"" + name + "\"" + " " + getString(R.string.location_added_successfully_toast));
-        Log.d(TAG, "Location added.\nName: " + name + "\nLatLng: " + latLngCamera);
 
         //return to sender
         Intent returnIntent = new Intent();
@@ -324,7 +303,6 @@ public class AddLocationActivity extends AppCompatActivity implements OnMapReady
     private void searchAddress(String query) {
         //check for geocoder availability
         if (!Geocoder.isPresent()) {
-            Log.d(TAG, "Geocoder not available - searchAddress");
             HelperFunctions.showToast(this, getString(R.string.geocoder_not_available_toast));
             return;
         }
@@ -338,17 +316,15 @@ public class AddLocationActivity extends AppCompatActivity implements OnMapReady
 
         try {
             //the second parameter is the number of max results, here we set it to 3
-            List<Address> addresses = geocoder.getFromLocationName(query, SEARCH_MAX_RESULTS);
+            List<Address> addresses = geocoder.getFromLocationName(query, 3);
             //check to make sure we got results
             if (addresses.size() < 1) {
                 HelperFunctions.showToast(this, getString(R.string.no_results_found_toast));
-                Log.d(TAG, "No results - searchAddress");
                 return;
             }//if
 
             //check the map first
             if (mMap == null) {
-                Log.d(TAG, "Map not ready - searchAddress");
                 return;
             }
 
@@ -366,16 +342,6 @@ public class AddLocationActivity extends AppCompatActivity implements OnMapReady
                         .position(latLng));
                 //include the marker
                 builder.include(latLng);
-                //TODO: for testing only
-                Log.d(TAG, "Search results: " + "\nFeature: " + result.getFeatureName() +
-                        "  ---   " + "Admin area: " + result.getAdminArea() + "  ---   " +
-                        "Country code: " + result.getCountryCode() + "  ---   " +
-                        "Country name: " + result.getCountryName() + "  ---   " +
-                        "Postal code: " + result.getPostalCode() + "  ---   " +
-                        "Subadmin area: " + result.getSubAdminArea() + "  ---   " +
-                        "Locale: " + result.getLocale().toString() + "  ---   " +
-                        "Latutude: " + result.getLatitude() + "  ---   " +
-                        "Longitude: " + result.getLongitude());
                 counter++;
             }//for
 
@@ -388,7 +354,6 @@ public class AddLocationActivity extends AppCompatActivity implements OnMapReady
                 String featureName = address.getFeatureName();
                 if (featureName != null && !featureName.isEmpty()) {
                     editTextName.setText(query);
-//                    editTextName.setText(featureName);
                 }
                 return;
             }
@@ -404,7 +369,6 @@ public class AddLocationActivity extends AppCompatActivity implements OnMapReady
             mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, width, height, padding));//this is the pixel padding
 
         } catch (IOException e) {
-            Log.e(TAG, "Error getting location", e);
         }//try/catch
     }//searchAddress
 

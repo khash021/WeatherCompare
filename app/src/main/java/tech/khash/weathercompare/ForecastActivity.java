@@ -70,8 +70,6 @@ public class ForecastActivity extends AppCompatActivity {
 
     private static final String TAG = ForecastActivity.class.getSimpleName();
 
-    private static final String FRAGMENT_OUTSTATE_BUNDLE = "fragment-outstate-bundle";
-
     private Loc currentLoc;
 
     private LinearLayout noConnectionLayout;
@@ -102,7 +100,6 @@ public class ForecastActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        Log.d(TAG, "onCreate caleed");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forecast);
 
@@ -172,7 +169,6 @@ public class ForecastActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        Log.d(TAG, "onCreateOptionsMenu Called");
         getMenuInflater().inflate(R.menu.forecast_menu, menu);
 
         //find the search item
@@ -196,7 +192,6 @@ public class ForecastActivity extends AppCompatActivity {
                 showSavedLocations();
                 return true;
             case R.id.action_add_locations:
-                //TODO: change this for results
                 Intent intent = new Intent(ForecastActivity.this, AddLocationActivity.class);
                 startActivity(intent);
                 return true;
@@ -249,39 +244,31 @@ public class ForecastActivity extends AppCompatActivity {
                             setUserLocation(latLng);
                         } else {
                             showAddLocationDialog(Constant.ALERT_CODE_UNABLE_FIND_DEVICE);
-                            Log.e(TAG, "Exception: %s", task.getException());
                         }
                     }
                 })
                         .addOnFailureListener(this, new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
-                                Log.e(TAG, "Failed to get the last know location", e);
                                 showAddLocationDialog(Constant.ALERT_CODE_UNABLE_FIND_DEVICE);
                             }
                         });
             } else {
-                //permission denied (should never happen since we have already checked it before this call
-                Log.wtf(TAG, "Location permission denied from getDeviceLocation");
                 return;
             }
 
         } catch (Exception e) {
-            Log.e(TAG, "Error finding my location from getDeviceLocation", e);
         }//try-catch
 
     }//getDeviceLocation
 
     private void setUserLocation(LatLng latLng) {
         if (latLng == null) {
-            Log.d(TAG, "setUserLocation - location is null");
             return;
         }
 
         //create a new Loc
         final Loc loc = new Loc(latLng);
-
-        Log.d(TAG, "USER LOCATION: " + latLng.toString());
 
         //get the AW code and set all URLs
         progressBar.setVisibility(View.VISIBLE);
@@ -289,7 +276,6 @@ public class ForecastActivity extends AppCompatActivity {
         //first we need to get the codeURL and then get the code
         URL locationCodeUrl = loc.getLocationCodeUrlAW();
         if (locationCodeUrl == null) {
-            Log.d(TAG, "setUserLocation - codeURL = null");
             return;
         }
 
@@ -303,12 +289,9 @@ public class ForecastActivity extends AppCompatActivity {
             @Override
             public void processFinish(HashMap<String, String> output) {
                 if (output == null) {
-                    Log.d(TAG, "processFinish - null response");
-
                     loc.setAllUrls();
 
                     currentLoc = loc;
-
                 } else {
                     //set key and name
                     String key = output.get(Constant.AW_KEY);
@@ -321,14 +304,11 @@ public class ForecastActivity extends AppCompatActivity {
 
                     //set current loc
                     currentLoc = loc;
-
                 }
-
                 deviceLocation = true;
 
                 //get weather
                 getForecasts(currentLoc);
-
             }//processFinish
 
         });
@@ -376,7 +356,6 @@ public class ForecastActivity extends AppCompatActivity {
         //TODO: show dialog for going to add location if no result or more than 1
         //check for geocoder availability
         if (!Geocoder.isPresent()) {
-            Log.d(TAG, "Geocoder not available - searchAddress");
             showAddLocationDialog(Constant.ALERT_CODE_NO_GEOCODER);
             return;
         }
@@ -393,7 +372,6 @@ public class ForecastActivity extends AppCompatActivity {
             //check to make sure we got results
             if (addresses.size() < 1) {
                 showAddLocationDialog(Constant.ALERT_CODE_NO_RESULT);
-                Log.d(TAG, "No results - searchAddress");
                 return;
             }//if
 
@@ -417,7 +395,6 @@ public class ForecastActivity extends AppCompatActivity {
             }
 
         } catch (IOException e) {
-            Log.e(TAG, "Error getting location", e);
         }//try/catch
 
     }//openSearch
@@ -434,7 +411,6 @@ public class ForecastActivity extends AppCompatActivity {
     private void showLocListDialog(final Activity activity, final ArrayList<Loc> locArrayList) {
         //check for empty list
         if (locArrayList == null || locArrayList.size() < 1) {
-            Log.d(TAG, "showLocListDialog - locArrayList is null/empty ");
             HelperFunctions.showToast(activity.getBaseContext(), getResources().getString(R.string.no_saved_location));
             return;
         }//if
@@ -446,7 +422,6 @@ public class ForecastActivity extends AppCompatActivity {
         }
 
         if (namesArrayList == null || locArrayList.size() < 1) {
-            Log.d(TAG, "showLocListDialog - namesArrayList is null/empty ");
             return;
         }
 
@@ -533,9 +508,7 @@ public class ForecastActivity extends AppCompatActivity {
      * @param loc
      */
     private void getForecasts(Loc loc) {
-        Log.d(TAG, "getForecasts called");
         if (loc == null) {
-            Log.d(TAG, "getForecasts - current loc = null");
             return;
         }
 
@@ -556,37 +529,30 @@ public class ForecastActivity extends AppCompatActivity {
         //------------------------------- AW ----------------------------------
         URL forecastUrlAW = loc.getForecastUrlAW();
         if (forecastUrlAW == null) {
-            Log.d(TAG, "forecastUrlAW = null");
             tracker++;
         } else {
-            Log.d(TAG, "Forecast URL - AW: " + forecastUrlAW.toString());
             getResponseAW(forecastUrlAW);
         }//url null
 
         //------------------------------- DS ----------------------------------
         URL forecastUrlDS = loc.getForecastUrlDS();
         if (forecastUrlDS == null) {
-            Log.d(TAG, "forecastUrlDS = null");
             tracker++;
         } else {
-            Log.d(TAG, "Forecast URL - DS: " + forecastUrlDS.toString());
             getResponseDS(forecastUrlDS);
         }//url null
 
         //------------------------------- WB ----------------------------------
         URL forecastUrlWB = loc.getForecastUrlWB();
         if (forecastUrlWB == null) {
-            Log.d(TAG, "forecastUrlWB = null");
             tracker++;
         } else {
-            Log.d(TAG, "Forecast URL - WB: " + forecastUrlWB.toString());
             getResponseWB(forecastUrlWB);
         }//url null
 
         //------------------------------- WU ----------------------------------
         URL forecastUrlWU = loc.getForecastUrlWU();
         if (forecastUrlWU == null) {
-            Log.d(TAG, "forecastUrlWU = null");
             tracker++;
         } else {
             getResponseWU(forecastUrlWU);
@@ -594,9 +560,7 @@ public class ForecastActivity extends AppCompatActivity {
     }//getForecasts
 
     private void createDayArrayLists() {
-        Log.d(TAG, "createDayArrayLists called");
         if (tracker != 4) {
-            Log.d(TAG, "createDayArrayLists - tracker is not 4. Tracker: " + tracker);
             return;
         }
         day1WeatherList = new ArrayList<>();
@@ -619,7 +583,6 @@ public class ForecastActivity extends AppCompatActivity {
         //if we get here, it means all the fetching of the data is done
         //---------------- AW -----------------------
         if (weatherAW == null || weatherAW.size() < 1) {
-            Log.d(TAG, "weatherAW - null/empty");
         } else {
             for (Weather weather : weatherAW) {
                 String date = weather.getDate();
@@ -635,7 +598,6 @@ public class ForecastActivity extends AppCompatActivity {
 
         //---------------- DS -----------------------
         if (weatherDS == null || weatherDS.size() < 1) {
-            Log.d(TAG, "weatherDS - null/empty");
         } else {
             for (Weather weather : weatherDS) {
                 String date = weather.getDate();
@@ -651,7 +613,6 @@ public class ForecastActivity extends AppCompatActivity {
 
         //---------------- WB -----------------------
         if (weatherWB == null || weatherWB.size() < 1) {
-            Log.d(TAG, "weatherWB - null/empty");
         } else {
             for (Weather weather : weatherWB) {
                 String date = weather.getDate();
@@ -667,7 +628,6 @@ public class ForecastActivity extends AppCompatActivity {
 
         //---------------- WU -----------------------
         if (weatherWU == null || weatherWU.size() < 1) {
-            Log.d(TAG, "weatherWB - null/empty");
         } else {
             for (Weather weather : weatherWU) {
                 String date = weather.getDate();
@@ -686,11 +646,8 @@ public class ForecastActivity extends AppCompatActivity {
     }//createDayArrayLists
 
     private void setupFragments() {
-        Log.d(TAG, "setupFragments called");
-
         //first remove all tabs
         tabLayout.removeAllTabs();
-
 
         //set the tab names
         tabLayout.addTab(tabLayout.newTab().setText(day1Date));
@@ -730,14 +687,12 @@ public class ForecastActivity extends AppCompatActivity {
 
     //------------------------------- AW ----------------------------------
     private void getResponseAW(URL url) {
-        Log.d(TAG, "getResponseAW called");
         //get the response
         NetworkCallsUtils.AccuWeatherForecastTask forecastTaskAW = new
                 NetworkCallsUtils.AccuWeatherForecastTask(new NetworkCallsUtils.AccuWeatherForecastTask.AsyncResponse() {
             @Override
             public void processFinish(String jsonResponse) {
                 if (TextUtils.isEmpty(jsonResponse)) {
-                    Log.d(TAG, "getWeather - processFinish callback - response : null/empty");
                     tracker++;
                     return;
                 }
@@ -748,13 +703,10 @@ public class ForecastActivity extends AppCompatActivity {
     }//getResponseAW
 
     private void getWeathersAW(String jsonResponse) {
-        Log.d(TAG, "getWeathersAW called");
         weatherAW = new ArrayList<>();
         try {
             weatherAW = ParseJSON.parseAccuWeatherForecast(jsonResponse);
-            Log.d(TAG, "getWeathersAW - size: " + weatherAW.size());
         } catch (JSONException e) {
-            Log.e(TAG, "Error getting arraylist from ParseJSON.parseAccuWeatherForecast", e);
         } finally {
             tracker++;
             createDayArrayLists();
@@ -763,14 +715,12 @@ public class ForecastActivity extends AppCompatActivity {
 
     //------------------------------- DS ----------------------------------
     private void getResponseDS(URL url) {
-        Log.d(TAG, "getResponseDS called");
         //get response
         NetworkCallsUtils.DarkSkyForecastTask forecastTask = new
                 NetworkCallsUtils.DarkSkyForecastTask(new NetworkCallsUtils.DarkSkyForecastTask.AsyncResponse() {
             @Override
             public void processFinish(String jsonResponse) {
                 if (TextUtils.isEmpty(jsonResponse)) {
-                    Log.d(TAG, "getWeather - processFinish callback - response : null/empty");
                     tracker++;
                     return;
                 }
@@ -782,14 +732,11 @@ public class ForecastActivity extends AppCompatActivity {
     }//getResponseDS
 
     private void getWeathersDS(String jsonResponse) {
-        Log.d(TAG, "getWeathersDS called");
         weatherDS = new ArrayList<>();
         try {
             weatherDS = ParseJSON.parseDarkSkyForecast(jsonResponse);
-            Log.d(TAG, "createWeatherArrayList - size: " + weatherDS.size());
             //start the adapter
         } catch (JSONException e) {
-            Log.e(TAG, "Error getting arraylist from ParseJSON.parseAccuWeatherForecast", e);
         } finally {
             tracker++;
             createDayArrayLists();
@@ -798,14 +745,12 @@ public class ForecastActivity extends AppCompatActivity {
 
     //------------------------------- WB ----------------------------------
     private void getResponseWB(URL url) {
-        Log.d(TAG, "getResponseWB called");
         //get the response
         NetworkCallsUtils.WeatherBitForecastTask forecastTask = new
                 NetworkCallsUtils.WeatherBitForecastTask(new NetworkCallsUtils.WeatherBitForecastTask.AsyncResponse() {
             @Override
             public void processFinish(String jsonResponse) {
                 if (TextUtils.isEmpty(jsonResponse)) {
-                    Log.d(TAG, "getWeather - processFinish callback - response : null/empty");
                     tracker++;
                     return;
                 }
@@ -817,13 +762,10 @@ public class ForecastActivity extends AppCompatActivity {
     }//getResponseWB
 
     private void getWeathersWB(String jsonResponse) {
-        Log.d(TAG, "getWeathersWB called");
         weatherWB = new ArrayList<>();
         try {
             weatherWB = ParseJSON.parseWeatherBitForecast(jsonResponse);
-            Log.d(TAG, "createWeatherArrayList - size: " + weatherWB.size());
         } catch (JSONException e) {
-            Log.e(TAG, "Error getting arraylist from ParseJSON.parseAccuWeatherForecast", e);
         } finally {
             //set the name
             if (deviceLocation) {
@@ -843,14 +785,12 @@ public class ForecastActivity extends AppCompatActivity {
 
     //------------------------------- WU ----------------------------------
     private void getResponseWU(URL url) {
-        Log.d(TAG, "getResponseWU called");
         //get the response
         NetworkCallsUtils.WeatherUnlockedForecastTask forecastTask = new
                 NetworkCallsUtils.WeatherUnlockedForecastTask(new NetworkCallsUtils.WeatherUnlockedForecastTask.AsyncResponse() {
             @Override
             public void processFinish(String jsonResponse) {
                 if (TextUtils.isEmpty(jsonResponse)) {
-                    Log.d(TAG, "getWeather - processFinish callback - response : null/empty");
                     tracker++;
                     return;
                 }
@@ -862,13 +802,10 @@ public class ForecastActivity extends AppCompatActivity {
     }//getResponseWB
 
     private void getWeathersWU(String jsonResponse) {
-        Log.d(TAG, "getWeathersWU called");
         weatherWU = new ArrayList<>();
         try {
             weatherWU = ParseJSON.parseWeatherUnlockedForecast(jsonResponse);
-            Log.d(TAG, "createWeatherArrayList - size: " + weatherWU.size());
         } catch (JSONException e) {
-            Log.e(TAG, "Error getting arraylist from ParseJSON.parseWeatherUnlockedForecast", e);
         } finally {
             tracker++;
             createDayArrayLists();

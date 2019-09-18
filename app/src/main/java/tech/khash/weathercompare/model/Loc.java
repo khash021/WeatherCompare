@@ -1,7 +1,6 @@
 package tech.khash.weathercompare.model;
 
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -177,7 +176,6 @@ public class Loc {
 
         URL url = createLocationCodeUrlAW(latLng);
         if (url == null) {
-            Log.d(TAG, "getLocationCodeUrlAW - URL null......Name: " + name);
             return null;
         } else {
             locationCodeUrlAW = url;
@@ -195,17 +193,12 @@ public class Loc {
             //it already has a keyAW
             URL url = createCurrentUrlAW(keyAW);
             if (url == null) {
-                Log.d(TAG, "getCurrentUrlAW - URL null......Name: " + name);
                 return null;
             } else {
                 currentUrlAW = url;
                 return currentUrlAW;
             }//if-else
         } else {
-            //we need keyAW
-            //TODO:
-            //get keyAW
-            Log.d(TAG, "getCurrentUrlAW - no keyAW......Name: " + name);
             return null;
         }//if-else keyAW
     }//getCurrentUrlAW
@@ -219,7 +212,6 @@ public class Loc {
             //it already has a keyAW
             URL url = createTodayUrlAW(keyAW);
             if (url == null) {
-                Log.d(TAG, "getTodayUrlAW - URL null......Name: " + name);
                 return null;
             } else {
                 todayUrlAW = url;
@@ -227,10 +219,6 @@ public class Loc {
             }//if-else
 
         } else {
-            //we need keyAW
-            //TODO:
-            //get keyAW
-            Log.d(TAG, "getTodayUrlAW - no keyAW......Name: " + name);
             return null;
         }//if-else keyAW
     }//getTodayUrlAW
@@ -243,17 +231,12 @@ public class Loc {
         if (hasKeyAW()) {
             URL url = createForecastUrlAW(keyAW);
             if (url == null) {
-                Log.d(TAG, "getForecastUrlAW - URL null......Name: " + name);
                 return null;
             } else {
                 forecastUrlAW = url;
                 return forecastUrlAW;
             }//url null
         } else {
-            //we need keyAW
-            //TODO:
-            //get keyAW
-            Log.d(TAG, "getForecastUrlAW - no keyAW......Name: " + name);
             return null;
         }//if-else keyAW
     }//getForecastUrlAW
@@ -266,7 +249,6 @@ public class Loc {
 
         URL url = createCurrentUrlOW(latLng);
         if (url == null) {
-            Log.d(TAG, "getCcurrentUrlOW - URL null......Name: " + name);
             return null;
         } else {
             currentUrlOW = url;
@@ -282,7 +264,6 @@ public class Loc {
 
         URL url = createForecastUrlOW(latLng);
         if (url == null) {
-            Log.d(TAG, "getForecastUrlOW - URL null......Name: " + name);
             return null;
         } else {
             forecastUrlOW = url;
@@ -298,7 +279,6 @@ public class Loc {
 
         URL url = createCurrentUrlDS(latLng);
         if (url == null) {
-            Log.d(TAG, "getCurrentUrlDS - URL null......Name: " + name);
             return null;
         } else {
             currentUrlDS = url;
@@ -313,7 +293,6 @@ public class Loc {
 
         URL url = createForecastUrlDS(latLng);
         if (url == null) {
-            Log.d(TAG, "getForecastUrlDS - URL null......Name: " + name);
             return null;
         } else {
             forecastUrlDS = url;
@@ -329,7 +308,6 @@ public class Loc {
 
         URL url = createCurrentUrlWB(latLng);
         if (url == null) {
-            Log.d(TAG, "getCurrentUrlDS - URL null......Name: " + name);
             return null;
         } else {
             currentUrlWB = url;
@@ -344,7 +322,6 @@ public class Loc {
 
         URL url = createForecastUrlWB(latLng);
         if (url == null) {
-            Log.d(TAG, "getForecastUrlDS - URL null......Name: " + name);
             return null;
         } else {
             forecastUrlWB = url;
@@ -360,7 +337,6 @@ public class Loc {
 
         URL url = createCurrentUrlWU(latLng);
         if (url == null) {
-            Log.d(TAG, "getCurrentUrlWU - URL null......Name: " + name);
             return null;
         } else {
             currentUrlWU = url;
@@ -375,7 +351,6 @@ public class Loc {
 
         URL url = createForecastUrlWU(latLng);
         if (url == null) {
-            Log.d(TAG, "getForecastUrlWU - URL null......Name: " + name);
             return null;
         } else {
             forecastUrlWU = url;
@@ -390,7 +365,6 @@ public class Loc {
 
         URL url = createSunriseSunsetUrl(latLng);
         if (url == null) {
-            Log.d(TAG, "getSunriseSunsetUrl - URL null......Name: " + name);
             return null;
         } else {
             sunriseSunsetUrl = url;
@@ -535,14 +509,11 @@ public class Loc {
         String latLngString = latLng.latitude + "," + latLng.longitude;
         String urlString = BASE_URL_LOCATION_AW + API_ID_AW +
                 API_KEY_AW + QUERY_AW + latLngString;
-        Log.d(TAG, "Code URL string - AW: " + urlString);
 
         URL url = null;
         try {
             url = new URL(urlString);
-            Log.d(TAG, "Location URL - AW: " + url.toString());
         } catch (MalformedURLException e) {
-            Log.e(TAG, "Error creating location URL from string", e);
         }
         return url;
     }//createLocationCodeUrl
@@ -556,14 +527,11 @@ public class Loc {
     private static URL createCurrentUrlAW(String locCode) {
         String urlString = BASE_URL_CURRENT_AW + locCode + API_ID_AW +
                 API_KEY_AW + DETAILS_TRUE_AW;
-        Log.d(TAG, "Current URL string - AW: " + urlString);
 
         URL url = null;
         try {
             url = new URL(urlString);
-            Log.d(TAG, "generated current url - AW: " + url.toString());
         } catch (MalformedURLException e) {
-            Log.e(TAG, "Error creating current weather URL from string", e);
         }
         return url;
     }//createCurrentWeatherUrlId
@@ -571,14 +539,11 @@ public class Loc {
     private static URL createTodayUrlAW(String locCode) {
         String urlString = BASE_URL_TODAY_AW + locCode + API_ID_AW +
                 API_KEY_AW + DETAILS_TRUE_AW + METRIC_TRUE_AW;
-        Log.d(TAG, "Today URL string - AW: " + urlString);
 
         URL url = null;
         try {
             url = new URL(urlString);
-            Log.d(TAG, "generated today url - AW: " + url.toString());
         } catch (MalformedURLException e) {
-            Log.e(TAG, "Error creating today weather URL from string", e);
         }
         return url;
 
@@ -593,14 +558,11 @@ public class Loc {
     private static URL createForecastUrlAW(String locCode) {
         String urlString = BASE_URL_FORECAST_AW + locCode + API_ID_AW +
                 API_KEY_AW + DETAILS_TRUE_AW + METRIC_TRUE_AW;
-        Log.d(TAG, "Forecast URL String - AW: " + urlString);
 
         URL url = null;
         try {
             url = new URL(urlString);
-            Log.d(TAG, "generated forecast url - AW: " + url.toString());
         } catch (MalformedURLException e) {
-            Log.e(TAG, "Error creating forecast weather URL from string", e);
         }
         return url;
     }//createForecastUrlAW
@@ -618,15 +580,12 @@ public class Loc {
 
         String urlString = BASE_URL_LAT_LNG_OW + latLngString + UNIT_OW +
                 METRIC_OW + API_ID_OW + API_KEY_OW;
-        Log.d(TAG, "Current URL string - OW: " + urlString);
 
         URL url = null;
         try {
             url = new URL(urlString);
-            Log.d(TAG, "generated current url - OW: " + url.toString());
         } catch (MalformedURLException e) {
 
-            Log.e(TAG, "Error creating current weather URL from string", e);
         }
         return url;
     }//createCurrentWeatherUrlId
@@ -643,14 +602,11 @@ public class Loc {
 
         String urlString = FORECAST_BASE_URL_OW + latLngString + UNIT_OW +
                 METRIC_OW + API_ID_OW + API_KEY_OW;
-        Log.d(TAG, "Forecast URL string - OW: " + urlString);
 
         URL url = null;
         try {
             url = new URL(urlString);
-            Log.d(TAG, "generated forecast url - OW: " + url.toString());
         } catch (MalformedURLException e) {
-            Log.e(TAG, "Error creating current weather URL from string", e);
         }
         return url;
     }//createForecastUrlOW
@@ -669,15 +625,11 @@ public class Loc {
         String urlString = BASE_URL_DS + API_KEY_DS + "/" + latLngString + "?" +
                 EXCLUDE_DS + EXCLUDE_BLOCK_CURRENT_DS + "&" + UNITS_DS +
                 UNITS_METRIC_DS;
-        Log.d(TAG, "Current URL string - DS: " + urlString);
 
         URL url = null;
         try {
             url = new URL(urlString);
-            Log.d(TAG, "generated current url - DS: " + url.toString());
         } catch (MalformedURLException e) {
-
-            Log.e(TAG, "Error creating URL from string", e);
         }
         return url;
     }//createCurrentWeatherUrlId
@@ -695,14 +647,10 @@ public class Loc {
                 EXCLUDE_DS + EXCLUDE_BLOCK_FORECAST_DS + "&" + UNITS_DS +
                 UNITS_METRIC_DS;
 
-        Log.d(TAG, "Forecast URL string - DS: " + urlString);
-
         URL url = null;
         try {
             url = new URL(urlString);
-            Log.d(TAG, "generated forecast url - DS: " + url.toString());
         } catch (MalformedURLException e) {
-            Log.e(TAG, "Error creating current weather URL from string", e);
         }
         return url;
     }//createForecastUrlOW
@@ -720,15 +668,11 @@ public class Loc {
 
         String urlString = BASE_URL_CURRENT_WB + latLngString + "&" + UNITS_WB + UNITS_METRIC_WB +
                 "&" + API_WB + API_KEY_WB;
-        Log.d(TAG, "Current URL string - WB: " + urlString);
 
         URL url = null;
         try {
             url = new URL(urlString);
-            Log.d(TAG, "generated current url - WB: " + url.toString());
         } catch (MalformedURLException e) {
-
-            Log.e(TAG, "Error creating URL from string", e);
         }
         return url;
     }//createCurrentUrlWB
@@ -744,15 +688,11 @@ public class Loc {
 
         String urlString = BASE_URL_FORECAST_WB + latLngString + "&" + UNITS_WB + UNITS_METRIC_WB +
                 "&" + API_WB + API_KEY_WB;
-        Log.d(TAG, "Current URL string - WB: " + urlString);
-
 
         URL url = null;
         try {
             url = new URL(urlString);
-            Log.d(TAG, "generated forecast url - WB: " + url.toString());
         } catch (MalformedURLException e) {
-            Log.e(TAG, "Error creating current weather URL from string", e);
         }
         return url;
 
@@ -771,15 +711,11 @@ public class Loc {
 
         String urlString = BASE_URL_CURRENT_WU + latLngString + "?" + APP_ID_WU + APP_ID_VALUE_WU +
                 "&" + APP_KEY_WB + APP_KEY_VALUE_WB;
-        Log.d(TAG, "Current URL string - WU: " + urlString);
 
         URL url = null;
         try {
             url = new URL(urlString);
-            Log.d(TAG, "generated current url - WU: " + url.toString());
         } catch (MalformedURLException e) {
-
-            Log.e(TAG, "Error creating URL from string", e);
         }
         return url;
     }//createCurrentUrlWB
@@ -795,15 +731,11 @@ public class Loc {
 
         String urlString = BASE_URL_FORECAST_WU + latLngString + "?" + APP_ID_WU + APP_ID_VALUE_WU +
                 "&" + APP_KEY_WB + APP_KEY_VALUE_WB;
-        Log.d(TAG, "Current URL string - WU: " + urlString);
-
 
         URL url = null;
         try {
             url = new URL(urlString);
-            Log.d(TAG, "generated forecast url - WU: " + url.toString());
         } catch (MalformedURLException e) {
-            Log.e(TAG, "Error creating current weather URL from string", e);
         }
         return url;
 
@@ -821,13 +753,11 @@ public class Loc {
     private static URL createSunriseSunsetUrl(LatLng latLng) {
         String urlString = BASE_URL_GEO + API_KEY_GEO + API_KEY_VALUE_GEO + "&" + LAT_GEO +
                 latLng.latitude + "&" + LONG_GEO + latLng.longitude;
-        Log.d(TAG, "GEOLOCATION URL string: " + urlString);
 
         URL url = null;
         try {
             url = new URL(urlString);
         } catch (MalformedURLException e) {
-            Log.e(TAG, "Error creating GEOLOCATION URL from string", e);
         }
         return url;
     }//createSunriseSunsetUrl

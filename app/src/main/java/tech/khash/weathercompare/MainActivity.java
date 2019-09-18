@@ -8,8 +8,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -43,7 +41,6 @@ import java.util.Objects;
 import tech.khash.weathercompare.adapter.LocListAdapter;
 import tech.khash.weathercompare.model.Constant;
 import tech.khash.weathercompare.model.Loc;
-import tech.khash.weathercompare.utilities.HelperFunctions;
 import tech.khash.weathercompare.utilities.NetworkCallsUtils;
 import tech.khash.weathercompare.utilities.SaveLoadList;
 
@@ -69,8 +66,6 @@ public class MainActivity extends AppCompatActivity implements
     private LocListAdapter adapter;
     private RecyclerView recyclerView;
 
-    private Loc currentLoc;
-
     private SharedPreferences sharedPreferences;
 
     //for tracking changes that needs the list to be updated/recreated
@@ -78,7 +73,6 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d(TAG, "onCreate Called");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //Set the tool bar
@@ -118,31 +112,15 @@ public class MainActivity extends AppCompatActivity implements
                 openAddLocation();
             }
         });
-
-        //TODO: testing
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean metric = sharedPreferences.getBoolean("metric_pref_key", true);
-
-
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        int height = displayMetrics.heightPixels;
-        int width = displayMetrics.widthPixels;
-        Log.d(TAG, "Width/Height : " + width + " - " + height);
-
         //ask for rate (based on number of visits)
         rateApp();
+
+        //update Locs
+        checkLocs();
     }//onCreate
 
     @Override
-    protected void onResume() {
-        Log.d(TAG, "onResume Called");
-        super.onResume();
-    }//onResume
-
-    @Override
     protected void onStart() {
-        Log.d(TAG, "onStart Called");
         //check for update boolean
         if (needsUpdate) {
             recreate();
@@ -152,7 +130,6 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     protected void onPause() {
-        Log.d(TAG, "onPause Called");
         super.onPause();
         //if the navigation drawer is open, we close it so when the user is directed back, it doesn't stay open
         if (drawerLayout != null) {
@@ -161,19 +138,6 @@ public class MainActivity extends AppCompatActivity implements
             }
         }
     }//onPause
-
-    @Override
-    protected void onStop() {
-        Log.d(TAG, "onStop Called");
-        super.onStop();
-
-    }//onStop
-
-    @Override
-    protected void onDestroy() {
-        Log.d(TAG, "onDestroy Called");
-        super.onDestroy();
-    }//onDestroy
 
     /**
      * We start AddLocation activity for results for adding new location. This gets
@@ -185,25 +149,21 @@ public class MainActivity extends AppCompatActivity implements
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        Log.d(TAG, "onActivityResult called");
         //check to make sure it is the right one
         if (requestCode == ADD_LOCATION_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             //get the name of the loc
             String nameLoc = data.getStringExtra(Constant.INTENT_EXTRA_LOC_NAME);
             if (nameLoc == null || nameLoc.isEmpty()) {
-                Log.d(TAG, "onActivityResult - Loc Name = null/empty");
                 return;
             }//null name
             //get the corresponding Loc object
             Loc loc = SaveLoadList.getLocFromDb(this, nameLoc);
             //set the current loc only if it is not null
             if (loc == null) {
-                Log.d(TAG, "onActivityResult - Loc =null ; name: " + nameLoc);
                 return;
             }//loc-null
             //we setup the loc info (setting URLs, and AW location code) and update db
-            currentLoc = loc;
-            setLocInfo(this);
+            setLocInfo(this, loc);
         }
         super.onActivityResult(requestCode, resultCode, data);
     }//onActivityResult
@@ -302,7 +262,6 @@ public class MainActivity extends AppCompatActivity implements
                 return true;
             case R.id.nav_about:
                 //TODO:
-                HelperFunctions.showToast(this, "About");
                 return true;
             case R.id.nav_privacy_policy:
                 try {
@@ -311,8 +270,6 @@ public class MainActivity extends AppCompatActivity implements
                     Intent privacyIntent = new Intent(Intent.ACTION_VIEW, addressUri);
                     startActivity(privacyIntent);
                 } catch (Exception e) {
-                    Log.e(TAG, "Error opening Privacy Policy page", e);
-
                 }
                 return true;
             default:
@@ -370,15 +327,13 @@ public class MainActivity extends AppCompatActivity implements
      * Then it updates the db so all consequent weather calls could be done using saved URls/codes
      *
      */
-    private void setLocInfo(final Context context) {
-        if (currentLoc == null) {
-            Log.d(TAG, "setLocInfo - currentLoc = null");
+    private void setLocInfo(final Context context, final Loc loc) {
+        if (loc == null) {
             return;
         }
         //first we need to get the codeURL and then get the code
-        URL locationCodeUrl = currentLoc.getLocationCodeUrlAW();
+        URL locationCodeUrl = loc.getLocationCodeUrlAW();
         if (locationCodeUrl == null) {
-            Log.d(TAG, "setLocInfo - codeURL = null");
             return;
         }
         //show seekbar
@@ -393,18 +348,17 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void processFinish(HashMap<String, String> output) {
                 if (output == null) {
-                    Log.d(TAG, "processFinish - null response");
                 }
                 //we only need the key here,
                 String key = output.get(Constant.AW_KEY);
                 //set the key
-                currentLoc.setKeyAW(key);
+                loc.setKeyAW(key);
 
                 //set all urls
-                currentLoc.setAllUrls();
+                loc.setAllUrls();
 
                 //update database here
-                SaveLoadList.replaceLocInDb(context, currentLoc);
+                SaveLoadList.replaceLocInDb(context, loc);
 
                 //remove seekbar
                 seekBar.setVisibility(View.GONE);
@@ -449,43 +403,6 @@ public class MainActivity extends AppCompatActivity implements
         Intent addLocationIntent = new Intent(MainActivity.this, AddLocationActivity.class);
         startActivityForResult(addLocationIntent, ADD_LOCATION_REQUEST_CODE);
     }//openAddLocation
-
-    //for testing
-    private void logList() {
-        if (locArrayList == null || locArrayList.size() < 1) {
-            Log.d(TAG, "LogList - empty");
-            return;
-        }
-        int counter = 1;
-        for (Loc loc : locArrayList) {
-            boolean hasLocationCodeUrlAW = loc.hasLocationCodeUrlAW();
-            boolean hasCurrentUrlAW = loc.hasCurrentUrlAW();
-            boolean hasCurrentUrlOW = loc.hasCurrentUrlOW();
-            boolean hasCurrentUrlDS = loc.hasCurrentUrlDS();
-            boolean hasForecastUrlAW = loc.hasForecastUrlAW();
-
-            URL forecastUrlAW = loc.getForecastUrlAW();
-            String urlString;
-            if (forecastUrlAW != null) {
-                urlString = forecastUrlAW.toString();
-            } else {
-                urlString = "null";
-            }
-
-            String locationCodeAW = loc.getKeyAW();
-
-
-            Log.d(TAG, "LogList\n" + counter + ": " + "\nName: " + loc.getName() + "\nLatLng: " + loc.getLatLng().toString()
-                    + "\nhasLocationCodeUrlAW : " + hasLocationCodeUrlAW + "\n" +
-                    "hasCurrentUrlAW : " + hasCurrentUrlAW + "\n" +
-                    "hasCurrentUrlOW : " + hasCurrentUrlOW + "\n" +
-                    "hasCurrentUrlDS : " + hasCurrentUrlDS +
-                    "\nCode: " + locationCodeAW + "\nhasForecastUrlAW : " + hasForecastUrlAW +
-                    "\nforecastAwUrl : " + urlString);
-
-            counter++;
-        }//for
-    }//logList
 
     //Helper method for sorting list based on their name (ascending)
     private void sortNameAscending() {
@@ -543,15 +460,15 @@ public class MainActivity extends AppCompatActivity implements
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         //set the title
-        String title = "Warning";
+        String title = getResources().getString(R.string.warning);
         builder.setTitle(title);
 
         //set the body
-        String message = "Are you sure you want to delete \"" + loc.getName() + "\"?" ;
+        String message = getResources().getString(R.string.delete_confirmation) + loc.getName() + "\"?" ;
         builder.setMessage(message);
 
         //set the buttons
-        builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(getResources().getString(R.string.delete), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 //delete the loc
@@ -561,7 +478,7 @@ public class MainActivity extends AppCompatActivity implements
                 updateRecyclerView();
             }
         })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                .setNegativeButton(getResources().getString(R.string.cancel), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         //close dialog
@@ -603,15 +520,15 @@ public class MainActivity extends AppCompatActivity implements
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         //set the title
-        String title = "Rate us!";
+        String title = getResources().getString(R.string.rate_us);
         builder.setTitle(title);
 
         //set the body
-        String message = "Do you enjoy using Weather Compare?\nRate us on Google Play";
+        String message = getResources().getString(R.string.rate_us_body);
         builder.setMessage(message);
 
         //set the buttons
-        builder.setPositiveButton("Rate us", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(getResources().getString(R.string.rate_us), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 //set the boolean to true so it never asks the user again
@@ -620,7 +537,7 @@ public class MainActivity extends AppCompatActivity implements
                 rateOnGooglePlay();
             }
         })
-                .setNegativeButton("Not now", new DialogInterface.OnClickListener() {
+                .setNegativeButton(getResources().getString(R.string.not_now), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         //close dialog
@@ -647,6 +564,15 @@ public class MainActivity extends AppCompatActivity implements
                     Uri.parse("http://play.google.com/store/apps/details?id=" + this.getPackageName())));
         }
     }//rateOnGooglePlay
+
+    private void checkLocs() {
+        for (Loc loc : locArrayList) {
+            if (loc.hasKeyAW()) {
+                continue;
+            }
+            setLocInfo(this, loc);
+        }//for
+    }//checkLocs
 
 
 }//MainActivity

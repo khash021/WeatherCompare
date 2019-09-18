@@ -50,22 +50,22 @@ public class WeatherListAdapterToday extends RecyclerView.Adapter<WeatherListAda
         if (position == 0) {
             //load the header
             //set the views
-            holder.textProvider.setText("Provider");
-            holder.textTempMin.setText("Min Temp");
-            holder.textTempMax.setText("Max Temp");
-            holder.textFeelMin.setText("Feels Min");
-            holder.textFeelMax.setText("Feels Max");
-            holder.textHumidity.setText("Humidity");
-            holder.textPop.setText("POP");
-            holder.textPopType.setText("P. Type");
-            holder.textPopTotal.setText("P. Total");
-            holder.textCloud.setText("Cloud");
-            holder.textWind.setText("Wind");
-            holder.textWindGust.setText("Gust");
-            holder.textVisibility.setText("Vis");
-            holder.textPressure.setText("Pressure");
-            holder.textTotalRain.setText("T. Rain");
-            holder.textTotalSnow.setText("T. Snow");
+            holder.textProvider.setText(context.getResources().getString(R.string.provider));
+            holder.textTempMin.setText(context.getResources().getString(R.string.min_temp));
+            holder.textTempMax.setText(context.getResources().getString(R.string.max_temp));
+            holder.textFeelMin.setText(context.getResources().getString(R.string.feels_min));
+            holder.textFeelMax.setText(context.getResources().getString(R.string.feels_max));
+            holder.textHumidity.setText(context.getResources().getString(R.string.humidity));
+            holder.textPop.setText(context.getResources().getString(R.string.pop));
+            holder.textPopType.setText(context.getResources().getString(R.string.pop_type));
+            holder.textPopTotal.setText(context.getResources().getString(R.string.pop_total));
+            holder.textCloud.setText(context.getResources().getString(R.string.cloud));
+            holder.textWind.setText(context.getResources().getString(R.string.wind));
+            holder.textWindGust.setText(context.getResources().getString(R.string.gust));
+            holder.textVisibility.setText(context.getResources().getString(R.string.visibility));
+            holder.textPressure.setText(context.getResources().getString(R.string.pressure));
+            holder.textTotalRain.setText(context.getResources().getString(R.string.total_rain));
+            holder.textTotalSnow.setText(context.getResources().getString(R.string.total_snow));
 
             //set the background color
             holder.rootLayout.setBackgroundColor(context.getResources().getColor(R.color.background));
@@ -117,8 +117,6 @@ public class WeatherListAdapterToday extends RecyclerView.Adapter<WeatherListAda
                 holder.textTotalSnow.setText(weather.getTotalSnowImperial());
 
             }
-
-
             //imageview
             String iconString = weather.getIcon();
             //we set it to day, if for some reason we don't have isDay data
@@ -143,9 +141,6 @@ public class WeatherListAdapterToday extends RecyclerView.Adapter<WeatherListAda
             return (weatherArrayList.size() + 1);
         }
     }//getItemCount
-
-
-
 
 
     class WeatherViewHolder extends RecyclerView.ViewHolder {

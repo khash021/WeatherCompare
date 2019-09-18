@@ -2,7 +2,6 @@ package tech.khash.weathercompare.utilities;
 
 import android.os.AsyncTask;
 import android.text.TextUtils;
-import android.util.Log;
 
 import org.json.JSONException;
 
@@ -56,8 +55,6 @@ public class NetworkCallsUtils {
                 return null;
             }
         } catch (Exception e) {
-            //Log error
-            Log.e(TAG, "Error getting http response", e);
             return null;
         } finally {
             //finally close the url connection
@@ -97,8 +94,6 @@ public class NetworkCallsUtils {
                 return null;
             }
         } catch (Exception e) {
-            //Log error
-            Log.e(TAG, "Error getting http response", e);
             return null;
         } finally {
             //finally close the url connection
@@ -150,7 +145,6 @@ public class NetworkCallsUtils {
                 String locationCodeResponse = NetworkCallsUtils.getResponseFromHttpUrl(urls[0]);
                 return locationCodeResponse;
             } catch (IOException e) {
-                Log.e(TAG, "Error establishing connection - AccuWeather - location ", e);
                 return null;
             }
         }//doInBackground
@@ -166,63 +160,11 @@ public class NetworkCallsUtils {
                 delegate.processFinish(responseHashMap);
 
             } catch (JSONException e) {
-                Log.e(TAG, "Error parsing location code response - AccuWeather ", e);
                 delegate.processFinish(null);
             }
         }//onPostExecute
     }//NetworkCallAccuWeatherCode
 
-
-    /**
-     * For now we are using an AsyncTask loader class for getting the JSON response from AccuWeather
-     */
-    public static class AccuWeatherCurrentTask extends AsyncTask<URL, Void, String> {
-
-        private final String TAG = AccuWeatherCurrentTask.class.getSimpleName();
-
-        public interface AsyncResponse {
-            void processFinish(Weather output);
-        }
-
-        private AsyncResponse delegate = null;
-
-        public AccuWeatherCurrentTask(AsyncResponse delegate) {
-            this.delegate = delegate;
-        }
-
-        @Override
-        protected String doInBackground(URL... urls) {
-            //Make the request
-            try {
-                //get the response using the class, passing in our url
-                String httpResponse = NetworkCallsUtils.getResponseFromHttpUrl(urls[0]);
-                Log.d(TAG, "AccuWeatherCurrent - JSON response: " + httpResponse);
-                return httpResponse;
-            } catch (IOException e) {
-                Log.e(TAG, "Error establishing connection - AccuWeatherCurrent ", e);
-                return null;
-            }
-        }//doInBackground
-
-        //return results
-        @Override
-        protected void onPostExecute(String s) {
-            if (TextUtils.isEmpty(s)) {
-                Log.e(TAG, "AccuWeatherCurrent - postExecute - response = null");
-
-            }
-            //parse response and get the code
-            Weather current = null;
-            try {
-                current = ParseJSON.parseAccuWeatherCurrent(s);
-                //pass data to interface
-                delegate.processFinish(current);
-            } catch (JSONException e) {
-                Log.e(TAG, "AccuWeatherCurrent - postExecute - error parsing response");
-                delegate.processFinish(null);
-            }//try-catch
-        }//onPostExecute
-    }//AccuWeatherCurrentTask - class
 
     public static class AccuWeatherTodayTask extends AsyncTask<URL, Void, String> {
 
@@ -244,10 +186,8 @@ public class NetworkCallsUtils {
             try {
                 //get the response using the class, passing in our url
                 String httpResponse = NetworkCallsUtils.getResponseFromHttpUrl(urls[0]);
-                Log.d(TAG, "AccuWeatherTodayTask - JSON response: " + httpResponse);
                 return httpResponse;
             } catch (IOException e) {
-                Log.e(TAG, "Error establishing connection - AccuWeatherTodayTask ", e);
                 return null;
             }
         }//doInBackground
@@ -255,10 +195,6 @@ public class NetworkCallsUtils {
         //return results
         @Override
         protected void onPostExecute(String s) {
-            if (TextUtils.isEmpty(s)) {
-                Log.e(TAG, "AccuWeatherTodayTask - postExecute - response = null");
-
-            }
             //parse response and get the code
             Weather current = null;
             try {
@@ -266,7 +202,6 @@ public class NetworkCallsUtils {
                 //pass data to interface
                 delegate.processFinish(current);
             } catch (JSONException e) {
-                Log.e(TAG, "AccuWeatherTodayTask - postExecute - error parsing response");
                 delegate.processFinish(null);
             }//try-catch
         }//onPostExecute
@@ -297,10 +232,8 @@ public class NetworkCallsUtils {
             try {
                 //get the response using the class, passing in our url
                 String httpResponse = NetworkCallsUtils.getResponseFromHttpUrl(urls[0]);
-                Log.d(TAG, "AccuWeatherForecast - JSON response: " + httpResponse);
                 return httpResponse;
             } catch (IOException e) {
-                Log.e(TAG, "Error establishing connection - AccuWeatherForecast ", e);
                 return null;
             }
         }//doInBackground
@@ -308,10 +241,8 @@ public class NetworkCallsUtils {
         @Override
         protected void onPostExecute(String s) {
             if (TextUtils.isEmpty(s)) {
-                Log.e(TAG, "AccuWeatherForecast - postExecute - response = null");
                 delegate.processFinish(null);
             } else {
-                Log.d(TAG, "AccuWeatherForecast response : " + s);
                 delegate.processFinish(s);
             }
         }//onPostExecute
@@ -322,57 +253,6 @@ public class NetworkCallsUtils {
     /*
         ----------------------------- DS --------------------------------------
      */
-
-    public static class DarkSkyQueryTask extends AsyncTask<URL, Void, String> {
-
-        private final String TAG = DarkSkyQueryTask.class.getSimpleName();
-
-        public interface AsyncResponse {
-            void processFinish(Weather output);
-        }
-
-        private AsyncResponse delegate = null;
-
-        public DarkSkyQueryTask(AsyncResponse delegate) {
-            this.delegate = delegate;
-        }
-
-        @Override
-        protected String doInBackground(URL... urls) {
-            //Make the request
-            try {
-                //get the response using the class, passing in our url
-                String httpResponse = NetworkCallsUtils.getResponseFromHttpUrl(urls[0]);
-                Log.d(TAG, "DarkSkyQueryTask - JSON response: " + httpResponse);
-                return httpResponse;
-            } catch (IOException e) {
-                Log.e(TAG, "Error establishing connection - DarkSkyQueryTask ", e);
-                return null;
-            }
-        }//doInBackground
-
-
-        //return results
-        @Override
-        protected void onPostExecute(String s) {
-            if (TextUtils.isEmpty(s)) {
-                Log.e(TAG, "DarkSkyQueryTask - postExecute - response = null");
-
-            }
-            //parse response and get the code
-            Weather current = null;
-            try {
-                current = ParseJSON.parseDarkSkyCurrent(s);
-                //pass data to interface
-                delegate.processFinish(current);
-            } catch (JSONException e) {
-                Log.e(TAG, "DarkSkyQueryTask - postExecute - error parsing response");
-                delegate.processFinish(null);
-            }//try-catch
-        }//onPostExecute
-
-    }//DarkSkyQueryTask
-
 
     public static class DarkSkyTodayTask extends AsyncTask<URL, Void, String> {
 
@@ -394,10 +274,8 @@ public class NetworkCallsUtils {
             try {
                 //get the response using the class, passing in our url
                 String httpResponse = NetworkCallsUtils.getResponseFromHttpUrl(urls[0]);
-                Log.d(TAG, "DarkSkyTodayTask - JSON response: " + httpResponse);
                 return httpResponse;
             } catch (IOException e) {
-                Log.e(TAG, "Error establishing connection - DarkSkyTodayTask ", e);
                 return null;
             }
         }//doInBackground
@@ -407,8 +285,7 @@ public class NetworkCallsUtils {
         @Override
         protected void onPostExecute(String s) {
             if (TextUtils.isEmpty(s)) {
-                Log.e(TAG, "DarkSkyTodayTask - postExecute - response = null");
-
+                delegate.processFinish(null);
             }
             //parse response and get the code
             Weather current = null;
@@ -417,7 +294,6 @@ public class NetworkCallsUtils {
                 //pass data to interface
                 delegate.processFinish(current);
             } catch (JSONException e) {
-                Log.e(TAG, "DarkSkyTodayTask - postExecute - error parsing response");
                 delegate.processFinish(null);
             }//try-catch
         }//onPostExecute
@@ -449,10 +325,8 @@ public class NetworkCallsUtils {
             try {
                 //get the response using the class, passing in our url
                 String httpResponse = NetworkCallsUtils.getResponseFromHttpUrl(urls[0]);
-                Log.d(TAG, "DarkSkyForecastTask - JSON response: " + httpResponse);
                 return httpResponse;
             } catch (IOException e) {
-                Log.e(TAG, "Error establishing connection - DarkSkyForecastTask ", e);
                 return null;
             }
         }//doInBackground
@@ -460,10 +334,8 @@ public class NetworkCallsUtils {
         @Override
         protected void onPostExecute(String s) {
             if (TextUtils.isEmpty(s)) {
-                Log.e(TAG, "DarkSkyForecastTask - postExecute - response = null");
                 return;
             }
-            Log.d(TAG, "DarkSkyForecastTask response : " + s);
             delegate.processFinish(s);
         }//onPostExecute
     }//DarkSkyForecastTask
@@ -472,57 +344,6 @@ public class NetworkCallsUtils {
     /*
         ----------------------------- WB --------------------------------------
      */
-
-    /**
-     * Gets the WB current response from web.
-     * It does not parse data here, it is done in the parent activity
-     */
-    public static class WeatherBitCurrentTask extends AsyncTask<URL, Void, String> {
-
-        private final String TAG = WeatherBitCurrentTask.class.getSimpleName();
-
-        public interface AsyncResponse {
-            void processFinish(Weather output);
-        }
-
-        private AsyncResponse delegate = null;
-
-        public WeatherBitCurrentTask(AsyncResponse deletegate) {
-            this.delegate = deletegate;
-        }
-
-        @Override
-        protected String doInBackground(URL... urls) {
-            //Make the request
-            try {
-                //get the response using the class, passing in our url
-                String httpResponse = NetworkCallsUtils.getResponseFromHttpUrl(urls[0]);
-                Log.d(TAG, "WeatherBitCurrentTask - JSON response: " + httpResponse);
-                return httpResponse;
-            } catch (IOException e) {
-                Log.e(TAG, "Error establishing connection - WeatherBitCurrentTask ", e);
-                return null;
-            }
-        }//doInBackground
-
-        @Override
-        protected void onPostExecute(String s) {
-            if (TextUtils.isEmpty(s)) {
-                Log.e(TAG, "WeatherBitCurrentTask - postExecute - response = null");
-            }
-            //parse response and get the code
-            Weather current = null;
-
-            try {
-                current = ParseJSON.parseWeatherBitCurrent(s);
-                //pass data to interface
-                delegate.processFinish(current);
-            } catch (JSONException e) {
-                Log.e(TAG, "WeatherBitCurrentTask - postExecute - error parsing response");
-                delegate.processFinish(null);
-            }//try-catch
-        }//onPostExecute
-    }//WeatherBitCurrentTask
 
     public static class WeatherBitTodayTask extends AsyncTask<URL, Void, String> {
 
@@ -544,10 +365,8 @@ public class NetworkCallsUtils {
             try {
                 //get the response using the class, passing in our url
                 String httpResponse = NetworkCallsUtils.getResponseFromHttpUrl(urls[0]);
-                Log.d(TAG, "WeatherBitTodayTask - JSON response: " + httpResponse);
                 return httpResponse;
             } catch (IOException e) {
-                Log.e(TAG, "Error establishing connection - WeatherBitTodayTask ", e);
                 return null;
             }
         }//doInBackground
@@ -555,7 +374,7 @@ public class NetworkCallsUtils {
         @Override
         protected void onPostExecute(String s) {
             if (TextUtils.isEmpty(s)) {
-                Log.e(TAG, "WeatherBitTodayTask - postExecute - response = null");
+                delegate.processFinish(null);
             }
             //parse response and get the code
             Weather current = null;
@@ -565,7 +384,6 @@ public class NetworkCallsUtils {
                 //pass data to interface
                 delegate.processFinish(current);
             } catch (JSONException e) {
-                Log.e(TAG, "WeatherBitTodayTask - postExecute - error parsing response");
                 delegate.processFinish(null);
             }//try-catch
         }//onPostExecute
@@ -596,10 +414,8 @@ public class NetworkCallsUtils {
             try {
                 //get the response using the class, passing in our url
                 String httpResponse = NetworkCallsUtils.getResponseFromHttpUrl(urls[0]);
-                Log.d(TAG, "WeatherBitForecastTask - JSON response: " + httpResponse);
                 return httpResponse;
             } catch (IOException e) {
-                Log.e(TAG, "Error establishing connection - WeatherBitForecastTask ", e);
                 return null;
             }
         }//doInBackground
@@ -607,10 +423,9 @@ public class NetworkCallsUtils {
         @Override
         protected void onPostExecute(String s) {
             if (TextUtils.isEmpty(s)) {
-                Log.e(TAG, "WeatherBitForecastTask - postExecute - response = null");
+                delegate.processFinish(null);
                 return;
             }
-            Log.d(TAG, "WeatherBitForecastTask response : " + s);
             delegate.processFinish(s);
         }//onPostExecute
     }//WeatherBitForecastTask
@@ -618,58 +433,6 @@ public class NetworkCallsUtils {
     /*
         ----------------------------- WU --------------------------------------
      */
-
-    /**
-     * Gets the WU current response from web.
-     * It does not parse data here, it is done in the parent activity
-     */
-    public static class WeatherUnlockedCurrentTask extends AsyncTask<URL, Void, String> {
-
-        private final String TAG = WeatherUnlockedCurrentTask.class.getSimpleName();
-
-        public interface AsyncResponse {
-            void processFinish(Weather output);
-        }
-
-        private AsyncResponse delegate = null;
-
-        public WeatherUnlockedCurrentTask(AsyncResponse deletegate) {
-            this.delegate = deletegate;
-        }
-
-        @Override
-        protected String doInBackground(URL... urls) {
-            //Make the request
-            try {
-                //get the response using the class, passing in our url
-                String httpResponse = NetworkCallsUtils.getResponseFromHttpUrlWithHeader(urls[0]);
-                Log.d(TAG, "WeatherUnlockedCurrentTask - JSON response: " + httpResponse);
-                return httpResponse;
-            } catch (IOException e) {
-                Log.e(TAG, "Error establishing connection - WeatherUnlockedCurrentTask ", e);
-                return null;
-            }
-        }//doInBackground
-
-        @Override
-        protected void onPostExecute(String s) {
-            if (TextUtils.isEmpty(s)) {
-                Log.e(TAG, "WeatherUnlockedCurrentTask - postExecute - response = null");
-            }
-            //parse response and get the code
-            Weather current = null;
-
-            try {
-                current = ParseJSON.parseWeatherUnlockedCurrent(s);
-                Log.d(TAG, "WU - Current response:\n" + s);
-                //pass data to interface
-                delegate.processFinish(current);
-            } catch (JSONException e) {
-                Log.e(TAG, "WeatherUnlockedCurrentTask - postExecute - error parsing response");
-                delegate.processFinish(null);
-            }//try-catch
-        }//onPostExecute
-    }//WeatherBitCurrentTask
 
     public static class WeatherUnlockedTodayTask extends AsyncTask<URL, Void, String> {
 
@@ -691,10 +454,8 @@ public class NetworkCallsUtils {
             try {
                 //get the response using the class, passing in our url
                 String httpResponse = NetworkCallsUtils.getResponseFromHttpUrlWithHeader(urls[0]);
-                Log.d(TAG, "WeatherUnlockedTodayTask - JSON response: " + httpResponse);
                 return httpResponse;
             } catch (IOException e) {
-                Log.e(TAG, "Error establishing connection - WeatherUnlockedTodayTask ", e);
                 return null;
             }
         }//doInBackground
@@ -702,18 +463,16 @@ public class NetworkCallsUtils {
         @Override
         protected void onPostExecute(String s) {
             if (TextUtils.isEmpty(s)) {
-                Log.e(TAG, "WeatherUnlockedTodayTask - postExecute - response = null");
+                delegate.processFinish(null);
             }
             //parse response and get the code
             Weather current = null;
 
             try {
                 current = ParseJSON.parseWeatherUnlockedToday(s);
-                Log.d(TAG, "WU - Today response:\n" + s);
                 //pass data to interface
                 delegate.processFinish(current);
             } catch (JSONException e) {
-                Log.e(TAG, "WeatherUnlockedTodayTask - postExecute - error parsing response");
                 delegate.processFinish(null);
             }//try-catch
         }//onPostExecute
@@ -743,10 +502,8 @@ public class NetworkCallsUtils {
             try {
                 //get the response using the class, passing in our url
                 String httpResponse = NetworkCallsUtils.getResponseFromHttpUrlWithHeader(urls[0]);
-                Log.d(TAG, "WeatherUnlockedForecastTask - JSON response: " + httpResponse);
                 return httpResponse;
             } catch (IOException e) {
-                Log.e(TAG, "Error establishing connection - WeatherUnlockedForecastTask ", e);
                 return null;
             }
         }//doInBackground
@@ -754,10 +511,8 @@ public class NetworkCallsUtils {
         @Override
         protected void onPostExecute(String s) {
             if (TextUtils.isEmpty(s)) {
-                Log.e(TAG, "WeatherUnlockedForecastTask - postExecute - response = null");
-                return;
+                delegate.processFinish(null);
             }
-            Log.d(TAG, "WU - Forecast response:\n" + s);
             delegate.processFinish(s);
         }//onPostExecute
     }//WeatherUnlockedForecastTask
@@ -794,7 +549,6 @@ public class NetworkCallsUtils {
             try {
                 response = NetworkCallsUtils.getResponseFromHttpUrl(urls[0]);
             } catch (IOException e) {
-                Log.e(TAG, "Error getting response", e);
             }
             return response;
         }//doInBackground
@@ -802,15 +556,10 @@ public class NetworkCallsUtils {
         @Override
         protected void onPostExecute(String s) {
             Boolean isday = null;
-            if (TextUtils.isEmpty(s)) {
-                Log.d(TAG, "SunriseSunset task results - null");
-            } else {
                 try {
                     isday = ParseJSON.parseSunriseSunset(s);
                 } catch (JSONException e) {
-                    Log.e(TAG, "Error parsing sunrise sunset data", e);
                 }
-            }
             delegate.processFinished(isday);
         }//onPostExecute
     }//SunriseSunsetTask

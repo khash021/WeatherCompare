@@ -10,7 +10,6 @@ import android.location.Location;
 import android.os.Bundle;
 import android.text.InputType;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -119,7 +118,6 @@ public class TodayActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        Log.d(TAG, "onCreateOptionsMenu Called");
         getMenuInflater().inflate(R.menu.today_menu, menu);
 
         //find the search item
@@ -208,7 +206,6 @@ public class TodayActivity extends AppCompatActivity {
         //TODO: show dialog for going to add location if no result or more than 1
         //check for geocoder availability
         if (!Geocoder.isPresent()) {
-            Log.d(TAG, "Geocoder not available - searchAddress");
             showAddLocationDialog(Constant.ALERT_CODE_NO_GEOCODER);
             return;
         }
@@ -225,17 +222,11 @@ public class TodayActivity extends AppCompatActivity {
             //check to make sure we got results
             if (addresses.size() < 1) {
                 showAddLocationDialog(Constant.ALERT_CODE_NO_RESULT);
-                Log.d(TAG, "No results - searchAddress");
                 return;
             }//if
 
             //go through all the results
-            int counter = 0;
-            for (Address result : addresses) {
-                LatLng latLng = new LatLng(result.getLatitude(), result.getLongitude());
-                counter++;
-            }//for
-
+            int counter = addresses.size();
 
             if (counter == 1) {
                 Address address = addresses.get(0);
@@ -249,7 +240,6 @@ public class TodayActivity extends AppCompatActivity {
             }
 
         } catch (IOException e) {
-            Log.e(TAG, "Error getting location", e);
         }//try/catch
 
     }//openSearch
@@ -288,32 +278,27 @@ public class TodayActivity extends AppCompatActivity {
                             setUserLocation(latLng);
                         } else {
                             showAddLocationDialog(Constant.ALERT_CODE_UNABLE_FIND_DEVICE);
-                            Log.e(TAG, "Exception: %s", task.getException());
                         }
                     }
                 })
                         .addOnFailureListener(this, new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
-                                Log.e(TAG, "Failed to get the last know location", e);
                                 showAddLocationDialog(Constant.ALERT_CODE_UNABLE_FIND_DEVICE);
                             }
                         });
             } else {
                 //permission denied (should never happen since we have already checked it before this call
-                Log.wtf(TAG, "Location permission denied from getDeviceLocation");
                 return;
             }
 
         } catch (Exception e) {
-            Log.e(TAG, "Error finding my location from getDeviceLocation", e);
         }//try-catch
 
     }//getDeviceLocation
 
     private void setUserLocation(LatLng latLng) {
         if (latLng == null) {
-            Log.d(TAG, "setUserLocation - location is null");
             return;
         }
 
@@ -323,15 +308,14 @@ public class TodayActivity extends AppCompatActivity {
         //create a new Loc
         final Loc loc = new Loc(latLng);
 
-        Log.d(TAG, "USER LOCATION: " + latLng.toString());
-
         //get the AW code and set all URLs
         progressBar.setVisibility(View.VISIBLE);
 
         //first we need to get the codeURL and then get the code
         URL locationCodeUrl = loc.getLocationCodeUrlAW();
         if (locationCodeUrl == null) {
-            Log.d(TAG, "setUserLocation - codeURL = null");
+            currentLoc = loc;
+            calculateIsDay();
             return;
         }
 
@@ -345,7 +329,6 @@ public class TodayActivity extends AppCompatActivity {
             @Override
             public void processFinish(HashMap<String, String> output) {
                 if (output == null) {
-                    Log.d(TAG, "processFinish - null response");
 
                     loc.setAllUrls();
 
@@ -367,11 +350,7 @@ public class TodayActivity extends AppCompatActivity {
                 }
 
                 //check to see if we need to calculate isDay first, otherwise get all weather
-                if (isDay == null) {
-                    calculateIsDay();
-                } else {
-                    getAllWeather();
-                }
+                calculateIsDay();
 
             }//processFinish
 
@@ -391,7 +370,6 @@ public class TodayActivity extends AppCompatActivity {
 
     private void calculateIsDay() {
         if (currentLoc == null) {
-            Log.d(TAG, "calculateIsDay - currentLoc is null");
             return;
         }//null loc
 
@@ -401,17 +379,11 @@ public class TodayActivity extends AppCompatActivity {
             return;
         }
 
-        if (isDay != null) {
-            getAllWeather();
-            return;
-        }
-
         //make the progress bar visible
         progressBar.setVisibility(View.VISIBLE);
 
         URL sunriseSunsetUrl = currentLoc.getSunriseSunsetUrl();
         if (sunriseSunsetUrl == null) {
-            Log.d(TAG, "calculateIsDay - currentUrl = null");
             //TODO: manage this case
         } else {
             NetworkCallsUtils.SunriseSunsetTask sunriseSunsetTask = new
@@ -430,7 +402,6 @@ public class TodayActivity extends AppCompatActivity {
     private void getAllWeather() {
 
         if (currentLoc == null) {
-            Log.d(TAG, "getAllWeather - currentLoc is null");
             //remove progress bar if it is running
             if (progressBar.getVisibility() == View.VISIBLE) {
                 progressBar.setVisibility(View.GONE);
@@ -462,12 +433,10 @@ public class TodayActivity extends AppCompatActivity {
     private void kickOffAccuWeather() {
         //check for null loc
         if (currentLoc == null) {
-            Log.d(TAG, "kickOffAccuWeather - currentLoc = null");
             return;
         }
 
         if (!currentLoc.hasKeyAW()) {
-            Log.d(TAG, "kickOffAccuWeather - currentLoc.hasKey = false");
             if (tracker == 3) {
                 //remove progress bar and reset the tracker
                 progressBar.setVisibility(View.GONE);
@@ -485,7 +454,6 @@ public class TodayActivity extends AppCompatActivity {
         URL todayUrlAW = currentLoc.getTodayUrlAW();
 
         if (todayUrlAW == null) {
-            Log.d(TAG, "kickOffAccuWeather - currentUrl = null");
             if (tracker == 3) {
                 //remove progress bar and reset the tracker
                 progressBar.setVisibility(View.GONE);
@@ -497,7 +465,6 @@ public class TodayActivity extends AppCompatActivity {
                 tracker++;
             }
         } else {
-            Log.d(TAG, "Current URL - AW : " + todayUrlAW.toString());
             NetworkCallsUtils.AccuWeatherTodayTask accuWeatherTodayTask = new
                     NetworkCallsUtils.AccuWeatherTodayTask(new NetworkCallsUtils.AccuWeatherTodayTask.AsyncResponse() {
                 @Override
@@ -527,16 +494,13 @@ public class TodayActivity extends AppCompatActivity {
     private void kickOffDarkSky() {
         //check for null loc
         if (currentLoc == null) {
-            Log.d(TAG, "kickOffDarkSky - currentLoc = null");
             return;
         }
 
         URL todayUrlDS = currentLoc.getForecastUrlDS();
 
         if (todayUrlDS == null) {
-            Log.d(TAG, "kickOffDarkSky - forecastUrl = null");
         } else {
-            Log.d(TAG, "Forecast URL - DS : " + todayUrlDS.toString());
             NetworkCallsUtils.DarkSkyTodayTask darskSkyTodayTask = new
                     NetworkCallsUtils.DarkSkyTodayTask(new NetworkCallsUtils.DarkSkyTodayTask.AsyncResponse() {
                 @Override
@@ -566,16 +530,13 @@ public class TodayActivity extends AppCompatActivity {
     private void kickOffWeatherBit() {
         //check for null loc
         if (currentLoc == null) {
-            Log.d(TAG, "kickOffWeatherBit - currentLoc = null");
             return;
         }
 
         URL todayUrlWB = currentLoc.getForecastUrlWB();
 
         if (todayUrlWB == null) {
-            Log.d(TAG, "kickOffWeatherBit - todayURL = null");
         } else {
-            Log.d(TAG, "Today URL - WB : " + todayUrlWB.toString());
             NetworkCallsUtils.WeatherBitTodayTask weatherBitTodayTask = new
                     NetworkCallsUtils.WeatherBitTodayTask(new NetworkCallsUtils.WeatherBitTodayTask.AsyncResponse() {
                 @Override
@@ -612,16 +573,13 @@ public class TodayActivity extends AppCompatActivity {
     private void kickOffWeatherUnlocked() {
         //check for null loc
         if (currentLoc == null) {
-            Log.d(TAG, "kickOffWeatherUnlocked - currentLoc = null");
             return;
         }
 
         URL todayUrlWU = currentLoc.getForecastUrlWU();
 
         if (todayUrlWU == null) {
-            Log.d(TAG, "kickOffWeatherUnlocked - todayURL = null");
         } else {
-            Log.d(TAG, "Today URL - WU : " + todayUrlWU.toString());
             NetworkCallsUtils.WeatherUnlockedTodayTask weatherUnlockedTodayTask = new
                     NetworkCallsUtils.WeatherUnlockedTodayTask(new NetworkCallsUtils.WeatherUnlockedTodayTask.AsyncResponse() {
                 @Override
@@ -650,7 +608,6 @@ public class TodayActivity extends AppCompatActivity {
 
     private void updateAdapter() {
         if (weatherArrayList == null || weatherArrayList.size() < 1) {
-            Log.d(TAG, "updateAdapter - weatherArrayList null/empty");
             return;
         }
 
@@ -665,7 +622,6 @@ public class TodayActivity extends AppCompatActivity {
 
 
         if (isDay == null) {
-            Log.d(TAG, "updateAdapter - isDay is null");
             adapter = new WeatherListAdapterToday(this, weatherArrayList, true);
         } else {
             adapter = new WeatherListAdapterToday(this, weatherArrayList, isDay);
@@ -691,7 +647,6 @@ public class TodayActivity extends AppCompatActivity {
     private void showLocListDialog(final Activity activity, final ArrayList<Loc> locArrayList) {
         //check for empty list
         if (locArrayList == null || locArrayList.size() < 1) {
-            Log.d(TAG, "showLocListDialog - locArrayList is null/empty ");
             HelperFunctions.showToast(activity.getBaseContext(), getResources().getString(R.string.no_saved_location));
             return;
         }//if
@@ -703,7 +658,6 @@ public class TodayActivity extends AppCompatActivity {
         }
 
         if (namesArrayList == null || locArrayList.size() < 1) {
-            Log.d(TAG, "showLocListDialog - namesArrayList is null/empty ");
             return;
         }
 

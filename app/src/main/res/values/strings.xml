@@ -1,4 +1,11 @@
 <resources>
+
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyAHyUo4VnllUXatwyKVvfEjMjhwsEDf5zE</string>
+
+    <!--Ads-->
+    <string name="banner_ad_unit_id" translatable="false">ca-app-pub-5875569058891842/3714951369</string>
+    <string name="ad_app_id" translatable="false">ca-app-pub-5875569058891842~4993192255</string>
+
     <string name="app_name">Weather Compare</string>
     <string name="package_name" translatable="false">tech.khash.weathercompare</string>
     <string name="title_activity_main">MainActivity</string>
@@ -11,13 +18,7 @@
     <string name="title_weather_unlocked_forecast">Weather Unlocked Forecast</string>
     <string name="title_activity_forecast">Forecast</string>
     <string name="title_activity_today">Today</string>
-
-    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyAHyUo4VnllUXatwyKVvfEjMjhwsEDf5zE</string>
-
-
-    <!--Ads-->
-    <string name="banner_ad_unit_id" translatable="false">ca-app-pub-5875569058891842/3714951369</string>
-    <string name="ad_app_id" translatable="false">ca-app-pub-5875569058891842~4993192255</string>
+    <string name="units">Units</string>
 
     <!--UI/Names-->
     <string name="open_weather">OpenWeather</string>
@@ -32,6 +33,20 @@
     <string name="wind_gust">Wind Gust</string>
     <string name="cloud_cover">Cloud Cover</string>
     <string name="visibility">Visibility</string>
+    <string name="today">Today</string>
+    <string name="forecast">Forecast</string>
+    <string name="provider">Provider</string>
+    <string name="min_temp">Min Temp</string>
+    <string name="max_temp">Max Temp</string>
+    <string name="feels_min">Feels Min</string>
+    <string name="feels_max">Feels Max</string>
+    <string name="pop">POP</string>
+    <string name="pop_type">P. Type</string>
+    <string name="pop_total">P. Total</string>
+    <string name="cloud">Cloud</string>
+    <string name="gust">Gust</string>
+    <string name="total_rain">T. Rain</string>
+    <string name="total_snow">T. Snow</string>
 
     <!--Menu Main and Navigation Drawer-->
     <string name="search">Search</string>
@@ -53,7 +68,6 @@
     <string name="sort_by_name_des">Sort (Descending)</string>
     <string name="sort_by_name_asc">Sort (Ascending)</string>
 
-
     <!--Permission-->
     <string name="permission_required_text_dialog">This feature requires user\'s location to work properly. This app does not store user\'s location.\nWould you like to turn it on now?</string>
     <string name="permission_required_title_dialog">Permission required</string>
@@ -70,26 +84,15 @@
     <string name="enter_address_hint">Enter address/city/zip</string>
     <string name="geocoder_not_available_toast">Geocoder not available</string>
     <string name="no_results_found_toast">No results found</string>
+    <string name="map_not_ready">Map not ready</string>
 
-    <!--Main Activity-->
+    <!--Dialogs - Toasts-->
     <string name="no_saved_location">No Saved Locations</string>
     <string name="add_location_empty_view_text">Add locations using the button or from menu</string>
     <string name="no_geofence_show_toast">No saved locations</string>
-
-    <!--Delete all alert dialog-->
     <string name="delete_all_dialog_msg">Are you sure you want to delete all saved locations?</string>
     <string name="cancel">Cancel</string>
 
-
-    <!--preferences-->
-    <string name="pref_key_metric">pref_key_metric</string>
-
-
-    <string name="units">Units</string>
-    <string name="rated_app_pref_key">rated-app-pref-key</string>
-    <string name="app_open_count_pref_key">app-open-count-pref-key</string>
-
-    <!--Dialogs-->
     <string name="no_results">No results</string>
     <string name="multiple_results">Multiple results</string>
     <string name="error">Error</string>
@@ -99,6 +102,33 @@
     <string name="unable_finish_search">Unable to finish search. Would you like to add location manually?</string>
     <string name="multiple_search_results">Multiple results were found. Would you like to add location manually?</string>
     <string name="no_searhc_results">No results found. Would you like to add location manually?</string>
+    <string name="warning">Warning</string>
+    <string name="delete_confirmation">Are you sure you want to delete \"</string>
+    <string name="delete">Delete</string>
+    <string name="rate_us">Rate us!</string>
+    <string name="rate_us_body">Do you enjoy using Weather Compare? Rate us on Google Play</string>
+    <string name="not_now">Not now</string>
+    <string name="no_internet_connection">No internet connection</string>
+
+    <!--preferences-->
+    <string name="pref_key_metric">pref_key_metric</string>
+    <string name="rated_app_pref_key">rated-app-pref-key</string>
+    <string name="app_open_count_pref_key">app-open-count-pref-key</string>
+
+    <!--Settings-->
+    <string name="metric_caps">METRIC</string>
+    <string name="celcius">Celsius</string>
+    <string name="millimeter">Millimeter</string>
+    <string name="centimeter_snow">Centimeter (snow)</string>
+    <string name="km">Km</string>
+    <string name="kph">kph</string>
+    <string name="imperial_caps">IMPERIAL</string>
+    <string name="fahrenheit">Fahrenheit</string>
+    <string name="inch">Inch</string>
+    <string name="inch_snow">Inch (snow)</string>
+    <string name="mile">Mile</string>
+    <string name="mph">mph</string>
+
 
 
 </resources>
