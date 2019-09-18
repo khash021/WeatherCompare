@@ -248,9 +248,9 @@ public class AddLocationActivity extends AppCompatActivity implements OnMapReady
         }
 
         //create Loc object
-        Loc location = new Loc(name, latLngCamera);
+        Loc loc = new Loc(name, latLngCamera);
         //add it to the list
-        SaveLoadList.addToLocList(this, location);
+        SaveLoadList.addToLocList(this, loc);
 
         HelperFunctions.showToast(this, "\"" + name + "\"" + " " + getString(R.string.location_added_successfully_toast));
 

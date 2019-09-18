@@ -56,6 +56,9 @@ public class TodayActivity extends AppCompatActivity {
 
     private static final String TAG = TodayActivity.class.getSimpleName();
 
+    //for sending and receiving location from add location activity
+    private static final int ADD_LOCATION_REQUEST_CODE = 2;
+
     private ProgressBar progressBar;
     private RecyclerView recyclerView;
     private WeatherListAdapterToday adapter;
@@ -117,6 +120,26 @@ public class TodayActivity extends AppCompatActivity {
     }//onCreate
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == ADD_LOCATION_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            //get the name of the loc
+            String nameLoc = data.getStringExtra(Constant.INTENT_EXTRA_LOC_NAME);
+            if (TextUtils.isEmpty(nameLoc)) {
+                return;
+            }
+            //get the corresponding Loc object
+            Loc loc = SaveLoadList.getLocFromDb(this, nameLoc);
+            if (loc == null) {
+                return;
+            }
+            locArrayList = SaveLoadList.loadLocList(this);
+            currentLoc = loc;
+            calculateIsDay();
+        }
+    }//onActivityResult
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.today_menu, menu);
 
@@ -157,9 +180,8 @@ public class TodayActivity extends AppCompatActivity {
                 }
                 return true;
             case R.id.action_add_locations:
-                //TODO: change this for results
                 Intent intent = new Intent(TodayActivity.this, AddLocationActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent, ADD_LOCATION_REQUEST_CODE);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -677,7 +699,7 @@ public class TodayActivity extends AppCompatActivity {
                 //set current loc
                 currentLoc = locArrayList.get(position);
                 //get the weather
-                getAllWeather();
+                calculateIsDay();
                 //set the title
                 activity.setTitle(currentLoc.getName());
                 //close dialog

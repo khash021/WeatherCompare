@@ -331,6 +331,13 @@ public class MainActivity extends AppCompatActivity implements
         if (loc == null) {
             return;
         }
+
+        //set the URLS
+        loc.setAllUrls();
+
+        //update database here
+        SaveLoadList.replaceLocInDb(context, loc);
+
         //first we need to get the codeURL and then get the code
         URL locationCodeUrl = loc.getLocationCodeUrlAW();
         if (locationCodeUrl == null) {
@@ -347,22 +354,21 @@ public class MainActivity extends AppCompatActivity implements
              */
             @Override
             public void processFinish(HashMap<String, String> output) {
+                //remove seekbar
+                seekBar.setVisibility(View.GONE);
+
                 if (output == null) {
+                    updateRecyclerView();
+                    return;
                 }
                 //we only need the key here,
                 String key = output.get(Constant.AW_KEY);
                 //set the key
                 loc.setKeyAW(key);
 
-                //set all urls
-                loc.setAllUrls();
-
                 //update database here
                 SaveLoadList.replaceLocInDb(context, loc);
-
-                //remove seekbar
-                seekBar.setVisibility(View.GONE);
-
+                
                 //update list
                 updateRecyclerView();
 

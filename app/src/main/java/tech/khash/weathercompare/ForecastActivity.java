@@ -10,7 +10,6 @@ import android.location.Location;
 import android.os.Bundle;
 import android.text.InputType;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -69,6 +68,9 @@ import tech.khash.weathercompare.utilities.SaveLoadList;
 public class ForecastActivity extends AppCompatActivity {
 
     private static final String TAG = ForecastActivity.class.getSimpleName();
+
+    //for sending and receiving location from add location activity
+    private static final int ADD_LOCATION_REQUEST_CODE = 3;
 
     private Loc currentLoc;
 
@@ -159,13 +161,32 @@ public class ForecastActivity extends AppCompatActivity {
                 actionBar.setTitle(title);
             }
         }
-
         progressBar = findViewById(R.id.progress_bar);
 
         getForecasts(currentLoc);
-
-
     }//onCreate
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == ADD_LOCATION_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            //get the name of the loc
+            String nameLoc = data.getStringExtra(Constant.INTENT_EXTRA_LOC_NAME);
+            if (TextUtils.isEmpty(nameLoc)) {
+                return;
+            }
+            //get the corresponding Loc object
+            Loc loc = SaveLoadList.getLocFromDb(this, nameLoc);
+            if (loc == null) {
+                return;
+            }
+            locArrayList = SaveLoadList.loadLocList(this);
+            currentLoc = loc;
+            actionBar.setTitle(loc.getName());
+            getForecasts(currentLoc);
+        }
+
+    }//onActivityResult
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -193,7 +214,7 @@ public class ForecastActivity extends AppCompatActivity {
                 return true;
             case R.id.action_add_locations:
                 Intent intent = new Intent(ForecastActivity.this, AddLocationActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent, ADD_LOCATION_REQUEST_CODE);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
