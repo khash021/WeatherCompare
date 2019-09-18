@@ -1,6 +1,7 @@
 package tech.khash.weathercompare.adapter;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -79,21 +81,42 @@ public class WeatherListAdapterToday extends RecyclerView.Adapter<WeatherListAda
 
             //set the views
             holder.textProvider.setText(weather.getProviderString());
-            holder.textTempMin.setText(weather.getTempMin());
-            holder.textTempMax.setText(weather.getTempMax());
-            holder.textFeelMin.setText(weather.getTempFeelMin());
-            holder.textFeelMax.setText(weather.getTempFeelMax());
             holder.textHumidity.setText(weather.getHumidity());
             holder.textPop.setText(weather.getPop());
             holder.textPopType.setText(weather.getPopTypeString());
-            holder.textPopTotal.setText(weather.getPopTotal());
             holder.textCloud.setText(weather.getCloudCoverage());
-            holder.textWind.setText(weather.getWindDirection() + " " + weather.getWindSpeed());
-            holder.textWindGust.setText(weather.getWindGust());
-            holder.textVisibility.setText(weather.getVisibility());
             holder.textPressure.setText(weather.getPressure());
-            holder.textTotalRain.setText(weather.getTotalRain());
-            holder.textTotalSnow.setText(weather.getTotalSnow());
+
+
+            //set the views based on selected units
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+            boolean metric = sharedPreferences.getBoolean(context.getResources().getString(R.string.pref_key_metric), true);
+            if (metric) {
+                //metric
+                holder.textTempMin.setText(weather.getTempMin());
+                holder.textTempMax.setText(weather.getTempMax());
+                holder.textFeelMin.setText(weather.getTempFeelMin());
+                holder.textFeelMax.setText(weather.getTempFeelMax());
+                holder.textPopTotal.setText(weather.getPopTotal());
+                holder.textWind.setText(weather.getWindDirection() + " " + weather.getWindSpeed());
+                holder.textWindGust.setText(weather.getWindGust());
+                holder.textVisibility.setText(weather.getVisibility());
+                holder.textTotalRain.setText(weather.getTotalRain());
+                holder.textTotalSnow.setText(weather.getTotalSnow());
+            } else {
+                //imperial
+                holder.textTempMin.setText(weather.getTempMinImperial());
+                holder.textTempMax.setText(weather.getTempMaxImperial());
+                holder.textFeelMin.setText(weather.getTempFeelMinImperial());
+                holder.textFeelMax.setText(weather.getTempFeelMaxImperial());
+                holder.textPopTotal.setText(weather.getPopTotalImperial());
+                holder.textWind.setText(weather.getWindDirection() + " " + weather.getWindSpeedImperial());
+                holder.textWindGust.setText(weather.getWindGustImperial());
+                holder.textVisibility.setText(weather.getVisibilityImperial());
+                holder.textTotalRain.setText(weather.getTotalRainImperial());
+                holder.textTotalSnow.setText(weather.getTotalSnowImperial());
+
+            }
 
 
             //imageview

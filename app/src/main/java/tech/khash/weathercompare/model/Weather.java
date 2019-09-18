@@ -2,6 +2,8 @@ package tech.khash.weathercompare.model;
 
 import android.text.TextUtils;
 
+import tech.khash.weathercompare.utilities.Conversions;
+
 /**
  * Class for weather object.
  * <p>
@@ -90,7 +92,7 @@ public class Weather {
         this.tempMin = tempMin;
     }//setTempMin
 
-    public void setTempFeelMin (String tempFeelMin) {
+    public void setTempFeelMin(String tempFeelMin) {
         this.tempFeelMin = tempFeelMin;
     }//setTempFeelMin
 
@@ -98,7 +100,7 @@ public class Weather {
         this.tempMax = tempMax;
     }//setTempMax
 
-    public void setTempFeelMax (String tempFeelMax) {
+    public void setTempFeelMax(String tempFeelMax) {
         this.tempFeelMax = tempFeelMax;
     }//setTempFeelMax
 
@@ -182,11 +184,11 @@ public class Weather {
         this.isDay = isDay;
     }//setIsDay
 
-    public void setIcon (String icon) {
+    public void setIcon(String icon) {
         this.icon = icon;
     }//setIcon
 
-    public void setCityName (String cityName) {
+    public void setCityName(String cityName) {
         this.cityName = cityName;
     }
 
@@ -252,11 +254,26 @@ public class Weather {
         return tempMax;
     }//getTempMax
 
+    public String getTempMaxImperial() {
+        if (tempMax == null) {
+            return "";
+        }
+        return Conversions.celToFarString(tempMax);
+    }//getTempMax
+
+
     public String getTempMin() {
         if (tempMin == null) {
             return "";
         }
         return tempMin;
+    }//getTempMin
+
+    public String getTempMinImperial() {
+        if (tempMin == null) {
+            return "";
+        }
+        return Conversions.celToFarString(tempMin);
     }//getTempMin
 
     public String getTempFeelMin() {
@@ -266,6 +283,13 @@ public class Weather {
         return tempFeelMin;
     }//getTempFeelMin
 
+    public String getTempFeelMinImperial() {
+        if (tempFeelMin == null) {
+            return "";
+        }
+        return Conversions.celToFarString(tempFeelMin);
+    }//getTempFeelMin
+
     public String getTempFeelMax() {
         if (tempFeelMax == null) {
             return "";
@@ -273,11 +297,25 @@ public class Weather {
         return tempFeelMax;
     }//getTempFeelMax
 
+    public String getTempFeelMaxImperial() {
+        if (tempFeelMax == null) {
+            return "";
+        }
+        return Conversions.celToFarString(tempFeelMax);
+    }//getTempFeelMax
+
     public String getDewPoint() {
         if (dewPoint == null) {
             return "";
         }
         return dewPoint;
+    }//getDewPoint
+
+    public String getDewPointImperial() {
+        if (dewPoint == null) {
+            return "";
+        }
+        return Conversions.celToFarString(dewPoint);
     }//getDewPoint
 
     public String getPressure() {
@@ -301,6 +339,13 @@ public class Weather {
         return windSpeed;
     }//getWindSpeed
 
+    public String getWindSpeedImperial() {
+        if (windSpeed == null) {
+            return "";
+        }
+        return Conversions.kmhToMphString(windSpeed);
+    }//getWindSpeed
+
     public String getWindDirection() {
         if (windDirection == null) {
             return "";
@@ -315,11 +360,25 @@ public class Weather {
         return windGust;
     }//getWindGust
 
+    public String getWindGustImperial() {
+        if (windGust == null) {
+            return "";
+        }
+        return Conversions.kmhToMphString(windGust);
+    }//getWindGust
+
     public String getVisibility() {
         if (visibility == null) {
             return "";
         }
         return visibility;
+    }//getVisibility
+
+    public String getVisibilityImperial() {
+        if (visibility == null) {
+            return "";
+        }
+        return Conversions.kmToMileString(visibility);
     }//getVisibility
 
     public String getCloudCoverage() {
@@ -339,33 +398,51 @@ public class Weather {
     public String getPopTotal() {
         if (popTotal == null) {
             return "";
-        } else {
-            return popTotal;
         }
+        return popTotal;
+    }//getPopTotal
+
+    public String getPopTotalImperial() {
+        if (popTotal == null) {
+            return "";
+        }
+        return Conversions.mmToInchString(popTotal);
     }//getPopTotal
 
     public String getTotalRain() {
         if (totalRain == null) {
             return "";
-        } else {
-            return totalRain;
         }
+        return totalRain;
+    }//getTotalRain
+
+    public String getTotalRainImperial() {
+        if (totalRain == null) {
+            return "";
+        }
+        return Conversions.mmToInchString(totalRain);
     }//getTotalRain
 
     public String getTotalSnow() {
         if (totalSnow == null) {
             return "";
-        } else {
-            return totalSnow;
         }
+        return totalSnow;
+    }//getTotalSnow
+
+    public String getTotalSnowImperial() {
+        if (totalSnow == null) {
+            return "";
+        }
+        return Conversions.cmToInchString(totalSnow);
+
     }//getTotalSnow
 
     public int getPopType() {
         if (popType != null) {
             return popType;
-        } else {
-            return POP_TYPE_NO_INPUT;
         }
+        return POP_TYPE_NO_INPUT;
     }//getPopType
 
     public String getPopTypeString() {
@@ -380,8 +457,8 @@ public class Weather {
             case POP_TYPE_RAIN_SNOW:
                 return "Rain/Snow";
             case POP_TYPE_NO_INPUT:
-                default:
-                    return "";
+            default:
+                return "";
         }//switch
     }//getPopTypeString
 

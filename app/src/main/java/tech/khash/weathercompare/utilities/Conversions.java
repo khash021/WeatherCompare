@@ -68,33 +68,52 @@ public class Conversions {
      */
 
     public static String celToFarString (String cel) {
-        String far;
+        if (TextUtils.isEmpty(cel)) {
+            return "";
+        }
         float celF = Float.valueOf(cel);
         float farF = (celF * (9f/5f)) + 32f;
-        far = String.format("%.0f", farF);
+        String far = String.format("%.0f", farF);
         return far;
     }//celToFarString
 
-    public static String mmToInchString (double mm) {
-        float mmF = (float) mm;
+    public static String mmToInchString (String mm) {
+        if (TextUtils.isEmpty(mm)) {
+            return "";
+        }
+        float mmF = Float.valueOf(mm);
         float inF = mmF * 0.0393701f;
         String inS =  String.format("%.1f", inF);
         return inS;
     }//mmToInch
 
+    public static String cmToInchString (String cm) {
+        if (TextUtils.isEmpty(cm)) {
+            return "";
+        }
+        float cmF = Float.valueOf(cm);
+        float inF = cmF * 0.393701f;
+        String inS =  String.format("%.1f", inF);
+        return inS;
+    }//mmToInch
+
     public static String kmToMileString (String km) {
-        String mile;
+        if (TextUtils.isEmpty(km)) {
+            return "";
+        }
         float kmF = Float.valueOf(km);
         float mileF = kmF / 1.609f;
-        mile = String.format("%.0f", mileF);
+        String mile = String.format("%.0f", mileF);
         return mile;
     }//kmToMileString
 
     public static String kmhToMphString (String kmh) {
-        String mph;
+        if (TextUtils.isEmpty(kmh)) {
+            return "";
+        }
         float kmhF = Float.valueOf(kmh);
         float mphF = kmhF / 1.609f;
-        mph = String.format("%.0f", mphF);
+        String mph = String.format("%.0f", mphF);
         return mph;
     }//kmhToMphString
 
