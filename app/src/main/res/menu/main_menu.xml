@@ -10,6 +10,13 @@
         app:showAsAction="ifRoom" />
 
     <item
+        android:id="@+id/action_loader"
+        android:icon="@drawable/ic_log_white"
+        android:orderInCategory="2"
+        android:title="Loader"
+        app:showAsAction="ifRoom"/>
+
+    <item
         android:id="@+id/action_sort_name_ascending"
         android:title="@string/sort_by_name_asc"
         app:showAsAction="never"

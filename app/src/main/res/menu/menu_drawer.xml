@@ -6,10 +6,6 @@
         android:icon="@drawable/ic_add_location_black"
         android:title="@string/add_location"/>
 
-    <item
-        android:id="@+id/nav_view_location"
-        android:icon="@drawable/ic_list_black"
-        android:title="Saved Locations"/>
 
 
     <item

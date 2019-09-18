@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
@@ -65,14 +66,10 @@ public class TodayActivity extends AppCompatActivity {
     private ArrayList<Loc> locArrayList;
 
     private Boolean isDay;
-    private boolean isDeviceLocation;
     private boolean deviceLocation = false;
     private int tracker;
 
-    private static final int ALERT_CODE_NO_RESULT = 1;
-    private static final int ALERT_CODE_MULTIPLE_RESULTS = 2;
-    private static final int ALERT_CODE_NO_GEOCODER = 3;
-    private static final int ALERT_CODE_UNABLE_FIND_DEVICE = 4;
+    private LinearLayout noConnectionLayout;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -82,14 +79,22 @@ public class TodayActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progress_bar);
         recyclerView = findViewById(R.id.recycler_view);
 
+        noConnectionLayout = findViewById(R.id.no_internet_view);
+
         tracker = 0;
 
         locArrayList = SaveLoadList.loadLocList(this);
 
+        //check internet connection
+        if (!HelperFunctions.isNetworkAvailable(this)) {
+            noConnectionLayout.setVisibility(View.VISIBLE);
+            return;
+        }
+
+
         //get the loc id from intent extra
         if (getIntent().hasExtra(Constant.INTENT_EXTRA_LOC_NAME)) {
             //set device location to false
-            isDeviceLocation = false;
             String id = getIntent().getStringExtra(Constant.INTENT_EXTRA_LOC_NAME);
             if (!TextUtils.isEmpty(id)) {
                 //get the corresponding loc
@@ -106,7 +111,7 @@ public class TodayActivity extends AppCompatActivity {
         } else if (getIntent().hasExtra(Constant.INTENT_EXTRA_DEVICE_LOCATION)) {
             if (getIntent().getBooleanExtra(Constant.INTENT_EXTRA_DEVICE_LOCATION, false)) {
                 //set device location to true
-                isDeviceLocation = true;
+                deviceLocation = true;
                 findMe();
             }
         }
@@ -141,11 +146,12 @@ public class TodayActivity extends AppCompatActivity {
                 //create intent
                 Intent forecastIntent = new Intent(TodayActivity.this, ForecastActivity.class);
                 //figure out if it is device location, or Loc
-                if (isDeviceLocation) {
+                if (deviceLocation) {
                     //convert our Loc object to Gson to pass it in extra
                     Gson gson = new Gson();
                     String json = gson.toJson(currentLoc);
                     forecastIntent.putExtra(Constant.INTENT_EXTRA_DEVICE_LOCATION, json);
+                    forecastIntent.putExtra(Constant.INTENT_EXTRA_DEVICE_LOCATION_NAME, getTitle());
                     startActivity(forecastIntent);
                 } else {
                     forecastIntent.putExtra(Constant.INTENT_EXTRA_LOC_NAME, currentLoc.getName());
@@ -157,8 +163,6 @@ public class TodayActivity extends AppCompatActivity {
                 Intent intent = new Intent(TodayActivity.this, AddLocationActivity.class);
                 startActivity(intent);
                 return true;
-            case R.id.action_refresh:
-                refresh();
             default:
                 return super.onOptionsItemSelected(item);
         }//switch
@@ -205,7 +209,7 @@ public class TodayActivity extends AppCompatActivity {
         //check for geocoder availability
         if (!Geocoder.isPresent()) {
             Log.d(TAG, "Geocoder not available - searchAddress");
-            showAddLocationDialog(ALERT_CODE_NO_GEOCODER);
+            showAddLocationDialog(Constant.ALERT_CODE_NO_GEOCODER);
             return;
         }
         //Now we know it is available, Create geocoder to retrieve the location
@@ -220,20 +224,20 @@ public class TodayActivity extends AppCompatActivity {
             List<Address> addresses = geocoder.getFromLocationName(query, 3);
             //check to make sure we got results
             if (addresses.size() < 1) {
-                showAddLocationDialog(ALERT_CODE_NO_RESULT);
+                showAddLocationDialog(Constant.ALERT_CODE_NO_RESULT);
                 Log.d(TAG, "No results - searchAddress");
                 return;
             }//if
 
-            //go through all the results and put them on map
+            //go through all the results
             int counter = 0;
             for (Address result : addresses) {
                 LatLng latLng = new LatLng(result.getLatitude(), result.getLongitude());
                 counter++;
             }//for
 
-            //don't need to set bounds if there is only one result. Just move the camera
-            if (counter <= 1) {
+
+            if (counter == 1) {
                 Address address = addresses.get(0);
                 LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
 
@@ -241,7 +245,7 @@ public class TodayActivity extends AppCompatActivity {
                 setUserLocation(latLng);
             } else {
                 //more than one result
-                showAddLocationDialog(ALERT_CODE_MULTIPLE_RESULTS);
+                showAddLocationDialog(Constant.ALERT_CODE_MULTIPLE_RESULTS);
             }
 
         } catch (IOException e) {
@@ -251,6 +255,12 @@ public class TodayActivity extends AppCompatActivity {
     }//openSearch
 
     private void findMe() {
+        //check internet connection
+        if (!HelperFunctions.isNetworkAvailable(this)) {
+            noConnectionLayout.setVisibility(View.VISIBLE);
+            return;
+        }
+
         //check for permission first and ask it if needed
         if (HelperFunctions.checkLocationPermission(this)) {
             //we have permission, get the user's location
@@ -277,7 +287,7 @@ public class TodayActivity extends AppCompatActivity {
                             LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
                             setUserLocation(latLng);
                         } else {
-                            showAddLocationDialog(ALERT_CODE_UNABLE_FIND_DEVICE);
+                            showAddLocationDialog(Constant.ALERT_CODE_UNABLE_FIND_DEVICE);
                             Log.e(TAG, "Exception: %s", task.getException());
                         }
                     }
@@ -286,7 +296,7 @@ public class TodayActivity extends AppCompatActivity {
                             @Override
                             public void onFailure(@NonNull Exception e) {
                                 Log.e(TAG, "Failed to get the last know location", e);
-                                showAddLocationDialog(ALERT_CODE_UNABLE_FIND_DEVICE);
+                                showAddLocationDialog(Constant.ALERT_CODE_UNABLE_FIND_DEVICE);
                             }
                         });
             } else {
@@ -344,7 +354,6 @@ public class TodayActivity extends AppCompatActivity {
                 } else {
                     //set key and name
                     String key = output.get(Constant.AW_KEY);
-                    String name = output.get(Constant.AW_NAME);
 
                     //set the key
                     loc.setKeyAW(key);
@@ -355,13 +364,6 @@ public class TodayActivity extends AppCompatActivity {
                     //set current loc
                     currentLoc = loc;
 
-                    //set the title
-                    //TODO: in case this fails, we will set it in WB (maybe remove this)
-                    if (!TextUtils.isEmpty(name)) {
-                        setTitle(name);
-                    } else {
-                        setTitle("Device Location");
-                    }
                 }
 
                 //check to see if we need to calculate isDay first, otherwise get all weather
@@ -382,10 +384,6 @@ public class TodayActivity extends AppCompatActivity {
         showLocListDialog(this, locArrayList);
     }//showSavedLocations
 
-    private void refresh() {
-
-    }//refresh
-
     /*------------------------------------------------------------------------------------------
                     ---------------    HELPER METHODS    ---------------
     ------------------------------------------------------------------------------------------*/
@@ -396,6 +394,12 @@ public class TodayActivity extends AppCompatActivity {
             Log.d(TAG, "calculateIsDay - currentLoc is null");
             return;
         }//null loc
+
+        //check internet connection
+        if (!HelperFunctions.isNetworkAvailable(this)) {
+            noConnectionLayout.setVisibility(View.VISIBLE);
+            return;
+        }
 
         if (isDay != null) {
             getAllWeather();
@@ -433,6 +437,12 @@ public class TodayActivity extends AppCompatActivity {
             }
             return;
         }//null loc
+
+        //check internet connection
+        if (!HelperFunctions.isNetworkAvailable(this)) {
+            noConnectionLayout.setVisibility(View.VISIBLE);
+            return;
+        }
 
         //show progress bar if it is not visible
         if (progressBar.getVisibility() != View.VISIBLE) {
@@ -644,6 +654,16 @@ public class TodayActivity extends AppCompatActivity {
             return;
         }
 
+        //set the name
+        for (Weather w : weatherArrayList) {
+            String name = w.getCityName();
+            if (!TextUtils.isEmpty(name)) {
+                setTitle(name);
+                break;
+            }
+        }
+
+
         if (isDay == null) {
             Log.d(TAG, "updateAdapter - isDay is null");
             adapter = new WeatherListAdapterToday(this, weatherArrayList, true);
@@ -672,7 +692,7 @@ public class TodayActivity extends AppCompatActivity {
         //check for empty list
         if (locArrayList == null || locArrayList.size() < 1) {
             Log.d(TAG, "showLocListDialog - locArrayList is null/empty ");
-            HelperFunctions.showToast(activity.getBaseContext(), "No saved locations");
+            HelperFunctions.showToast(activity.getBaseContext(), getResources().getString(R.string.no_saved_location));
             return;
         }//if
 
@@ -721,21 +741,21 @@ public class TodayActivity extends AppCompatActivity {
 
         //set the title based on alert code
         switch (alertCode) {
-            case ALERT_CODE_NO_RESULT:
-                builderQuestion.setMessage("No results found." +
-                        "\nWould you like to add location manually?").setTitle("No results");
+            case Constant.ALERT_CODE_NO_RESULT:
+                builderQuestion.setMessage(getResources().getString(R.string.no_searhc_results))
+                        .setTitle(getResources().getString(R.string.no_results));
                 break;
-            case ALERT_CODE_MULTIPLE_RESULTS:
-                builderQuestion.setMessage("Multiple results were found." +
-                        "\nWould you like to add location manually?").setTitle("Multiple results");
+            case Constant.ALERT_CODE_MULTIPLE_RESULTS:
+                builderQuestion.setMessage(getResources().getString(R.string.multiple_search_results))
+                        .setTitle(getResources().getString(R.string.multiple_results));
                 break;
-            case ALERT_CODE_NO_GEOCODER:
-                builderQuestion.setMessage("Unable to finish search." +
-                        "\nWould you like to add location manually?").setTitle("Error");
+            case Constant.ALERT_CODE_NO_GEOCODER:
+                builderQuestion.setMessage(getResources().getString(R.string.unable_finish_search))
+                        .setTitle(getResources().getString(R.string.error));
                 break;
-            case ALERT_CODE_UNABLE_FIND_DEVICE:
-                builderQuestion.setMessage("Unable to locate device." +
-                        "\nWould you like to add location manually?").setTitle("Error");
+            case Constant.ALERT_CODE_UNABLE_FIND_DEVICE:
+                builderQuestion.setMessage(getResources().getString(R.string.unable_to_locate_device))
+                        .setTitle(getResources().getString(R.string.error));
                 break;
             default:
                 return;
@@ -743,7 +763,7 @@ public class TodayActivity extends AppCompatActivity {
         }//switch
 
         // Add the buttons. We can call helper methods from inside the onClick if we need to
-        builderQuestion.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+        builderQuestion.setPositiveButton(getResources().getString(R.string.yes), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int id) {
                 Intent intent = new Intent(TodayActivity.this, AddLocationActivity.class);
@@ -751,7 +771,7 @@ public class TodayActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        builderQuestion.setNegativeButton("No", new DialogInterface.OnClickListener() {
+        builderQuestion.setNegativeButton(getResources().getString(R.string.no), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 //what happens on this click goes here.

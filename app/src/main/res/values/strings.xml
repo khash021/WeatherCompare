@@ -16,8 +16,8 @@
 
 
     <!--Ads-->
-    <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
-    <string name="interstitial_ad_unit_id">ca-app-pub-3940256099942544/1033173712</string>
+    <string name="banner_ad_unit_id" translatable="false">ca-app-pub-5875569058891842/3714951369</string>
+    <string name="ad_app_id" translatable="false">ca-app-pub-5875569058891842~4993192255</string>
 
     <!--UI/Names-->
     <string name="open_weather">OpenWeather</string>
@@ -59,7 +59,6 @@
     <string name="permission_required_title_dialog">Permission required</string>
     <string name="permission_required_yes_dialog">Give permission</string>
     <string name="toast_no_location_permission">Location permission denied</string>
-    <string name="no">No</string>
     <string name="name_required_toast">Name required</string>
     <string name="error_getting_location_toast">Error getting location</string>
     <string name="location_added_successfully_toast">added successfully</string>
@@ -82,7 +81,6 @@
     <string name="cancel">Cancel</string>
 
 
-
     <!--preferences-->
     <string name="pref_key_metric">pref_key_metric</string>
 
@@ -90,6 +88,17 @@
     <string name="units">Units</string>
     <string name="rated_app_pref_key">rated-app-pref-key</string>
     <string name="app_open_count_pref_key">app-open-count-pref-key</string>
+
+    <!--Dialogs-->
+    <string name="no_results">No results</string>
+    <string name="multiple_results">Multiple results</string>
+    <string name="error">Error</string>
+    <string name="no">No</string>
+    <string name="yes">Yes</string>
+    <string name="unable_to_locate_device">Unable to locate device. Would you like to add location manually?</string>
+    <string name="unable_finish_search">Unable to finish search. Would you like to add location manually?</string>
+    <string name="multiple_search_results">Multiple results were found. Would you like to add location manually?</string>
+    <string name="no_searhc_results">No results found. Would you like to add location manually?</string>
 
 
 </resources>
