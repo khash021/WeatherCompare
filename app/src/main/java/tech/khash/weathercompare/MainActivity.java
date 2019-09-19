@@ -269,16 +269,18 @@ public class MainActivity extends AppCompatActivity implements
                         .startChooser();
                 return true;
             case R.id.nav_about:
-                //TODO:
+                Intent aboutIntent = new Intent(MainActivity.this, AboutActivity.class);
+                startActivity(aboutIntent);
                 return true;
             case R.id.nav_privacy_policy:
-                try {
-                    //TODO: url
-                    Uri addressUri = Uri.parse("");
-                    Intent privacyIntent = new Intent(Intent.ACTION_VIEW, addressUri);
-                    startActivity(privacyIntent);
-                } catch (Exception e) {
-                }
+//                try {
+//                    Uri addressUri = Uri.parse("https://firebasestorage.googleapis.com/v0/b/irecycle-1522273491755.appspot.com/o/WeatherComparePrivacy%20Policy.pdf?alt=media&token=2957611c-ecdd-4bf8-8edc-b755c4c694eb");
+//                    Intent privacyIntent = new Intent(Intent.ACTION_VIEW, addressUri);
+//                    startActivity(privacyIntent);
+//                } catch (Exception e) {
+//                }
+                Intent privacyIntent = new Intent(MainActivity.this, PrivacyPolicyActivity.class);
+                startActivity(privacyIntent);
                 return true;
             default:
                 return false;

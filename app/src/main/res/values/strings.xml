@@ -121,7 +121,7 @@
     <string name="millimeter">Millimeter</string>
     <string name="centimeter_snow">Centimeter (snow)</string>
     <string name="km">Km</string>
-    <string name="kph">kph</string>
+    <string name="kmh">kmh</string>
     <string name="imperial_caps">IMPERIAL</string>
     <string name="fahrenheit">Fahrenheit</string>
     <string name="inch">Inch</string>
@@ -129,6 +129,40 @@
     <string name="mile">Mile</string>
     <string name="mph">mph</string>
 
+    <!--About-->
+    <string name="about_text">
+        This app features side-by-side weather forecast from up to 4 different providers to easily
+        compare weather data across multiple providers.
+        \n\nIt has the feature to show user\’s location (requires location permission).
+        \nAdditionally, users can easily search address, or use the map to pinpoint a specific
+        location on a map.
+        \nUser can save unlimited number of saved locations for ease of use.
+        \n\nUnits can be set from the settings and it supports Metric (Celsius, km, mm, and kmh)
+        and Imperial (Fahrenheit, mile, inch, and mph).
+        \n\nWeather providers are: AccuWeather, DarkSky, WeatherBit, and WeatherUnlocked.
+
+    </string>
+
+    <!--Privacy Policy-->
+    <string name="privacy_policy_text">WeatherCompare is a free Android app (it may show small
+        banner ads).
+        \n\nThis SERVICE is provided by WeatherCompare, and is intended for use as is.
+        \n\nThis page is used to inform app users regarding our policies with the collection, use, and
+        disclosure of Personal Information if anyone decided to use our Service.
+        \n\nIf you choose to use our Service, and if you give permission to WeatherCompare to use your
+        location, then you agree to the collection and use of information in relation with this
+        policy.
+        \n\nThe Personal location Information that we collect are used for providing and
+        improving the Service. We do not save any user information off the mobile device, and we
+        will not use or share your information with anyone except as described in this Privacy Policy.
+        \n\nInformation Collection and Use
+        \n\nFor a better experience while using our Service, we may require you to provide us with
+        certain personally identifiable information, including but not limited to user’s location.
+        \nThe information that we request is retained on your device and is not collected by us in any way.
+        \n\n\nContact Us
+        \nIf you have any questions or suggestions about our Privacy Policy, do not hesitate to
+        contact us at \nWeatherCompare@khash.tech
+    </string>
 
 
 </resources>

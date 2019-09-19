@@ -10,9 +10,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <meta-data
-            android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="@string/ad_app_id" />
 
         <activity
             android:name=".MainActivity"
@@ -47,31 +44,51 @@
         </activity>
         <activity
             android:name=".TodayActivity"
-            android:screenOrientation="portrait"
-            android:label="@string/title_activity_today">
+            android:label="@string/title_activity_today"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="tech.khash.weathercompare.MainActivity" />
         </activity>
         <activity
             android:name=".SettingsActivity"
-            android:screenOrientation="portrait"
-            android:label="@string/settings">
+            android:label="@string/settings"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="tech.khash.weathercompare.MainActivity" />
         </activity>
+
+        <activity android:name=".AboutActivity"
+            android:screenOrientation="portrait"
+            android:label="@string/about">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="tech.khash.weathercompare.MainActivity" />
+        </activity>
+
+        <activity android:name=".PrivacyPolicyActivity"
+            android:screenOrientation="portrait"
+            android:label="@string/privacy_policy">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="tech.khash.weathercompare.MainActivity" />
+        </activity>
+
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="@string/ad_app_id" />
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
-
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
     </application>
-    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
 
 </manifest>

@@ -16,6 +16,8 @@
     <color name="background3">#90caf9</color>
     <color name="color_light">#bcf0ff</color>
 
+    <color name="blue_argb">#ff0000ff</color>
+
     <!--could work-->
     <color name="colorAccentOctonary">#a003f4</color>
     <!--maybe-->
