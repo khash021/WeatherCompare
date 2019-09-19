@@ -576,6 +576,9 @@ public class MainActivity extends AppCompatActivity implements
     }//rateOnGooglePlay
 
     private void checkLocs() {
+        if (locArrayList == null || locArrayList.size() < 1) {
+            return;
+        }
         for (Loc loc : locArrayList) {
             if (loc.hasKeyAW()) {
                 continue;

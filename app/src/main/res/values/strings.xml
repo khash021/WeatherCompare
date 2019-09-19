@@ -88,10 +88,12 @@
 
     <!--Dialogs - Toasts-->
     <string name="no_saved_location">No Saved Locations</string>
-    <string name="add_location_empty_view_text">Add locations using the button or from menu</string>
+    <string name="add_location_empty_view_text">Add locations using the button or from menu.\nOr use
+        device location from app bar</string>
     <string name="no_geofence_show_toast">No saved locations</string>
     <string name="delete_all_dialog_msg">Are you sure you want to delete all saved locations?</string>
     <string name="cancel">Cancel</string>
+    <string name="location_permission_denied">Location permission denied</string>
 
     <string name="no_results">No results</string>
     <string name="multiple_results">Multiple results</string>
@@ -109,6 +111,7 @@
     <string name="rate_us_body">Do you enjoy using Weather Compare? Rate us on Google Play</string>
     <string name="not_now">Not now</string>
     <string name="no_internet_connection">No internet connection</string>
+    <string name="no_location_permission">Location permission required.\nPlease give permission and try again.</string>
 
     <!--preferences-->
     <string name="pref_key_metric">pref_key_metric</string>
@@ -163,6 +166,7 @@
         \nIf you have any questions or suggestions about our Privacy Policy, do not hesitate to
         contact us at \nWeatherCompare@khash.tech
     </string>
+
 
 
 </resources>
