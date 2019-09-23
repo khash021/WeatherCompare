@@ -6,6 +6,13 @@
         android:icon="@drawable/ic_add_location_black"
         android:title="@string/add_location"/>
 
+    <item
+        android:id="@+id/nav_today"
+        android:title="@string/today_s_weather"/>
+
+    <item
+        android:id="@+id/nav_forecast"
+        android:title="@string/_3_day_forecast"/>
 
 
     <item

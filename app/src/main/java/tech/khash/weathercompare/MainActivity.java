@@ -241,6 +241,15 @@ public class MainActivity extends AppCompatActivity implements
             case R.id.nav_add_location:
                 openAddLocation();
                 return true;
+            case R.id.nav_today:
+                Intent todayIntent = new Intent(MainActivity.this, TodayActivity.class);
+                startActivity(todayIntent);
+                return true;
+            case R.id.nav_forecast:
+                //TODO:
+                Intent forecastIntent = new Intent(MainActivity.this, ForecastActivity.class);
+                startActivity(forecastIntent);
+                return true;
             case R.id.nav_settings:
                 Intent settingsIntent = new Intent(MainActivity.this, SettingsActivity.class);
                 startActivity(settingsIntent);

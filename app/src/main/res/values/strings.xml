@@ -1,6 +1,6 @@
 <resources>
 
-    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyAHyUo4VnllUXatwyKVvfEjMjhwsEDf5zE</string>
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyCUc_5xg2zCErjNEVpW6KKdVXKY2hS1JME</string>
 
     <!--Ads-->
     <string name="banner_ad_unit_id" translatable="false">ca-app-pub-5875569058891842/3714951369</string>
@@ -67,6 +67,8 @@
     <string name="refresh">Refresh</string>
     <string name="sort_by_name_des">Sort (Descending)</string>
     <string name="sort_by_name_asc">Sort (Ascending)</string>
+    <string name="today_s_weather">Today\'s Weather</string>
+    <string name="_3_day_forecast">3-day Forecast</string>
 
     <!--Permission-->
     <string name="permission_required_text_dialog">This feature requires user\'s location to work properly. This app does not store user\'s location.\nWould you like to turn it on now?</string>
@@ -112,6 +114,7 @@
     <string name="not_now">Not now</string>
     <string name="no_internet_connection">No internet connection</string>
     <string name="no_location_permission">Location permission required.\nPlease give permission and try again.</string>
+    <string name="no_location_has_been_chosen">No Location has been chosen.\nPlease use device location,\nor choose a location using search from app bar.</string>
 
     <!--preferences-->
     <string name="pref_key_metric">pref_key_metric</string>

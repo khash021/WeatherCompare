@@ -80,6 +80,7 @@ public class TodayActivity extends AppCompatActivity {
 
     private LinearLayout noConnectionLayout;
     private LinearLayout noLocationLayout;
+    private LinearLayout noLocDefaultLayout;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -91,6 +92,7 @@ public class TodayActivity extends AppCompatActivity {
 
         noConnectionLayout = findViewById(R.id.no_internet_view);
         noLocationLayout = findViewById(R.id.no_location_view);
+        noLocDefaultLayout = findViewById(R.id.no_loc_default_view);
 
         tracker = 0;
 
@@ -125,6 +127,9 @@ public class TodayActivity extends AppCompatActivity {
                 deviceLocation = true;
                 findMe();
             }
+        } else {
+            //setup no Loc mode
+            noLocDefaultLayout.setVisibility(View.VISIBLE);
         }
     }//onCreate
 
@@ -183,10 +188,12 @@ public class TodayActivity extends AppCompatActivity {
                     forecastIntent.putExtra(Constant.INTENT_EXTRA_DEVICE_LOCATION, json);
                     forecastIntent.putExtra(Constant.INTENT_EXTRA_DEVICE_LOCATION_NAME, getTitle());
                     startActivity(forecastIntent);
-                } else {
+                } else if (currentLoc != null){
                     forecastIntent.putExtra(Constant.INTENT_EXTRA_LOC_NAME, currentLoc.getName());
                     startActivity(forecastIntent);
-                }
+                } else {
+                    startActivity(forecastIntent);
+            }
                 return true;
             case R.id.action_add_locations:
                 Intent intent = new Intent(TodayActivity.this, AddLocationActivity.class);
@@ -317,9 +324,13 @@ public class TodayActivity extends AppCompatActivity {
     }//onRequestPermissionsResult
 
     private void getDeviceLocation() {
-        //remove the warning
+        //remove the warning views if present
         if (noLocationLayout.getVisibility() != View.GONE) {
             noLocationLayout.setVisibility(View.GONE);
+        }
+
+        if (noLocDefaultLayout.getVisibility() != View.GONE) {
+            noLocDefaultLayout.setVisibility(View.GONE);
         }
         // Construct a FusedLocationProviderClient.
         FusedLocationProviderClient fusedLocationProviderClient =
@@ -359,6 +370,15 @@ public class TodayActivity extends AppCompatActivity {
     private void setUserLocation(LatLng latLng) {
         if (latLng == null) {
             return;
+        }
+
+        //remove the warning views if present
+        if (noLocationLayout.getVisibility() != View.GONE) {
+            noLocationLayout.setVisibility(View.GONE);
+        }
+
+        if (noLocDefaultLayout.getVisibility() != View.GONE) {
+            noLocDefaultLayout.setVisibility(View.GONE);
         }
 
         //set the boolean to true

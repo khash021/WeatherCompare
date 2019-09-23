@@ -83,6 +83,7 @@ public class ForecastActivity extends AppCompatActivity {
 
     private LinearLayout noConnectionLayout;
     private LinearLayout noLocationLayout;
+    private LinearLayout noLocDefaultLayout;
 
     private ArrayList<Weather> day1WeatherList;
     private ArrayList<Weather> day2WeatherList;
@@ -126,6 +127,7 @@ public class ForecastActivity extends AppCompatActivity {
 
         noConnectionLayout = findViewById(R.id.no_internet_view);
         noLocationLayout = findViewById(R.id.no_location_view);
+        noLocDefaultLayout = findViewById(R.id.no_loc_default_view);
 
         locArrayList = SaveLoadList.loadLocList(this);
 
@@ -169,6 +171,8 @@ public class ForecastActivity extends AppCompatActivity {
             if (!TextUtils.isEmpty(title)) {
                 actionBar.setTitle(title);
             }
+        } else {
+            noLocDefaultLayout.setVisibility(View.VISIBLE);
         }
         progressBar = findViewById(R.id.progress_bar);
 
@@ -282,9 +286,13 @@ public class ForecastActivity extends AppCompatActivity {
     }//onRequestPermissionsResult
 
     private void getDeviceLocation() {
-        //remove the warning
+        //remove the warning views if present
         if (noLocationLayout.getVisibility() != View.GONE) {
             noLocationLayout.setVisibility(View.GONE);
+        }
+
+        if (noLocDefaultLayout.getVisibility() != View.GONE) {
+            noLocDefaultLayout.setVisibility(View.GONE);
         }
         // Construct a FusedLocationProviderClient.
         FusedLocationProviderClient fusedLocationProviderClient =
@@ -323,6 +331,15 @@ public class ForecastActivity extends AppCompatActivity {
     private void setUserLocation(LatLng latLng) {
         if (latLng == null) {
             return;
+        }
+
+        //remove the warning views if present
+        if (noLocationLayout.getVisibility() != View.GONE) {
+            noLocationLayout.setVisibility(View.GONE);
+        }
+
+        if (noLocDefaultLayout.getVisibility() != View.GONE) {
+            noLocDefaultLayout.setVisibility(View.GONE);
         }
 
         //create a new Loc
